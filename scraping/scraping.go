@@ -6,15 +6,17 @@ import (
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/model"
+	"github.com/n1try/kithub2/util"
 	"golang.org/x/sync/semaphore"
 	"golang.org/x/text/language"
 	"net/url"
 	"regexp"
+	"strings"
 	"sync"
 )
 
 const (
-	baseUrl      = "https://campus.kit.edu/live-stud/campus/all"
+	baseUrl      = model.KitVvzBaseUrl
 	mainUrl      = baseUrl + "/field.asp"
 	facultiesUrl = baseUrl + "/fields.asp?group=Vorlesungsverzeichnis"
 	maxWorkers   = 6
@@ -26,60 +28,84 @@ var tguids = map[model.SemesterKey]string{
 }
 
 type ScrapeJob interface {
-	Process() (interface{}, error)
+	process() (interface{}, error)
 }
 
-type ListFaculties struct {
-	Tguid    string
-	Language language.Tag
+type FetchLecturesJob struct {
+	Semester model.SemesterKey
 }
 
-type ListCategories struct {
+type listLectureFacultiesJob struct {
+	Tguid string
+}
+
+type listLectureCategoriesJob struct {
 	Tguid string
 	Gguid string
 }
 
-type ListLectures struct {
+type listLecturesJob struct {
 	Tguid       string
 	Gguid       string
 	ParentGguid string
 }
 
-type KITCampusPortalScraper struct{}
+type lectureFaculty struct {
+	Gguid string
+	Name  string
+}
 
-func FetchLectures(semester model.SemesterKey, lang language.Tag) ([]*model.Lecture, error) {
+type lectureCategory struct {
+	Gguid string
+	Name  string
+}
+
+type LectureScraper struct{}
+
+func NewLectureScraper() *LectureScraper {
+	return &LectureScraper{}
+}
+
+func (l *LectureScraper) Schedule(job ScrapeJob, cronExp string) {
+}
+
+func (l *LectureScraper) Run(job ScrapeJob) (interface{}, error) {
+	return job.process()
+}
+
+func (l FetchLecturesJob) process() (interface{}, error) {
 	var lectures = make([]*model.Lecture, 0)
-	var categories = make([]*model.Category, 0)
-	var faculties = make([]*model.Faculty, 0)
+	var categories = make([]*lectureCategory, 0)
+	var faculties = make([]*lectureFaculty, 0)
 
 	makeError := func(err error) ([]*model.Lecture, error) {
 		return lectures, err
 	}
 
-	if _, ok := tguids[semester]; !ok {
+	if _, ok := tguids[l.Semester]; !ok {
 		return makeError(errors.New("unknown semester key"))
 	}
-	tguid := tguids[semester]
+	tguid := tguids[l.Semester]
 
-	job1 := ListFaculties{Tguid: tguid, Language: lang}
-	result1, err := job1.Process()
+	job1 := listLectureFacultiesJob{Tguid: tguid}
+	result1, err := job1.process()
 	if err != nil {
 		return makeError(err)
 	}
-	faculties = result1.([]*model.Faculty)
+	faculties = result1.([]*lectureFaculty)[6:7]
 
 	facultyByCategory := make(map[string]string)
 	for _, faculty := range faculties {
-		job2 := ListCategories{Tguid: tguid, Gguid: faculty.Id}
-		result2, err := job2.Process()
+		job2 := listLectureCategoriesJob{Tguid: tguid, Gguid: faculty.Gguid}
+		result2, err := job2.process()
 		if err != nil {
 			log.Errorf("failed to fetch categories – %v\n", err)
 			continue
 		}
-		categories = append(categories, result2.([]*model.Category)...)
+		categories = append(categories, result2.([]*lectureCategory)...)
 
-		for _, cat := range result2.([]*model.Category) {
-			facultyByCategory[cat.Id] = faculty.Id
+		for _, cat := range result2.([]*lectureCategory) {
+			facultyByCategory[cat.Gguid] = faculty.Gguid
 		}
 	}
 
@@ -93,32 +119,30 @@ func FetchLectures(semester model.SemesterKey, lang language.Tag) ([]*model.Lect
 			if item, ok := lectureMap[l.Id]; !ok {
 				lectureMap[l.Id] = l
 			} else {
-				var found bool
-				for _, fid := range item.FacultyIds {
-					if fid == l.FacultyIds[0] {
-						found = true
-						break
+				// Merge categories
+				newCategories := make([]string, 0)
+				for _, cat := range l.Categories {
+					if !util.ContainsString(cat, item.Categories) {
+						newCategories = append(newCategories, cat)
 					}
 				}
-				if !found {
-					item.FacultyIds = append(item.FacultyIds, l.FacultyIds[0])
-				}
+				item.Categories = append(item.Categories, newCategories...)
 			}
 		}
 	}
 
-	for _, cat := range categories {
+	for _, cat := range categories[:1] {
 		if err := sem.Acquire(ctx, 1); err != nil {
 			log.Errorf("failed to acquire semaphore while fetching lectures – %v\n", err)
 			continue
 		}
 
-		catId := cat.Id
+		catId := cat.Gguid
 
 		go func() {
 			defer sem.Release(1)
-			job := ListLectures{Tguid: tguid, Gguid: catId, ParentGguid: facultyByCategory[catId]}
-			result, err := job.Process()
+			job := listLecturesJob{Tguid: tguid, Gguid: catId, ParentGguid: facultyByCategory[catId]}
+			result, err := job.process()
 			if err != nil {
 				log.Errorf("failed to fetch lectures – %v\n", err)
 				return
@@ -145,17 +169,18 @@ func FetchLectures(semester model.SemesterKey, lang language.Tag) ([]*model.Lect
 	return lectures, nil
 }
 
-func (l ListFaculties) Process() (interface{}, error) {
-	faculties := make([]*model.Faculty, 0)
-	re := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
+func (l listLectureFacultiesJob) process() (interface{}, error) {
+	faculties := make([]*lectureFaculty, 0)
+
+	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 	u, _ := url.Parse(facultiesUrl)
 	q := u.Query()
 	q.Add("tguid", l.Tguid)
-	q.Add("lang", l.Language.String())
+	q.Add("lang", language.German.String()) // TODO: make configurable
 	u.RawQuery = q.Encode()
 
-	log.V(2).Infof("[ListFaculties] processing %s\n", u.String())
+	log.V(2).Infof("[listLectureFacultiesJob] processing %s\n", u.String())
 	doc, err := htmlquery.LoadURL(u.String())
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
@@ -169,22 +194,13 @@ func (l ListFaculties) Process() (interface{}, error) {
 	}
 
 	for _, a := range as {
-		var name string
-		var href string
-
-		name = htmlquery.InnerText(a)
-		for _, attr := range a.Attr {
-			if attr.Key == "href" {
-				href = attr.Val
-				break
-			}
-		}
-
-		matches := re.FindStringSubmatch(href)
+		name := htmlquery.InnerText(a)
+		href := util.GetHTMLAttrValue("href", a.Attr)
+		matches := reGguid.FindStringSubmatch(href)
 		if len(matches) == 2 {
-			faculties = append(faculties, &model.Faculty{
-				Name: name,
-				Id:   matches[1], // gguid
+			faculties = append(faculties, &lectureFaculty{
+				Name:  name,
+				Gguid: matches[1], // gguid
 			})
 		} else {
 			log.Errorf("failed to find gguid for %s\n", href)
@@ -194,9 +210,10 @@ func (l ListFaculties) Process() (interface{}, error) {
 	return faculties, nil
 }
 
-func (l ListCategories) Process() (interface{}, error) {
-	categories := make([]*model.Category, 0)
-	re := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
+func (l listLectureCategoriesJob) process() (interface{}, error) {
+	categories := make([]*lectureCategory, 0)
+
+	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 	u, _ := url.Parse(mainUrl)
 	q := url.Values{}
@@ -206,7 +223,7 @@ func (l ListCategories) Process() (interface{}, error) {
 	q.Add("pagesize", "250")
 	u.RawQuery = q.Encode()
 
-	log.V(2).Infof("[ListCategories] processing %s\n", u.String())
+	log.V(2).Infof("[listLectureCategoriesJob] processing %s\n", u.String())
 	doc, err := htmlquery.LoadURL(u.String())
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
@@ -220,22 +237,14 @@ func (l ListCategories) Process() (interface{}, error) {
 	}
 
 	for _, a := range as {
-		var name string
-		var href string
+		name := htmlquery.InnerText(a)
+		href := util.GetHTMLAttrValue("href", a.Attr)
 
-		name = htmlquery.InnerText(a)
-		for _, attr := range a.Attr {
-			if attr.Key == "href" {
-				href = attr.Val
-				break
-			}
-		}
-
-		matches := re.FindStringSubmatch(href)
+		matches := reGguid.FindStringSubmatch(href)
 		if len(matches) == 2 {
-			categories = append(categories, &model.Category{
-				Name: name,
-				Id:   matches[1], // gguid
+			categories = append(categories, &lectureCategory{
+				Name:  name,
+				Gguid: matches[1], // gguid
 			})
 		} else {
 			log.Errorf("failed to find gguid for %s\n", href)
@@ -245,8 +254,12 @@ func (l ListCategories) Process() (interface{}, error) {
 	return categories, nil
 }
 
-func (l ListLectures) Process() (interface{}, error) {
+func (l listLecturesJob) process() (interface{}, error) {
 	lectures := make([]*model.Lecture, 0)
+
+	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
+	reStripPagetitle := regexp.MustCompile(`.+: +(.+) +\(.+\)`)
+	reStripBreadcrumbTitle := regexp.MustCompile(`[\d\.]*\d? ?(.+)`)
 
 	u, _ := url.Parse(mainUrl)
 	q := url.Values{}
@@ -256,21 +269,66 @@ func (l ListLectures) Process() (interface{}, error) {
 	q.Add("pagesize", "250")
 	u.RawQuery = q.Encode()
 
-	log.V(2).Infof("[ListLectures] processing %s\n", u.String())
+	log.V(2).Infof("[listLecturesJob] processing %s\n", u.String())
 	doc, err := htmlquery.LoadURL(u.String())
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
 		return nil, err
 	}
 
+	categories := make([]string, 0)
+	titles := make([]string, 0)
+
+	// Extract child category from page title
+	h1, err := htmlquery.Query(doc, "//h1[@class='pagetitle']")
+	if err != nil {
+		log.Errorf("failed to query lectures document for title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		return nil, err
+	}
+	if title := htmlquery.InnerText(h1); title != "" {
+		matches := reStripPagetitle.FindStringSubmatch(strings.ReplaceAll(title, "\n", ""))
+		if len(matches) != 2 {
+			log.Errorf("failed to parse title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		} else {
+			titles = append(titles, strings.Trim(matches[1], " "))
+		}
+	}
+
+	// Extract parent categories from breadcrumbs
+	as, err := htmlquery.QueryAll(doc, "//li[@class='breadcrumb-item']/a")
+	if err != nil {
+		log.Errorf("failed to query lectures document for breadcrumbs for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		return nil, err
+	}
+
+	for i, a := range as {
+		if i == 0 {
+			continue
+		}
+		title := util.GetHTMLAttrValue("title", a.Attr)
+		if title != "" {
+			titles = append(titles, title)
+		}
+	}
+
+	// Strip titles (e.g. "1.2 Vorlesungen" -> "Vorlesungen")
+	for _, title := range titles {
+		matches := reStripBreadcrumbTitle.FindStringSubmatch(title)
+		if len(matches) != 2 {
+			log.Errorf("failed to parse title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		} else {
+			categories = append(categories, matches[1])
+		}
+	}
+
 	trs, err := htmlquery.QueryAll(doc, "//table[@id='EVENTLIST']/tbody[@class='tablecontent']/tr[@id]")
 	if err != nil {
-		log.Errorf("failed to query lectures document for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		log.Errorf("failed to query lectures document for rows for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
 		return nil, err
 	}
 
 	for i, tr := range trs {
-		lecture := &model.Lecture{FacultyIds: []string{l.ParentGguid}}
+		lecture := &model.Lecture{Categories: categories}
 		reLecturerId := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 		tds, err := htmlquery.QueryAll(tr, "/td")
@@ -295,6 +353,20 @@ func (l ListLectures) Process() (interface{}, error) {
 		}
 		lecture.Name = htmlquery.InnerText(a)
 
+		// Gguid
+		if href := util.GetHTMLAttrValue("href", a.Attr); href != "" {
+			matches := reGguid.FindStringSubmatch(href)
+			if len(matches) == 2 {
+				lecture.Gguid = matches[1]
+			} else {
+				log.Errorf("failed to find gguid for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
+				continue
+			}
+		} else {
+			log.Errorf("failed to find gguid for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
+			continue
+		}
+
 		// Art
 		a, err = htmlquery.Query(tds[4], "/a")
 		if err != nil {
@@ -314,19 +386,16 @@ func (l ListLectures) Process() (interface{}, error) {
 			lecturer := &model.Lecturer{}
 			lecturer.Name = htmlquery.InnerText(a)
 
-			for _, attr := range a.Attr {
-				if attr.Key == "href" {
-					matches := reLecturerId.FindStringSubmatch(attr.Val)
-					if len(matches) == 2 {
-						lecturer.Id = matches[1]
-						break
-					} else {
-						log.Errorf("failed to find lecturer gguid for %s\n", attr.Val)
-					}
+			if href := util.GetHTMLAttrValue("href", a.Attr); href != "" {
+				matches := reLecturerId.FindStringSubmatch(href)
+				if len(matches) == 2 {
+					lecturer.Gguid = matches[1]
+				} else {
+					log.Errorf("failed to find lecturer gguid for %s\n", href)
 				}
 			}
 
-			if lecturer.Id == "" {
+			if lecturer.Gguid == "" {
 				break
 			}
 
