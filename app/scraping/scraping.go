@@ -5,8 +5,8 @@ import (
 	"errors"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
-	"github.com/n1try/kithub2/model"
-	"github.com/n1try/kithub2/util"
+	"github.com/n1try/kithub2/app/model"
+	"github.com/n1try/kithub2/app/util"
 	"golang.org/x/sync/semaphore"
 	"golang.org/x/text/language"
 	"net/url"
@@ -92,7 +92,7 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 	if err != nil {
 		return makeError(err)
 	}
-	faculties = result1.([]*lectureFaculty)[6:7]
+	faculties = result1.([]*lectureFaculty)
 
 	facultyByCategory := make(map[string]string)
 	for _, faculty := range faculties {
@@ -131,7 +131,7 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 		}
 	}
 
-	for _, cat := range categories[:1] {
+	for _, cat := range categories {
 		if err := sem.Acquire(ctx, 1); err != nil {
 			log.Errorf("failed to acquire semaphore while fetching lectures – %v\n", err)
 			continue
