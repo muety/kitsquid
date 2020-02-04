@@ -1,6 +1,8 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type SemesterKey string
 
@@ -26,10 +28,10 @@ type Lecture struct {
 	Lecturers  []*Lecturer
 }
 
-func (l *Lecture) Link() string {
-	return fmt.Sprintf("%s/event.asp?gguid=%s", KitVvzBaseUrl, l.Gguid)
+func (l *Lecture) Link(baseUrl string) string {
+	return fmt.Sprintf("%s/event.asp?gguid=%s", baseUrl, l.Gguid)
 }
 
 func (l Lecture) String() string {
-	return fmt.Sprintf("[%s] %s (%s) (%s) @ %v by %s\n", l.Id, l.Name, l.Type, l.Link(), l.Categories, l.Lecturers)
+	return fmt.Sprintf("[%s] %s (%s) (%s) @ %v by %s\n", l.Id, l.Name, l.Type, l.Categories, l.Lecturers)
 }

@@ -2,9 +2,9 @@ package scraping
 
 import (
 	"context"
-	"errors"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
+	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/model"
 	"github.com/n1try/kithub2/app/util"
 	"golang.org/x/sync/semaphore"
@@ -16,16 +16,11 @@ import (
 )
 
 const (
-	baseUrl      = model.KitVvzBaseUrl
+	baseUrl      = config.KitVvzBaseUrl
 	mainUrl      = baseUrl + "/field.asp"
 	facultiesUrl = baseUrl + "/fields.asp?group=Vorlesungsverzeichnis"
 	maxWorkers   = 6
 )
-
-// TODO: Move to external config or so
-var tguids = map[model.SemesterKey]string{
-	model.SemesterWs1819: "0x4CB7204338AE4F67A58AFCE6C29D1488",
-}
 
 type ScrapeJob interface {
 	process() (interface{}, error)
@@ -82,10 +77,10 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 		return lectures, err
 	}
 
-	if _, ok := tguids[l.Semester]; !ok {
-		return makeError(errors.New("unknown semester key"))
+	tguid, err := config.ResolveSemesterId(l.Semester)
+	if err != nil {
+		return makeError(err)
 	}
-	tguid := tguids[l.Semester]
 
 	job1 := listLectureFacultiesJob{Tguid: tguid}
 	result1, err := job1.process()

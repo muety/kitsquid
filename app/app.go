@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/golang/glog"
+	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/model"
 	"github.com/n1try/kithub2/app/scraping"
+	"github.com/n1try/kithub2/app/store"
 )
 
 func init() {
@@ -13,6 +15,9 @@ func init() {
 	flag.Set("stderrthreshold", "WARNING")
 	flag.Set("v", "2")
 	flag.Parse()
+
+	config.Init()
+	store.Init()
 }
 
 func Run() {
@@ -22,6 +27,16 @@ func Run() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
 	log.Flush()
+
+	if err := store.InsertLectures(result.([]*model.Lecture), true); err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+
+	ls, err := store.GetLectures()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+
+	fmt.Println(ls)
 }
