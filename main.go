@@ -17,8 +17,7 @@ func init() {
 }
 
 func main() {
-	scraper := scraping.NewKITCampusPortalScraper()
-	result, err := scraper.FetchLectures(model.SemesterWs1819, language.English)
+	result, err := scraping.FetchLectures(model.SemesterWs1819, language.English)
 	if err != nil {
 		panic(err)
 	}

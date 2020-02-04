@@ -47,7 +47,7 @@ type ListLectures struct {
 
 type KITCampusPortalScraper struct{}
 
-func (s *KITCampusPortalScraper) FetchLectures(semester model.SemesterKey, lang language.Tag) ([]*model.Lecture, error) {
+func FetchLectures(semester model.SemesterKey, lang language.Tag) ([]*model.Lecture, error) {
 	var lectures = make([]*model.Lecture, 0)
 	var categories = make([]*model.Category, 0)
 	var faculties = make([]*model.Faculty, 0)
@@ -338,8 +338,4 @@ func (l ListLectures) Process() (interface{}, error) {
 	}
 
 	return lectures, nil
-}
-
-func NewKITCampusPortalScraper() *KITCampusPortalScraper {
-	return &KITCampusPortalScraper{}
 }
