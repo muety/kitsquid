@@ -2,7 +2,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="assets/css/app.css">
-    <link rel="stylesheet" href="assets/css/coreui.min.css">
+    <link rel="stylesheet" href="assets/css/icons.min.css">
 </head>
 <body class="bg-pattern-circuit text-gray-700">
     <div>

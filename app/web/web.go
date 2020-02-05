@@ -18,7 +18,7 @@ func Init() {
 	router = gin.Default()
 	router.LoadHTMLGlob("app/views/*")
 
-	router.Static("/assets", "app/public/assets")
+	router.Static("/assets", "app/public/build")
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tpl", gin.H{

@@ -3,11 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "dependencies": {
+    "@coreui/icons": "^1.0.1",
+    "jquery": "^3.4.1",
     "tailwindcss": "^1.1.4"
   },
   "devDependencies": {},
   "scripts": {
-    "build": "npx tailwind build app.tailwind.css -o assets/css/app.css",
+    "build": "npx tailwind build app.tailwind.css -o build/css/app.css && node build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ferdinand Mütsch",
