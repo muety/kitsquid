@@ -21,7 +21,7 @@ func Init() {
 	router.Static("/assets", "app/public/build")
 
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tpl", gin.H{
+		c.HTML(http.StatusOK, "index.tpl.html", gin.H{
 			"title": "Hello Gin",
 		})
 	})
