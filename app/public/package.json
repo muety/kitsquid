@@ -1,0 +1,15 @@
+{
+  "name": "kithub2-web",
+  "version": "0.0.1",
+  "description": "",
+  "dependencies": {
+    "tailwindcss": "^1.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "npx tailwind build app.tailwind.css -o assets/css/app.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ferdinand Mütsch",
+  "license": "MIT"
+}

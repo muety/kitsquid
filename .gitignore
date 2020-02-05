@@ -16,4 +16,6 @@
 
 .idea
 
-**/config.yml
+config.yml
+
+**/node_modules

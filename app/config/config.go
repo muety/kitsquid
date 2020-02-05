@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
 	"github.com/timshannon/bolthold"
@@ -31,8 +30,6 @@ func Init() {
 	if err := configor.Load(config, "config.yml"); err != nil {
 		log.Fatalf("failed to load config file — %v\n", err)
 	}
-
-	fmt.Println(config.Port)
 
 	// Init database
 	if _db, err := bolthold.Open(config.Db.Path, 0600, nil); err != nil {

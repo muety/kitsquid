@@ -2,12 +2,9 @@ package app
 
 import (
 	"flag"
-	"fmt"
-	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/model"
-	"github.com/n1try/kithub2/app/scraping"
 	"github.com/n1try/kithub2/app/store"
+	"github.com/n1try/kithub2/app/web"
 )
 
 func init() {
@@ -18,10 +15,11 @@ func init() {
 
 	config.Init()
 	store.Init()
+	web.Init()
 }
 
 func Run() {
-	scraper := scraping.NewLectureScraper()
+	/*scraper := scraping.NewLectureScraper()
 	job := scraping.FetchLecturesJob{Semester: model.SemesterWs1819}
 	result, err := scraper.Run(job)
 	if err != nil {
@@ -38,5 +36,7 @@ func Run() {
 		fmt.Printf("Error: %v\n", err)
 	}
 
-	fmt.Println(ls)
+	fmt.Println(ls)*/
+
+	web.Start()
 }
