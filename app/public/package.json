@@ -10,6 +10,7 @@
   "devDependencies": {},
   "scripts": {
     "build": "npx tailwind build app.tailwind.css -o build/css/app.css && node build.js",
+    "dev": "npm run build && node build.js --watch --no-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ferdinand Mütsch",

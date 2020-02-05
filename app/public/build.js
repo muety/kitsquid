@@ -26,8 +26,10 @@ const JQUERY = {
     ]
 }
 
+const configs = [ASSETS, CORE_UI_ICONS, JQUERY]
+
 function copyAssets() {
-    [ASSETS, CORE_UI_ICONS, JQUERY].forEach(copyCfg => {
+    configs.forEach(copyCfg => {
         console.log(`Copying assets from ${copyCfg.base}`)
         copyCfg.files.forEach(file => {
             const from = path.normalize(path.join(copyCfg.base, file.src))
@@ -41,4 +43,34 @@ function copyAssets() {
     })
 }
 
-copyAssets()
+function run() {
+    if (!process.argv.includes('--no-build')) {
+        copyAssets()
+    }
+
+    if (process.argv.includes('--watch')) {
+        console.log('Watching for file system changes ...')
+
+        configs.forEach(copyCfg => {
+            copyCfg.files.forEach(file => {
+                let ready = true
+                const from = path.normalize(path.join(copyCfg.base, file.src))
+                const to = path.normalize(path.join(DST_DIR, file.hasOwnProperty('dst') ? file.dst : file.src))
+
+                fs.watch(from, event => {
+                    if (!ready) {
+                        return
+                    }
+
+                    ready = false
+                    setTimeout(() => ready = true, 1000)
+
+                    console.log(`${from} updated.`)
+                    fs.copyFileSync(from, to)
+                })
+            })
+        })
+    }
+}
+
+run()
