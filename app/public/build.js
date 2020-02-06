@@ -1,13 +1,14 @@
 const fs = require('fs'),
     path = require('path')
 
+const ASSET_DIR = 'assets/'
 const DST_DIR = 'build/'
 
 const ASSETS = {
     base: '',
     files: [
-        { src: 'js/ui.js' },
-        ...fs.readdirSync('images').map(f => Object.assign({}, { src: `images/${f}` }))
+        { src: `${ASSET_DIR}/js/ui.js`, dst: 'js/ui.js' },
+        ...fs.readdirSync(`${ASSET_DIR}/images`).map(f => Object.assign({}, { src: `${ASSET_DIR}/images/${f}`, dst: `images/${f}` }))
     ]
 }
 

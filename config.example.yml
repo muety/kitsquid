@@ -1,4 +1,8 @@
 port: 8080
 addr: 127.0.0.1
+env: development
+tls:
+  key: etc/key.pem
+  cert: etc/cert.pem
 db:
   path: /tmp/kithub.db

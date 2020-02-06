@@ -1,16 +1,22 @@
 package config
 
 import (
+	"strconv"
+
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
 	"github.com/timshannon/bolthold"
-	"strconv"
 )
 
 type Config struct {
+	Env  string `default:"development" env:"KITHUB_ENV"`
 	Port int    `default:"8080" env:"KITHUB_PORT"`
 	Addr string `default:"" env:"KITHUB_ADDR"`
-	Db   struct {
+	Tls  struct {
+		KeyPath  string `default:"etc/key.pem" env:"KITHUB_TLS_KEY"`
+		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
+	}
+	Db struct {
 		Path string `default:"kithub.db" env:"KITHUB_DB_FILE"`
 	}
 }
@@ -37,6 +43,8 @@ func Init() {
 	} else {
 		db = _db
 	}
+
+	log.Infof("Running in %s mode.\n", config.Env)
 }
 
 func Get() *Config {
