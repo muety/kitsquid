@@ -1,11 +1,12 @@
 package web
 
 import (
-	"net/http"
-
+	"github.com/foolin/goview"
+	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
+	"net/http"
 )
 
 var (
@@ -14,17 +15,28 @@ var (
 )
 
 func Init() {
+	configure()
+	routes()
+}
+
+func configure() {
 	cfg = config.Get()
-
 	router = gin.Default()
-	router.LoadHTMLGlob("app/views/*")
 
+	ginviewConfig := goview.DefaultConfig
+	ginviewConfig.Root = "app/views"
+	ginviewConfig.DisableCache = cfg.Env == "development"
+	ginviewConfig.Extension = ".tpl.html"
+
+	router.HTMLRender = ginview.New(ginviewConfig)
+}
+
+func routes() {
 	router.Static("/assets", "app/public/build")
 
 	router.GET("/", func(c *gin.Context) {
 		pushAssets(c)
-
-		c.HTML(http.StatusOK, "index.tpl.html", gin.H{
+		c.HTML(http.StatusOK, "index", gin.H{
 			"title": "Hello Gin",
 		})
 	})
