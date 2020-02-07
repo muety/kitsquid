@@ -2,7 +2,11 @@ package app
 
 import (
 	"flag"
+	"fmt"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
+	"github.com/n1try/kithub2/app/model"
+	"github.com/n1try/kithub2/app/scraping"
 	"github.com/n1try/kithub2/app/store"
 	"github.com/n1try/kithub2/app/web"
 )
@@ -18,8 +22,8 @@ func init() {
 	web.Init()
 }
 
-func Run() {
-	/*scraper := scraping.NewLectureScraper()
+func _debugScrape() {
+	scraper := scraping.NewLectureScraper()
 	job := scraping.FetchLecturesJob{Semester: model.SemesterWs1819}
 	result, err := scraper.Run(job)
 	if err != nil {
@@ -30,13 +34,18 @@ func Run() {
 	if err := store.InsertLectures(result.([]*model.Lecture), true); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
+}
 
-	ls, err := store.GetLectures()
+func _debugGet() {
+	ls, err := store.FindLectures(&model.LectureQuery{
+		LecturerIdEq: "0xE4129354DF0A3A4E8EE42CD65C5BCD1C",
+	})
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
+	fmt.Println(ls)
+}
 
-	fmt.Println(ls)*/
-
+func Run() {
 	web.Start()
 }

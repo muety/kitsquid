@@ -3,14 +3,47 @@ package store
 import (
 	"github.com/n1try/kithub2/app/model"
 	"github.com/timshannon/bolthold"
+	"regexp"
 )
 
 func GetLectures() ([]*model.Lecture, error) {
+	return FindLectures(nil)
+}
+
+// TODO: Use indices!!!
+func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
 	var lectures []*model.Lecture
-	if err := db.Find(&lectures, &bolthold.Query{}); err != nil {
-		return lectures, err
+
+	q := bolthold.Where("Id").Not().Eq("")
+
+	if query != nil {
+		if query.NameLike != "" {
+			if re, err := regexp.Compile("(?i)" + query.NameLike); err == nil {
+				q.And("Name").RegExp(re)
+			}
+		}
+		if query.TypeEq != "" {
+			q.And("Type").Eq(query.TypeEq)
+		}
+		if query.LecturerIdEq != "" {
+			q.And("Lecturers").MatchFunc(func(ra *bolthold.RecordAccess) (bool, error) {
+				if field := ra.Field(); field != nil {
+					for _, item := range field.([]*model.Lecturer) {
+						if item.Gguid == query.LecturerIdEq {
+							return true, nil
+						}
+					}
+				}
+				return false, nil
+			})
+		}
+		if len(query.CategoryIn) > 0 {
+			q.And("Categories").ContainsAny(query.CategoryIn)
+		}
 	}
-	return lectures, nil
+
+	err := db.Find(&lectures, q)
+	return lectures, err
 }
 
 func InsertLecture(lecture *model.Lecture, upsert bool) error {
@@ -18,11 +51,7 @@ func InsertLecture(lecture *model.Lecture, upsert bool) error {
 	if upsert {
 		f = db.Upsert
 	}
-
-	if err := f(lecture.Id, lecture); err != nil {
-		return err
-	}
-	return nil
+	return f(lecture.Id, lecture)
 }
 
 func InsertLectures(lectures []*model.Lecture, upsert bool) error {
@@ -43,9 +72,5 @@ func InsertLectures(lectures []*model.Lecture, upsert bool) error {
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	return tx.Commit()
 }
