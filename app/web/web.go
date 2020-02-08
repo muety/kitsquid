@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"github.com/foolin/goview"
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,9 @@ import (
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/store"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -52,17 +56,43 @@ func routes() {
 func Start() {
 	cfg := config.Get()
 
-	if cfg.Env == "production" {
-		if err := router.RunTLS(cfg.ListenAddr(), cfg.Tls.CertPath, cfg.Tls.KeyPath); err != nil {
-			log.Fatalf("error listening (https) on %s – %v\n", cfg.ListenAddr(), err)
-		}
-	} else {
-		if err := router.Run(cfg.ListenAddr()); err != nil {
-			log.Fatalf("error listening (http) on %s – %v\n", cfg.ListenAddr(), err)
-		}
+	srv := &http.Server{
+		Addr:    cfg.ListenAddr(),
+		Handler: router,
 	}
 
+	exited := make(chan struct{})
+
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, syscall.SIGINT, syscall.SIGTERM)
+		<-sigint
+
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Fatalf("failed to shut down the server gracefully – %v", err)
+		}
+
+		log.Infoln("exited gracefully")
+		close(exited)
+	}()
+
 	log.Infof("Listening on %s\n", cfg.ListenAddr())
+	if err := getServeFunc(srv)(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("failed to start server on %s – %v\n", cfg.ListenAddr(), err)
+	}
+
+	<-exited
+}
+
+func getServeFunc(srv *http.Server) func() error {
+	if cfg.Env == "production" {
+		return func() error {
+			return srv.ListenAndServe()
+		}
+	}
+	return func() error {
+		return srv.ListenAndServeTLS(cfg.Tls.CertPath, cfg.Tls.KeyPath)
+	}
 }
 
 func pushAssets(c *gin.Context) {
