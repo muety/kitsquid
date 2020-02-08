@@ -23,3 +23,5 @@ config.yml
 kithub2
 
 vendor
+
+*.db

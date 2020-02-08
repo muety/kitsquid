@@ -1,3 +1,6 @@
 {{ define "content" }}
 <h1 class="text-2xl">Courses</h1>
+    {{ range .lectures }}
+        {{ .Id }}
+    {{ end }}
 {{ end }}

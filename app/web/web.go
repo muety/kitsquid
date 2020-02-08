@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
+	"github.com/n1try/kithub2/app/store"
 	"net/http"
 )
 
@@ -36,8 +37,14 @@ func routes() {
 
 	router.GET("/", func(c *gin.Context) {
 		pushAssets(c)
+
+		lectures, err := store.FindLectures(nil)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
+
 		c.HTML(http.StatusOK, "index", gin.H{
-			"title": "Hello Gin",
+			"lectures": lectures,
 		})
 	})
 }
