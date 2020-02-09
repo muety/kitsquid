@@ -16,7 +16,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/timshannon/bolthold v0.0.0-20200128153810-cd019dfd9224
-	go.etcd.io/bbolt v1.3.3
+	go.etcd.io/bbolt v1.3.3 // indirect
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect

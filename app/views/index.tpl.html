@@ -1,6 +1,31 @@
 {{ define "content" }}
-<h1 class="text-2xl">Courses</h1>
-    {{ range .lectures }}
-        {{ .Id }}
-    {{ end }}
+    <h1 class="text-2xl">Courses</h1>
+    <div class="flex flex-wrap">
+        {{ range .lectures }}
+            <div class="w-full sm:w-1/2 p-1">
+                <div class="h-full rounded relative overflow-hidden shadow-md bg-white">
+                    <div class="h-full rounded-bl rounded-tl w-1 absolute" style="background-color: {{ catColor (index .Categories 0) }}" title="{{ index .Categories 0 }}"></div>
+                    <div class="pl-4 pr-8 py-2 text-gray-700 text-sm">
+                        <div>
+                            <span class="font-semibold">{{ .Name }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs">
+                                <i class="cil-user"></i>
+                                {{ range $i, $e := .Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap text-2xs mt-2">
+                            {{ range slice .Categories 1 }}
+                                <div class="rounded bg-gray-400 p-1 m-px">{{ . }}</div>
+                            {{ end }}
+                        </div>
+                    </div>
+                    <div class="absolute top-0 right-0 m-2 p-1 bg-gray-400 rounded text-xs text-gray-700 font-semibold">
+                        <span>{{ strIndex 0 .Type }}</span>
+                    </div>
+                </div>
+            </div>
+        {{ end }}
+    </div>
 {{ end }}

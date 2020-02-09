@@ -8,6 +8,8 @@ import (
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/store"
+	"github.com/n1try/kithub2/app/util"
+	"html/template"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,6 +34,10 @@ func configure() {
 	ginviewConfig.Root = "app/views"
 	ginviewConfig.DisableCache = cfg.Env == "development"
 	ginviewConfig.Extension = ".tpl.html"
+	ginviewConfig.Funcs = template.FuncMap{
+		"strIndex": util.StrIndex,
+		"catColor": config.ResolveColor,
+	}
 
 	router.HTMLRender = ginview.New(ginviewConfig)
 }
@@ -49,6 +55,7 @@ func routes() {
 
 		c.HTML(http.StatusOK, "index", gin.H{
 			"lectures": lectures,
+			"active":   "index",
 		})
 	})
 }
@@ -85,7 +92,7 @@ func Start() {
 }
 
 func getServeFunc(srv *http.Server) func() error {
-	if cfg.Env == "production" {
+	if cfg.Env == "development" {
 		return func() error {
 			return srv.ListenAndServe()
 		}

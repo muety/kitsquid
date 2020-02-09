@@ -20,6 +20,29 @@ func init() {
 	config.Init()
 	store.Init()
 	web.Init()
+
+	config.SetColorDomain(readCategories(0, 3))
+}
+
+func readCategories(atIndex, minItems int) []string {
+	categoryMap := make(map[string]bool)
+	lectures, err := store.GetLectures()
+	if err != nil {
+		log.Fatalf("failed to read categories")
+	}
+	for _, l := range lectures {
+		if len(l.Categories) >= minItems {
+			categoryMap[l.Categories[atIndex]] = true
+		}
+	}
+
+	result := make([]string, len(categoryMap))
+	i := 0
+	for k, _ := range categoryMap {
+		result[i] = k
+		i++
+	}
+	return result
 }
 
 func _debugScrape() {
@@ -48,4 +71,6 @@ func _debugGet() {
 
 func Run() {
 	web.Start()
+	//_debugScrape()
+	//_debugGet()
 }

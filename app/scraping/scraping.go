@@ -306,6 +306,13 @@ func (l listLecturesJob) process() (interface{}, error) {
 		}
 	}
 
+	// Quick hack to have the faculty be the first slice item
+	if len(titles) >= 2 {
+		tmp := titles[0]
+		titles[0] = titles[1]
+		titles[1] = tmp
+	}
+
 	// Strip titles (e.g. "1.2 Vorlesungen" -> "Vorlesungen")
 	for _, title := range titles {
 		matches := reStripBreadcrumbTitle.FindStringSubmatch(title)
