@@ -1,6 +1,8 @@
 package store
 
 import (
+	"fmt"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/model"
 	"github.com/timshannon/bolthold"
 	"regexp"
@@ -12,6 +14,12 @@ func GetLectures() ([]*model.Lecture, error) {
 
 // TODO: Use indices!!!
 func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
+	cacheKey := fmt.Sprintf("find:%v", query)
+	if ll, ok := lecturesCache.Get(cacheKey); ok {
+		log.Infof("cache hit for %v\n", cacheKey)
+		return ll.([]*model.Lecture), nil
+	}
+
 	var lectures []*model.Lecture
 
 	q := bolthold.Where("Id").Not().Eq("")
@@ -43,6 +51,9 @@ func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
 	}
 
 	err := db.Find(&lectures, q)
+	if err == nil {
+		lecturesCache.SetDefault(cacheKey, lectures)
+	}
 	return lectures, err
 }
 
@@ -55,6 +66,9 @@ func InsertLecture(lecture *model.Lecture, upsert bool) error {
 }
 
 func InsertLectures(lectures []*model.Lecture, upsert bool) error {
+	lecturesCache.Flush()
+	facultiesCache.Flush()
+
 	f := db.TxInsert
 	if upsert {
 		f = db.TxUpsert

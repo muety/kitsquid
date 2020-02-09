@@ -3,6 +3,11 @@ package store
 import "github.com/n1try/kithub2/app/config"
 
 func GetFaculties() ([]string, error) {
+	cacheKey := "get:all"
+	if fl, ok := facultiesCache.Get(cacheKey); ok {
+		return fl.([]string), nil
+	}
+
 	facultyMap := make(map[string]bool)
 	lectures, err := GetLectures()
 	if err != nil {
@@ -24,6 +29,7 @@ func GetFaculties() ([]string, error) {
 		i++
 	}
 
+	facultiesCache.SetDefault("get:all", faculties)
 	return faculties, nil
 }
 

@@ -1,11 +1,11 @@
 package config
 
 import (
-	"strconv"
-
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
 	"github.com/timshannon/bolthold"
+	"strconv"
+	"time"
 )
 
 type Config struct {
@@ -17,8 +17,9 @@ type Config struct {
 		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
 	}
 	Db struct {
-		Path string `default:"kithub.db" env:"KITHUB_DB_FILE"`
+		Path string `field:"cache" default:"kithub.db" env:"KITHUB_DB_FILE"`
 	}
+	Cache map[string]string
 }
 
 var (
@@ -44,7 +45,7 @@ func Init() {
 		db = _db
 	}
 
-	log.Infof("Running in %s mode.\n", config.Env)
+	log.Infof("running in %s mode.\n", config.Env)
 }
 
 func Get() *Config {
@@ -57,4 +58,15 @@ func Db() *bolthold.Store {
 
 func (c *Config) ListenAddr() string {
 	return c.Addr + ":" + strconv.Itoa(c.Port)
+}
+
+func (c *Config) CacheDuration(key string, defaultVal time.Duration) time.Duration {
+	if ds, ok := c.Cache[key]; ok {
+		if d, err := time.ParseDuration(ds); err == nil {
+			return d
+		} else {
+			log.Errorf("failed to parse cache duration for key %s\n", key)
+		}
+	}
+	return defaultVal
 }

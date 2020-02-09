@@ -9,4 +9,5 @@ var db *bolthold.Store
 
 func Init() {
 	db = config.Db()
+	initDefaultCaches()
 }

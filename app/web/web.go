@@ -84,7 +84,7 @@ func Start() {
 		close(exited)
 	}()
 
-	log.Infof("Listening on %s\n", cfg.ListenAddr())
+	log.Infof("listening on %s\n", cfg.ListenAddr())
 	if err := getServeFunc(srv)(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("failed to start server on %s – %v\n", cfg.ListenAddr(), err)
 	}

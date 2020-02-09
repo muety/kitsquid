@@ -15,6 +15,7 @@ require (
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/timshannon/bolthold v0.0.0-20200128153810-cd019dfd9224
 	go.etcd.io/bbolt v1.3.3 // indirect
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
