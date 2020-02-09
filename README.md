@@ -7,7 +7,7 @@
 ## To Do
 * Scraper: Scrape lecture ILIAS link
 * Scraper: Scrape lecture details from ILIAS
-* Scraper: Save faculty separate from categories
+* Store: Introduce cache
 
 ## License
 MIT @ [Ferdinand Mütsch](https://muetsch.io)

@@ -40,9 +40,8 @@ type listLectureCategoriesJob struct {
 }
 
 type listLecturesJob struct {
-	Tguid       string
-	Gguid       string
-	ParentGguid string
+	Tguid string
+	Gguid string
 }
 
 type lectureFaculty struct {
@@ -89,7 +88,6 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 	}
 	faculties = result1.([]*lectureFaculty)
 
-	facultyByCategory := make(map[string]string)
 	for _, faculty := range faculties {
 		job2 := listLectureCategoriesJob{Tguid: tguid, Gguid: faculty.Gguid}
 		result2, err := job2.process()
@@ -98,10 +96,6 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 			continue
 		}
 		categories = append(categories, result2.([]*lectureCategory)...)
-
-		for _, cat := range result2.([]*lectureCategory) {
-			facultyByCategory[cat.Gguid] = faculty.Gguid
-		}
 	}
 
 	ctx := context.TODO()
@@ -136,7 +130,7 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 
 		go func() {
 			defer sem.Release(1)
-			job := listLecturesJob{Tguid: tguid, Gguid: catId, ParentGguid: facultyByCategory[catId]}
+			job := listLecturesJob{Tguid: tguid, Gguid: catId}
 			result, err := job.process()
 			if err != nil {
 				log.Errorf("failed to fetch lectures – %v\n", err)
@@ -275,6 +269,7 @@ func (l listLecturesJob) process() (interface{}, error) {
 	titles := make([]string, 0)
 
 	// Extract child category from page title
+	var childCatFound bool
 	h1, err := htmlquery.Query(doc, "//h1[@class='pagetitle']")
 	if err != nil {
 		log.Errorf("failed to query lectures document for title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
@@ -286,6 +281,7 @@ func (l listLecturesJob) process() (interface{}, error) {
 			log.Errorf("failed to parse title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
 		} else {
 			titles = append(titles, strings.Trim(matches[1], " "))
+			childCatFound = true
 		}
 	}
 
@@ -307,7 +303,7 @@ func (l listLecturesJob) process() (interface{}, error) {
 	}
 
 	// Quick hack to have the faculty be the first slice item
-	if len(titles) >= 2 {
+	if childCatFound && len(titles) >= 2 {
 		tmp := titles[0]
 		titles[0] = titles[1]
 		titles[1] = tmp

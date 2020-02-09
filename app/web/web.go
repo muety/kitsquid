@@ -35,8 +35,8 @@ func configure() {
 	ginviewConfig.DisableCache = cfg.Env == "development"
 	ginviewConfig.Extension = ".tpl.html"
 	ginviewConfig.Funcs = template.FuncMap{
-		"strIndex": util.StrIndex,
-		"catColor": config.ResolveColor,
+		"strIndex":    util.StrIndex,
+		"randomColor": util.RandomColor,
 	}
 
 	router.HTMLRender = ginview.New(ginviewConfig)
@@ -54,8 +54,9 @@ func routes() {
 		}
 
 		c.HTML(http.StatusOK, "index", gin.H{
-			"lectures": lectures,
-			"active":   "index",
+			"lectures":   lectures,
+			"active":     "index",
+			"facultyIdx": config.FacultyIdx,
 		})
 	})
 }

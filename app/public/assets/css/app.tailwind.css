@@ -14,3 +14,19 @@
 .sidebar-item-active {
     @apply bg-gray-400;
 }
+
+.max-w-2xs {
+    max-width: 16rem;
+}
+
+.max-w-3xs {
+    max-width: 12rem;
+}
+
+.max-w-4xs {
+    max-width: 10rem;
+}
+
+.max-w-5xs {
+    max-width: 8rem;
+}

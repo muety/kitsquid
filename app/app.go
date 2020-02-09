@@ -20,8 +20,6 @@ func init() {
 	config.Init()
 	store.Init()
 	web.Init()
-
-	config.SetColorDomain(readCategories(0, 3))
 }
 
 func readCategories(atIndex, minItems int) []string {
