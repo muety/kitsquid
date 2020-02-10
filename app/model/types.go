@@ -18,6 +18,7 @@ type Lecture struct {
 	Type        string
 	Description string
 	Categories  []string
+	Links       []string
 	Dates       []*LectureDate
 	Lecturers   []*Lecturer
 }

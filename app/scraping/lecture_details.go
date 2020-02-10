@@ -55,20 +55,92 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				return
 			}
 
+			var (
+				desc1 string
+				desc2 string
+				desc  string
+				link  string
+			)
+
+			// Description from "Veranstaltungsdetails"
+			noteEl, err := htmlquery.Query(doc, "//div[@id='rwev_note']")
+			if err != nil {
+				log.Errorf("failed to query event document for description %s\n", gguid)
+				return
+			}
+			desc1 = htmlquery.OutputHTML(noteEl, false)
+
+			// Description from "Weitere Informationen"
 			var sb strings.Builder
 
-			ps, err := htmlquery.QueryAll(doc, "//div[@id='rwev_note']/p")
+			aimEl, err := htmlquery.Query(doc, "//div[@id='rwev_aim']")
+			if err != nil {
+				log.Errorf("failed to query event document for description %s\n", gguid)
+				return
+			}
+			lcEl, err := htmlquery.Query(doc, "//div[@id='rwev_learningcontent']")
+			if err != nil {
+				log.Errorf("failed to query event document for description %s\n", gguid)
+				return
+			}
+			prereqEl, err := htmlquery.Query(doc, "//div[@id='rwev_prereq']")
+			if err != nil {
+				log.Errorf("failed to query event document for description %s\n", gguid)
+				return
+			}
+			workloadEl, err := htmlquery.Query(doc, "//div[@id='rwev_workload']")
 			if err != nil {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
 			}
 
-			for _, el := range ps {
-				sb.WriteString(htmlquery.OutputHTML(el, false))
+			if aimEl != nil {
+				sb.WriteString("<strong>Lernziele</strong><br>")
+				sb.WriteString(htmlquery.OutputHTML(aimEl, false))
+				sb.WriteString("<br><br>")
+			}
+			if lcEl != nil {
+				sb.WriteString("<strong>Lehrinhalt</strong><br>")
+				sb.WriteString(htmlquery.OutputHTML(lcEl, false))
+				sb.WriteString("<br><br>")
+			}
+			if prereqEl != nil {
+				sb.WriteString("<strong>Voraussetzungen</strong><br>")
+				sb.WriteString(htmlquery.OutputHTML(prereqEl, false))
+				sb.WriteString("<br><br>")
+			}
+			if workloadEl != nil {
+				sb.WriteString("<strong>Arbeitsaufwand</strong><br>")
+				sb.WriteString(htmlquery.OutputHTML(workloadEl, false))
+				sb.WriteString("<br><br>")
+			}
+			desc2 = sb.String()
+
+			if len(desc1) > len(desc2) {
+				desc = desc1
+			} else {
+				desc = desc2
+			}
+
+			// Link
+			linkEl, err := htmlquery.Query(doc, "//div[@id='rwev_link']/a")
+			if err != nil {
+				log.Errorf("failed to query event document for link %s\n", gguid)
+				return
+			}
+			if linkEl != nil {
+				link = htmlquery.SelectAttr(linkEl, "href")
 			}
 
 			newLecture := *existingLecture
-			newLecture.Description = sb.String()
+			newLecture.Description = desc
+
+			if newLecture.Links == nil {
+				newLecture.Links = make([]string, 0)
+			}
+			if link != "" {
+				newLecture.Links = append(newLecture.Links, link)
+			}
 
 			mtx.Lock()
 			updatedLectures[index] = &newLecture
