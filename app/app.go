@@ -57,10 +57,29 @@ func _debugScrape() {
 	}
 }
 
+func _debugScrapeDetails() {
+	scraper := scraping.NewLectureDetailsScraper()
+	existingLecture, err := store.GetLecture("24005")
+	if err != nil {
+		panic(err)
+	}
+
+	job := scraping.FetchDetailsJob{Lectures: []*model.Lecture{existingLecture}}
+	result, err := scraper.Run(job)
+	if err != nil {
+		panic(err)
+	}
+	log.Flush()
+
+	for _, l := range result.([]*model.Lecture) {
+		if err := store.InsertLecture(l, true); err != nil {
+			log.Errorf("failed to update lecture %s – %v\n", l.Id, err)
+		}
+	}
+}
+
 func _debugGet() {
-	ls, err := store.FindLectures(&model.LectureQuery{
-		LecturerIdEq: "0xE4129354DF0A3A4E8EE42CD65C5BCD1C",
-	})
+	ls, err := store.GetLectures()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
@@ -70,5 +89,6 @@ func _debugGet() {
 func Run() {
 	web.Start()
 	//_debugScrape()
+	//_debugScrapeDetails()
 	//_debugGet()
 }

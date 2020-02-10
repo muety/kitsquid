@@ -12,12 +12,19 @@ const (
 )
 
 type Lecture struct {
-	Id         string
-	Gguid      string
-	Name       string
-	Type       string
-	Categories []string
-	Lecturers  []*Lecturer
+	Id          string
+	Gguid       string
+	Name        string
+	Type        string
+	Description string
+	Categories  []string
+	Dates       []*LectureDate
+	Lecturers   []*Lecturer
+}
+
+type LectureDate struct {
+	Date string
+	Room string
 }
 
 type Lecturer struct {

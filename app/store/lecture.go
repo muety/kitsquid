@@ -8,6 +8,21 @@ import (
 	"regexp"
 )
 
+func GetLecture(id string) (*model.Lecture, error) {
+	cacheKey := fmt.Sprintf("get:%s", id)
+	if l, ok := lecturesCache.Get(cacheKey); ok {
+		return l.(*model.Lecture), nil
+	}
+
+	var lecture model.Lecture
+	if err := db.Get(id, &lecture); err != nil {
+		return nil, err
+	}
+
+	lecturesCache.SetDefault(cacheKey, lecture)
+	return &lecture, nil
+}
+
 func GetLectures() ([]*model.Lecture, error) {
 	return FindLectures(nil)
 }
@@ -58,6 +73,9 @@ func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
 }
 
 func InsertLecture(lecture *model.Lecture, upsert bool) error {
+	lecturesCache.Flush()
+	facultiesCache.Flush()
+
 	f := db.Insert
 	if upsert {
 		f = db.Upsert
