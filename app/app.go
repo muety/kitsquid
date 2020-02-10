@@ -59,12 +59,12 @@ func _debugScrape() {
 
 func _debugScrapeDetails() {
 	scraper := scraping.NewLectureDetailsScraper()
-	existingLecture, err := store.GetLecture("24005")
+	ls, err := store.GetLectures()
 	if err != nil {
 		panic(err)
 	}
 
-	job := scraping.FetchDetailsJob{Lectures: []*model.Lecture{existingLecture}}
+	job := scraping.FetchDetailsJob{Lectures: ls}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)
@@ -79,7 +79,9 @@ func _debugScrapeDetails() {
 }
 
 func _debugGet() {
-	ls, err := store.GetLectures()
+	ls, err := store.FindLectures(&model.LectureQuery{
+		LecturerIdEq: "0xE4129354DF0A3A4E8EE42CD65C5BCD1C",
+	})
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
