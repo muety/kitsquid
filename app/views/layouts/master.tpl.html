@@ -1,21 +1,20 @@
-<html>
+<html class="font-sans">
 <head>
     {{ include "layouts/head" }}
 </head>
-<body class="bg-pattern-circuit text-gray-700 pb-8">
+<body class="bg-gray-200 text-gray-700 pb-8">
     <div>
         {{ include "layouts/header" }}
         <div class="w-full lg:w-3/4 mx-auto overflow-x-hidden md:overflow-auto">
             <div class="md:flex">
                 {{ include "layouts/sidebar" }}
                 <div id="main-content" class="mt-32 h-full z-90 w-full md:block md:w-3/4 lg:w-5/6 px-6 md:pl-0 lg:px-0">
-                    {{ include "layouts/alert" }}
                     {{ template "content" . }}
                 </div>
             </div>
         </div>
     </div>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/ui.js"></script>
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/ui.js"></script>
 </body>
 </html>

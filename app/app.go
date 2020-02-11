@@ -59,11 +59,11 @@ func _debugScrape() {
 
 func _debugScrapeDetails() {
 	scraper := scraping.NewLectureDetailsScraper()
-	l1, _ := store.GetLecture("24030")
-	l2, _ := store.GetLecture("24005")
-	l3, _ := store.GetLecture("24001")
-
-	job := scraping.FetchDetailsJob{Lectures: []*model.Lecture{l1, l2, l3}}
+	ls, err := store.GetLectures()
+	if err != nil {
+		panic(err)
+	}
+	job := scraping.FetchDetailsJob{Lectures: ls}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)

@@ -9,6 +9,7 @@ import (
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/store"
 	"github.com/n1try/kithub2/app/util"
+	"github.com/n1try/kithub2/app/web/errors"
 	"html/template"
 	"net/http"
 	"os"
@@ -30,13 +31,18 @@ func configure() {
 	cfg = config.Get()
 	router = gin.Default()
 
+	router.Use(gin.Recovery())
+	router.Use(ErrorHandler())
+
 	ginviewConfig := goview.DefaultConfig
 	ginviewConfig.Root = "app/views"
 	ginviewConfig.DisableCache = cfg.Env == "development"
 	ginviewConfig.Extension = ".tpl.html"
 	ginviewConfig.Funcs = template.FuncMap{
 		"strIndex":    util.StrIndex,
+		"strRemove":   util.StrRemove,
 		"randomColor": util.RandomColor,
+		"htmlSafe":    util.HtmlSafe,
 	}
 
 	router.HTMLRender = ginview.New(ginviewConfig)
@@ -45,16 +51,31 @@ func configure() {
 func routes() {
 	router.Static("/assets", "app/public/build")
 
-	router.GET("/", func(c *gin.Context) {
-		pushAssets(c)
-
+	router.GET("/", AssetsPusher(), func(c *gin.Context) {
 		lectures, err := store.FindLectures(nil)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			c.Error(err)
+			c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+			return
 		}
 
 		c.HTML(http.StatusOK, "index", gin.H{
 			"lectures":   lectures,
+			"active":     "index",
+			"facultyIdx": config.FacultyIdx,
+		})
+	})
+
+	router.GET("/event/:id", AssetsPusher(), func(c *gin.Context) {
+		lecture, err := store.GetLecture(c.Param("id"))
+		if err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
+			return
+		}
+
+		c.HTML(http.StatusOK, "event", gin.H{
+			"lecture":    lecture,
 			"active":     "index",
 			"facultyIdx": config.FacultyIdx,
 		})
@@ -100,15 +121,5 @@ func getServeFunc(srv *http.Server) func() error {
 	}
 	return func() error {
 		return srv.ListenAndServeTLS(cfg.Tls.CertPath, cfg.Tls.KeyPath)
-	}
-}
-
-func pushAssets(c *gin.Context) {
-	if pusher := c.Writer.Pusher(); pusher != nil {
-		for _, a := range config.PushAssets {
-			if err := pusher.Push(a, nil); err != nil {
-				log.Errorf("failed to push %s – %v", a, err)
-			}
-		}
 	}
 }

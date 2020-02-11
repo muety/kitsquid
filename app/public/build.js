@@ -7,8 +7,10 @@ const DST_DIR = 'build/'
 const ASSETS = {
     base: '',
     files: [
-        { src: `${ASSET_DIR}/js/ui.js`, dst: 'js/ui.js' },
-        ...fs.readdirSync(`${ASSET_DIR}/images`).map(f => Object.assign({}, { src: `${ASSET_DIR}/images/${f}`, dst: `images/${f}` }))
+        ...fs.readdirSync(`${ASSET_DIR}/css`).filter(f => !f.includes('tailwind')).map(f => Object.assign({}, { src: `${ASSET_DIR}/css/${f}`, dst: `css/${f}` })),
+        ...fs.readdirSync(`${ASSET_DIR}/js`).map(f => Object.assign({}, { src: `${ASSET_DIR}/js/${f}`, dst: `js/${f}` })),
+        ...fs.readdirSync(`${ASSET_DIR}/images`).map(f => Object.assign({}, { src: `${ASSET_DIR}/images/${f}`, dst: `images/${f}` })),
+        ...fs.readdirSync(`${ASSET_DIR}/fonts`).map(f => Object.assign({}, { src: `${ASSET_DIR}/fonts/${f}`, dst: `fonts/${f}` }))
     ]
 }
 

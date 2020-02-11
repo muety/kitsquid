@@ -68,7 +68,9 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
 			}
-			desc1 = htmlquery.OutputHTML(noteEl, false)
+			if noteEl != nil {
+				desc1 = htmlquery.OutputHTML(noteEl, false)
+			}
 
 			// Description from "Weitere Informationen"
 			var sb strings.Builder

@@ -19,7 +19,7 @@ func GetLecture(id string) (*model.Lecture, error) {
 		return nil, err
 	}
 
-	lecturesCache.SetDefault(cacheKey, lecture)
+	lecturesCache.SetDefault(cacheKey, &lecture)
 	return &lecture, nil
 }
 
