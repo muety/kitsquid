@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@tailwind
 
 .text-2xs {
     font-size: 0.65rem;
@@ -15,6 +14,10 @@
 .sidebar-item-active:hover {
     @apply bg-kit;
     @apply text-white;
+}
+
+.w-05 {
+    width: 0.2rem;
 }
 
 .max-w-2xs {
