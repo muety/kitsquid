@@ -7,10 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/store"
-	"github.com/n1try/kithub2/app/util"
-	"github.com/n1try/kithub2/app/web/errors"
-	"html/template"
+	"github.com/n1try/kithub2/app/web/util"
 	"net/http"
 	"os"
 	"os/signal"
@@ -23,11 +20,6 @@ var (
 )
 
 func Init() {
-	configure()
-	routes()
-}
-
-func configure() {
 	cfg = config.Get()
 	router = gin.Default()
 
@@ -38,56 +30,14 @@ func configure() {
 	ginviewConfig.Root = "app/views"
 	ginviewConfig.DisableCache = cfg.Env == "development"
 	ginviewConfig.Extension = ".tpl.html"
-	ginviewConfig.Funcs = template.FuncMap{
-		"strIndex":    util.StrIndex,
-		"strRemove":   util.StrRemove,
-		"randomColor": util.RandomColor,
-		"htmlSafe":    util.HtmlSafe,
-	}
+	ginviewConfig.Funcs = util.GetFuncMap()
 
 	router.HTMLRender = ginview.New(ginviewConfig)
-}
 
-func routes() {
-	router.Static("/assets", "app/public/build")
-
-	router.NoMethod(func(c *gin.Context) {
-		c.AbortWithError(http.StatusMethodNotAllowed, errors.NotFound{}).SetType(gin.ErrorTypePublic)
-	})
-
-	router.NoRoute(func(c *gin.Context) {
-		c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
-	})
-
-	router.GET("/", AssetsPusher(), func(c *gin.Context) {
-		lectures, err := store.FindLectures(nil)
-		if err != nil {
-			c.Error(err)
-			c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
-			return
-		}
-
-		c.HTML(http.StatusOK, "index", gin.H{
-			"lectures":   lectures,
-			"active":     "index",
-			"facultyIdx": config.FacultyIdx,
-		})
-	})
-
-	router.GET("/event/:id", AssetsPusher(), func(c *gin.Context) {
-		lecture, err := store.GetLecture(c.Param("id"))
-		if err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
-			c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
-			return
-		}
-
-		c.HTML(http.StatusOK, "event", gin.H{
-			"lecture":    lecture,
-			"active":     "index",
-			"facultyIdx": config.FacultyIdx,
-		})
-	})
+	// Routes
+	RegisterStaticRoutes(router)
+	RegisterFallbackRoutes(router)
+	RegisterMainRoutes(router)
 }
 
 func Start() {

@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"time"
 )
 
 type SemesterKey string
@@ -33,18 +32,9 @@ type Lecturer struct {
 	Name  string
 }
 
-type Review struct {
-	Id        string
-	LectureId string
-	Comment   string
-	Ratings   map[string]uint8
-}
-
-type User struct {
-	Id        string
-	Active    bool
-	Gender    string
-	CreatedAt time.Time
+type Link struct {
+	Name string
+	Url  string
 }
 
 type LectureQuery struct {

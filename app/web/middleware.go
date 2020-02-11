@@ -5,9 +5,10 @@ import (
 	"github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/web/errors"
+	"github.com/n1try/kithub2/app/web/util"
 )
 
-func AssetsPusher() gin.HandlerFunc {
+func AssetsPush() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 		if pusher := c.Writer.Pusher(); pusher != nil {
@@ -37,7 +38,7 @@ func ErrorHandler() gin.HandlerFunc {
 
 		c.HTML(c.Writer.Status(), "error", gin.H{
 			"error":  error.Error(),
-			"active": "",
+			"tplCtx": util.GetTplCtx(c),
 		})
 		return
 	}

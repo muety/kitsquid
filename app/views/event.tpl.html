@@ -28,7 +28,7 @@
                 <div class="my-1">
                     <span class="text-md">
                         <i class="cil-building mr-1"></i>
-                        <span class="border-b-2" style="border-color: {{ randomColor (index .lecture.Categories $.facultyIdx) }}">{{ index .lecture.Categories .facultyIdx }}</span>
+                        <span class="border-b-2" style="border-color: {{ randomColor (index .lecture.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .lecture.Categories .tplCtx.Constants.FacultyIndex }}</span>
                     </span>
                 </div>
                 {{ if .lecture.Links }}
