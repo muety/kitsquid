@@ -51,6 +51,14 @@ func configure() {
 func routes() {
 	router.Static("/assets", "app/public/build")
 
+	router.NoMethod(func(c *gin.Context) {
+		c.AbortWithError(http.StatusMethodNotAllowed, errors.NotFound{}).SetType(gin.ErrorTypePublic)
+	})
+
+	router.NoRoute(func(c *gin.Context) {
+		c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
+	})
+
 	router.GET("/", AssetsPusher(), func(c *gin.Context) {
 		lectures, err := store.FindLectures(nil)
 		if err != nil {
