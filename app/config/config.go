@@ -3,6 +3,7 @@ package config
 import (
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
+	"github.com/n1try/kithub2/app/model"
 	"github.com/timshannon/bolthold"
 	"strconv"
 	"time"
@@ -17,9 +18,23 @@ type Config struct {
 		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
 	}
 	Db struct {
-		Path string `field:"cache" default:"kithub.db" env:"KITHUB_DB_FILE"`
+		Path string `default:"kithub.db" env:"KITHUB_DB_FILE"`
 	}
 	Cache map[string]string
+	Auth  struct {
+		Whitelist []model.UserWhitelistItem
+	}
+}
+
+func (c *Config) Validate() error {
+	if c.Auth.Whitelist != nil {
+		for _, i := range c.Auth.Whitelist {
+			if err := i.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 var (
@@ -36,6 +51,9 @@ func Init() {
 	config = &Config{}
 	if err := configor.Load(config, "config.yml"); err != nil {
 		log.Fatalf("failed to load config file — %v\n", err)
+	}
+	if err := config.Validate(); err != nil {
+		log.Fatalf("config is not valid – %v", err)
 	}
 
 	// Init database
