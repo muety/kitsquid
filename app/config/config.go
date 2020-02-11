@@ -70,3 +70,7 @@ func (c *Config) CacheDuration(key string, defaultVal time.Duration) time.Durati
 	}
 	return defaultVal
 }
+
+func (c *Config) IsDev() bool {
+	return c.Env == "development"
+}

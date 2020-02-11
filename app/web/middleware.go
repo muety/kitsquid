@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/web/errors"
 	"github.com/n1try/kithub2/app/web/util"
 )
 
@@ -22,22 +21,24 @@ func AssetsPush() gin.HandlerFunc {
 }
 
 func ErrorHandler() gin.HandlerFunc {
+	cfg := config.Get()
+
 	return func(c *gin.Context) {
 		c.Next()
 
-		var error errors.KitHubError
-		e := c.Errors.ByType(gin.ErrorTypePublic).Last()
-		if e == nil {
-			if e := c.Errors.Last(); e == nil {
-				return
+		if len(c.Errors) == 0 {
+			return
+		}
+
+		var errors = make([]string, 0)
+		for _, e := range c.Errors {
+			if e.Type == gin.ErrorTypePublic || cfg.IsDev() {
+				errors = append(errors, e.Error())
 			}
-			error = errors.Internal{}
-		} else {
-			error = e.Err
 		}
 
 		c.HTML(c.Writer.Status(), "error", gin.H{
-			"error":  error.Error(),
+			"errors": errors,
 			"tplCtx": util.GetTplCtx(c),
 		})
 		return

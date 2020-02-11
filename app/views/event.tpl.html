@@ -35,7 +35,7 @@
                 <div class="my-1">
                     <span class="text-md">
                         <i class="cil-external-link mr-1"></i>
-                        {{ range $i, $l := .lecture.Links }}{{ if $i }}, {{ end }}<a href="{{ $l }}" target="_blank" class="text-kit">{{ $l }}</a>{{ end }}
+                        {{ range $i, $l := .lecture.Links }}{{ if $i }}, {{ end }}<a href="{{ $l.Url }}" target="_blank" class="text-kit">{{ $l.Name }}</a>{{ end }}
                     </span>
                 </div>
                 {{ end }}

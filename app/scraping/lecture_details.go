@@ -56,10 +56,11 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			}
 
 			var (
-				desc1 string
-				desc2 string
-				desc  string
-				link  string
+				desc1   string
+				desc2   string
+				desc    string
+				link    string
+				extLink string
 			)
 
 			// Description from "Veranstaltungsdetails"
@@ -124,24 +125,32 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				desc = desc2
 			}
 
-			// Link
-			linkEl, err := htmlquery.Query(doc, "//div[@id='rwev_link']/a")
+			// External Link
+			extLinkEl, err := htmlquery.Query(doc, "//div[@id='rwev_link']/a")
 			if err != nil {
 				log.Errorf("failed to query event document for link %s\n", gguid)
 				return
 			}
+			if extLinkEl != nil {
+				extLink = htmlquery.SelectAttr(extLinkEl, "href")
+			}
+
+			// Shortlink
+			linkEl, err := htmlquery.Query(doc, "//div[@id='shortlink']/input")
+			if err != nil {
+				log.Errorf("failed to query event document for shortlink %s\n", gguid)
+				return
+			}
 			if linkEl != nil {
-				link = htmlquery.SelectAttr(linkEl, "href")
+				link = htmlquery.SelectAttr(linkEl, "value")
 			}
 
 			newLecture := *existingLecture
 			newLecture.Description = desc
 
-			if newLecture.Links == nil {
-				newLecture.Links = make([]string, 0)
-			}
-			if link != "" {
-				newLecture.Links = append(newLecture.Links, link)
+			newLecture.Links = []*model.Link{{Name: "VVZ", Url: link}}
+			if extLink != "" {
+				newLecture.Links = append(newLecture.Links, &model.Link{Name: "Link", Url: extLink})
 			}
 
 			mtx.Lock()

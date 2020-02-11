@@ -72,7 +72,7 @@ func Start() {
 }
 
 func getServeFunc(srv *http.Server) func() error {
-	if cfg.Env == "development" {
+	if cfg.IsDev() {
 		return func() error {
 			return srv.ListenAndServe()
 		}
