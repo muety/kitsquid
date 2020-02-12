@@ -18,7 +18,8 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/timshannon/bolthold v0.0.0-20200128153810-cd019dfd9224
 	go.etcd.io/bbolt v1.3.3 // indirect
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
 	golang.org/x/text v0.3.2

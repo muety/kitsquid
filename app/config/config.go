@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+// TODO: Use proper i18n
+const (
+	StrAlertSignupSuccessful = "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach."
+)
+
 type Config struct {
 	Env  string `default:"development" env:"KITHUB_ENV"`
 	Port int    `default:"8080" env:"KITHUB_PORT"`
@@ -22,7 +27,13 @@ type Config struct {
 	}
 	Cache map[string]string
 	Auth  struct {
+		Salt      string `default:"0" env:"KITHUB_AUTH_SALT"`
 		Whitelist []model.UserWhitelistItem
+	}
+	University struct {
+		Majors  []string
+		Degrees []string
+		Genders []string
 	}
 }
 

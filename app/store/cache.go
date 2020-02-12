@@ -11,11 +11,13 @@ var (
 	caches         = map[string]*cache.Cache{}
 	lecturesCache  *cache.Cache
 	facultiesCache *cache.Cache
+	usersCache     *cache.Cache
 )
 
 func initDefaultCaches() {
 	lecturesCache = GetOrInitCache("lectures", false)
 	facultiesCache = GetOrInitCache("faculties", false)
+	usersCache = GetOrInitCache("users", false)
 }
 
 func GetOrInitCache(key string, force bool) *cache.Cache {

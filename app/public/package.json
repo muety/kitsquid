@@ -7,7 +7,9 @@
     "jquery": "^3.4.1",
     "tailwindcss": "^1.1.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@tailwindcss/custom-forms": "^0.2.1"
+  },
   "scripts": {
     "build": "npx tailwind build assets/css/app.tailwind.css -o build/css/app.css && node build.js",
     "dev": "npm run build && node build.js --watch --no-build",

@@ -4,7 +4,8 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                kit: '#009682'
+                'kit': '#009682',
+                'kit-dark': '#007061'
             },
             fontFamily: {
                 sans: [
@@ -15,7 +16,9 @@ module.exports = {
         }
     },
     variants: {},
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/custom-forms'),
+    ],
     corePlugins: {
         gridTemplateColumns: true
     }

@@ -25,8 +25,10 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/")
 	group.Use(AssetsPush())
 
-	group.GET("/", routes.Index)
-	group.GET("/event/:id", routes.GetEvent)
+	group.GET("/", routes.Index(router))
+	group.GET("/event/:id", routes.GetEvent(router))
+	group.GET("/signup", routes.GetSignup(router))
+	group.POST("/signup", routes.PostSignup(router))
 
 	return group
 }

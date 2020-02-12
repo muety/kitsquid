@@ -23,9 +23,16 @@ type TplCtx struct {
 		FacultyIndex int
 		VvzBaseUrl   string
 	}
+	Alerts []string
+	Errors []string
 }
 
 func GetTplCtx(c *gin.Context) TplCtx {
+	var alerts []string
+	if _, ok := c.Request.URL.Query()["postsignup"]; ok {
+		alerts = []string{config.StrAlertSignupSuccessful}
+	}
+
 	return TplCtx{
 		Path: c.FullPath(),
 		Constants: struct {
@@ -35,6 +42,7 @@ func GetTplCtx(c *gin.Context) TplCtx {
 			FacultyIndex: config.FacultyIdx,
 			VvzBaseUrl:   config.KitVvzBaseUrl,
 		},
+		Alerts: alerts,
 	}
 }
 

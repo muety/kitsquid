@@ -37,9 +37,11 @@ func ErrorHandler() gin.HandlerFunc {
 			}
 		}
 
+		tplCtx := util.GetTplCtx(c)
+		tplCtx.Errors = errors
+
 		c.HTML(c.Writer.Status(), "error", gin.H{
-			"errors": errors,
-			"tplCtx": util.GetTplCtx(c),
+			"tplCtx": tplCtx,
 		})
 		return
 	}
