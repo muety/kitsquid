@@ -14,7 +14,7 @@ import (
 
 func Index(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		lectures, err := store.FindLectures(nil)
+		events, err := store.FindEvents(nil)
 		if err != nil {
 			c.Error(err)
 			webutil.MakeError(c, "index", http.StatusInternalServerError, errors.Internal{}, nil)
@@ -22,15 +22,15 @@ func Index(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		c.HTML(http.StatusOK, "index", gin.H{
-			"lectures": lectures,
-			"tplCtx":   webutil.GetTplCtx(c),
+			"events": events,
+			"tplCtx": webutil.GetTplCtx(c),
 		})
 	}
 }
 
 func GetEvent(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		lecture, err := store.GetLecture(c.Param("id"))
+		event, err := store.GetEvent(c.Param("id"))
 		if err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
 			webutil.MakeError(c, "event", http.StatusNotFound, errors.NotFound{}, nil)
@@ -38,8 +38,8 @@ func GetEvent(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		c.HTML(http.StatusOK, "event", gin.H{
-			"lecture": lecture,
-			"tplCtx":  webutil.GetTplCtx(c),
+			"event":  event,
+			"tplCtx": webutil.GetTplCtx(c),
 		})
 	}
 }

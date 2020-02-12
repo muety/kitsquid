@@ -9,12 +9,12 @@ func GetFaculties() ([]string, error) {
 	}
 
 	facultyMap := make(map[string]bool)
-	lectures, err := GetLectures()
+	events, err := GetEvents()
 	if err != nil {
 		return []string{}, err
 	}
 
-	for _, l := range lectures {
+	for _, l := range events {
 		if len(l.Categories) > config.FacultyIdx {
 			if _, ok := facultyMap[l.Categories[config.FacultyIdx]]; !ok {
 				facultyMap[l.Categories[config.FacultyIdx]] = true

@@ -12,36 +12,36 @@ import (
 )
 
 type FetchDetailsJob struct {
-	Lectures []*model.Lecture
+	Events []*model.Event
 }
 
-type LectureDetailsScraper struct{}
+type EventDetailsScraper struct{}
 
-func NewLectureDetailsScraper() *LectureDetailsScraper {
-	return &LectureDetailsScraper{}
+func NewEventDetailsScraper() *EventDetailsScraper {
+	return &EventDetailsScraper{}
 }
 
-func (l LectureDetailsScraper) Schedule(job ScrapeJob, cronExp string) {
+func (l EventDetailsScraper) Schedule(job ScrapeJob, cronExp string) {
 }
 
-func (l LectureDetailsScraper) Run(job ScrapeJob) (interface{}, error) {
+func (l EventDetailsScraper) Run(job ScrapeJob) (interface{}, error) {
 	return job.process()
 }
 
 func (f FetchDetailsJob) process() (interface{}, error) {
-	var updatedLectures = make([]*model.Lecture, len(f.Lectures))
+	var updatedEvents = make([]*model.Event, len(f.Events))
 
 	ctx := context.TODO()
 	mtx := &sync.Mutex{}
 	sem := semaphore.NewWeighted(int64(maxWorkers))
 
-	for i, l := range f.Lectures {
+	for i, l := range f.Events {
 		if err := sem.Acquire(ctx, 1); err != nil {
-			log.Errorf("failed to acquire semaphore while fetching lecture details – %v\n", err)
+			log.Errorf("failed to acquire semaphore while fetching event details – %v\n", err)
 			continue
 		}
 
-		go func(index int, gguid string, existingLecture *model.Lecture) {
+		go func(index int, gguid string, existingEvent *model.Event) {
 			defer sem.Release(1)
 			u, _ := url.Parse(eventUrl)
 			q := u.Query()
@@ -145,16 +145,16 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				link = htmlquery.SelectAttr(linkEl, "value")
 			}
 
-			newLecture := *existingLecture
-			newLecture.Description = desc
+			newEvent := *existingEvent
+			newEvent.Description = desc
 
-			newLecture.Links = []*model.Link{{Name: "VVZ", Url: link}}
+			newEvent.Links = []*model.Link{{Name: "VVZ", Url: link}}
 			if extLink != "" {
-				newLecture.Links = append(newLecture.Links, &model.Link{Name: "Link", Url: extLink})
+				newEvent.Links = append(newEvent.Links, &model.Link{Name: "Link", Url: extLink})
 			}
 
 			mtx.Lock()
-			updatedLectures[index] = &newLecture
+			updatedEvents[index] = &newEvent
 			mtx.Unlock()
 			log.Flush()
 		}(i, l.Gguid, l)
@@ -164,5 +164,5 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 		log.Errorf("failed to acquire semaphore – %v\n", err)
 	}
 
-	return updatedLectures, nil
+	return updatedEvents, nil
 }

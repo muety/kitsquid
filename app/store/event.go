@@ -2,39 +2,38 @@ package store
 
 import (
 	"fmt"
-	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/model"
 	"github.com/timshannon/bolthold"
 	"regexp"
 )
 
-func GetLecture(id string) (*model.Lecture, error) {
+func GetEvent(id string) (*model.Event, error) {
 	cacheKey := fmt.Sprintf("get:%s", id)
-	if l, ok := lecturesCache.Get(cacheKey); ok {
-		return l.(*model.Lecture), nil
+	if l, ok := eventsCache.Get(cacheKey); ok {
+		return l.(*model.Event), nil
 	}
 
-	var lecture model.Lecture
-	if err := db.Get(id, &lecture); err != nil {
+	var event model.Event
+	if err := db.Get(id, &event); err != nil {
 		return nil, err
 	}
 
-	lecturesCache.SetDefault(cacheKey, &lecture)
-	return &lecture, nil
+	eventsCache.SetDefault(cacheKey, &event)
+	return &event, nil
 }
 
-func GetLectures() ([]*model.Lecture, error) {
-	return FindLectures(nil)
+func GetEvents() ([]*model.Event, error) {
+	return FindEvents(nil)
 }
 
 // TODO: Use indices!!!
-func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
+func FindEvents(query *model.EventQuery) ([]*model.Event, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
-	if ll, ok := lecturesCache.Get(cacheKey); ok {
-		return ll.([]*model.Lecture), nil
+	if ll, ok := eventsCache.Get(cacheKey); ok {
+		return ll.([]*model.Event), nil
 	}
 
-	var lectures []*model.Lecture
+	var events []*model.Event
 
 	q := bolthold.Where("Id").Not().Eq("")
 
@@ -64,26 +63,26 @@ func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
 		}
 	}
 
-	err := db.Find(&lectures, q)
+	err := db.Find(&events, q)
 	if err == nil {
-		lecturesCache.SetDefault(cacheKey, lectures)
+		eventsCache.SetDefault(cacheKey, events)
 	}
-	return lectures, err
+	return events, err
 }
 
-func InsertLecture(lecture *model.Lecture, upsert bool) error {
-	lecturesCache.Flush()
+func InsertEvent(event *model.Event, upsert bool) error {
+	eventsCache.Flush()
 	facultiesCache.Flush()
 
 	f := db.Insert
 	if upsert {
 		f = db.Upsert
 	}
-	return f(lecture.Id, lecture)
+	return f(event.Id, event)
 }
 
-func InsertLectures(lectures []*model.Lecture, upsert bool) error {
-	lecturesCache.Flush()
+func InsertEvents(events []*model.Event, upsert bool) error {
+	eventsCache.Flush()
 	facultiesCache.Flush()
 
 	f := db.TxInsert
@@ -97,7 +96,7 @@ func InsertLectures(lectures []*model.Lecture, upsert bool) error {
 	}
 	defer tx.Rollback()
 
-	for _, l := range lectures {
+	for _, l := range events {
 		if err := f(tx, l.Id, l); err != nil {
 			return err
 		}

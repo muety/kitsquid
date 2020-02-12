@@ -15,54 +15,54 @@ import (
 	"sync"
 )
 
-type FetchLecturesJob struct {
+type FetchEventsJob struct {
 	Semester model.SemesterKey
 }
 
-type listLectureFacultiesJob struct {
+type listEventFacultiesJob struct {
 	Tguid string
 }
 
-type listLectureCategoriesJob struct {
-	Tguid string
-	Gguid string
-}
-
-type listLecturesJob struct {
+type listEventCategoriesJob struct {
 	Tguid string
 	Gguid string
 }
 
-type lectureFaculty struct {
+type listEventsJob struct {
+	Tguid string
+	Gguid string
+}
+
+type eventFaculty struct {
 	Gguid string
 	Name  string
 }
 
-type lectureCategory struct {
+type eventCategory struct {
 	Gguid string
 	Name  string
 }
 
-type LectureScraper struct{}
+type EventScraper struct{}
 
-func NewLectureScraper() *LectureScraper {
-	return &LectureScraper{}
+func NewEventScraper() *EventScraper {
+	return &EventScraper{}
 }
 
-func (l LectureScraper) Schedule(job ScrapeJob, cronExp string) {
+func (l EventScraper) Schedule(job ScrapeJob, cronExp string) {
 }
 
-func (l LectureScraper) Run(job ScrapeJob) (interface{}, error) {
+func (l EventScraper) Run(job ScrapeJob) (interface{}, error) {
 	return job.process()
 }
 
-func (l FetchLecturesJob) process() (interface{}, error) {
-	var lectures = make([]*model.Lecture, 0)
-	var categories = make([]*lectureCategory, 0)
-	var faculties = make([]*lectureFaculty, 0)
+func (l FetchEventsJob) process() (interface{}, error) {
+	var events = make([]*model.Event, 0)
+	var categories = make([]*eventCategory, 0)
+	var faculties = make([]*eventFaculty, 0)
 
-	makeError := func(err error) ([]*model.Lecture, error) {
-		return lectures, err
+	makeError := func(err error) ([]*model.Event, error) {
+		return events, err
 	}
 
 	tguid, err := config.ResolveSemesterId(l.Semester)
@@ -70,32 +70,32 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 		return makeError(err)
 	}
 
-	job1 := listLectureFacultiesJob{Tguid: tguid}
+	job1 := listEventFacultiesJob{Tguid: tguid}
 	result1, err := job1.process()
 	if err != nil {
 		return makeError(err)
 	}
-	faculties = result1.([]*lectureFaculty)
+	faculties = result1.([]*eventFaculty)
 
 	for _, faculty := range faculties {
-		job2 := listLectureCategoriesJob{Tguid: tguid, Gguid: faculty.Gguid}
+		job2 := listEventCategoriesJob{Tguid: tguid, Gguid: faculty.Gguid}
 		result2, err := job2.process()
 		if err != nil {
 			log.Errorf("failed to fetch categories – %v\n", err)
 			continue
 		}
-		categories = append(categories, result2.([]*lectureCategory)...)
+		categories = append(categories, result2.([]*eventCategory)...)
 	}
 
 	ctx := context.TODO()
 	mtx := &sync.Mutex{}
 	sem := semaphore.NewWeighted(int64(maxWorkers))
 
-	lectureMap := make(map[string]*model.Lecture)
-	addLectures := func(lectureList []*model.Lecture) {
-		for _, l := range lectureList {
-			if item, ok := lectureMap[l.Id]; !ok {
-				lectureMap[l.Id] = l
+	eventMap := make(map[string]*model.Event)
+	addEvents := func(eventList []*model.Event) {
+		for _, l := range eventList {
+			if item, ok := eventMap[l.Id]; !ok {
+				eventMap[l.Id] = l
 			} else {
 				// Merge categories
 				newCategories := make([]string, 0)
@@ -111,7 +111,7 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 
 	for _, cat := range categories {
 		if err := sem.Acquire(ctx, 1); err != nil {
-			log.Errorf("failed to acquire semaphore while fetching lectures – %v\n", err)
+			log.Errorf("failed to acquire semaphore while fetching events – %v\n", err)
 			continue
 		}
 
@@ -119,15 +119,15 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 
 		go func() {
 			defer sem.Release(1)
-			job := listLecturesJob{Tguid: tguid, Gguid: catId}
+			job := listEventsJob{Tguid: tguid, Gguid: catId}
 			result, err := job.process()
 			if err != nil {
-				log.Errorf("failed to fetch lectures – %v\n", err)
+				log.Errorf("failed to fetch events – %v\n", err)
 				return
 			}
 
 			mtx.Lock()
-			addLectures(result.([]*model.Lecture))
+			addEvents(result.([]*model.Event))
 			mtx.Unlock()
 			log.Flush()
 		}()
@@ -138,17 +138,17 @@ func (l FetchLecturesJob) process() (interface{}, error) {
 	}
 
 	i := 0
-	lectures = make([]*model.Lecture, len(lectureMap))
-	for _, l := range lectureMap {
-		lectures[i] = l
+	events = make([]*model.Event, len(eventMap))
+	for _, l := range eventMap {
+		events[i] = l
 		i++
 	}
 
-	return lectures, nil
+	return events, nil
 }
 
-func (l listLectureFacultiesJob) process() (interface{}, error) {
-	faculties := make([]*lectureFaculty, 0)
+func (l listEventFacultiesJob) process() (interface{}, error) {
+	faculties := make([]*eventFaculty, 0)
 
 	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
@@ -158,7 +158,7 @@ func (l listLectureFacultiesJob) process() (interface{}, error) {
 	q.Add("lang", language.German.String()) // TODO: make configurable
 	u.RawQuery = q.Encode()
 
-	log.V(2).Infof("[listLectureFacultiesJob] processing %s\n", u.String())
+	log.V(2).Infof("[listEventFacultiesJob] processing %s\n", u.String())
 	doc, err := htmlquery.LoadURL(u.String())
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
@@ -176,7 +176,7 @@ func (l listLectureFacultiesJob) process() (interface{}, error) {
 		href := htmlquery.SelectAttr(a, "href")
 		matches := reGguid.FindStringSubmatch(href)
 		if len(matches) == 2 {
-			faculties = append(faculties, &lectureFaculty{
+			faculties = append(faculties, &eventFaculty{
 				Name:  name,
 				Gguid: matches[1], // gguid
 			})
@@ -188,8 +188,8 @@ func (l listLectureFacultiesJob) process() (interface{}, error) {
 	return faculties, nil
 }
 
-func (l listLectureCategoriesJob) process() (interface{}, error) {
-	categories := make([]*lectureCategory, 0)
+func (l listEventCategoriesJob) process() (interface{}, error) {
+	categories := make([]*eventCategory, 0)
 
 	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
@@ -201,7 +201,7 @@ func (l listLectureCategoriesJob) process() (interface{}, error) {
 	q.Add("pagesize", "250")
 	u.RawQuery = q.Encode()
 
-	log.V(2).Infof("[listLectureCategoriesJob] processing %s\n", u.String())
+	log.V(2).Infof("[listEventCategoriesJob] processing %s\n", u.String())
 	doc, err := htmlquery.LoadURL(u.String())
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
@@ -220,7 +220,7 @@ func (l listLectureCategoriesJob) process() (interface{}, error) {
 
 		matches := reGguid.FindStringSubmatch(href)
 		if len(matches) == 2 {
-			categories = append(categories, &lectureCategory{
+			categories = append(categories, &eventCategory{
 				Name:  name,
 				Gguid: matches[1], // gguid
 			})
@@ -232,8 +232,8 @@ func (l listLectureCategoriesJob) process() (interface{}, error) {
 	return categories, nil
 }
 
-func (l listLecturesJob) process() (interface{}, error) {
-	lectures := make([]*model.Lecture, 0)
+func (l listEventsJob) process() (interface{}, error) {
+	events := make([]*model.Event, 0)
 
 	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 	reStripPagetitle := regexp.MustCompile(`.+: +(.+) +\(.+\)`)
@@ -247,7 +247,7 @@ func (l listLecturesJob) process() (interface{}, error) {
 	q.Add("pagesize", "250")
 	u.RawQuery = q.Encode()
 
-	log.V(2).Infof("[listLecturesJob] processing %s\n", u.String())
+	log.V(2).Infof("[listEventsJob] processing %s\n", u.String())
 	doc, err := htmlquery.LoadURL(u.String())
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
@@ -261,7 +261,7 @@ func (l listLecturesJob) process() (interface{}, error) {
 	var childCatFound bool
 	h1, err := htmlquery.Query(doc, "//h1[@class='pagetitle']")
 	if err != nil {
-		log.Errorf("failed to query lectures document for title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		log.Errorf("failed to query events document for title for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
 		return nil, err
 	}
 	if title := htmlquery.InnerText(h1); title != "" {
@@ -277,7 +277,7 @@ func (l listLecturesJob) process() (interface{}, error) {
 	// Extract parent categories from breadcrumbs
 	as, err := htmlquery.QueryAll(doc, "//li[@class='breadcrumb-item']/a")
 	if err != nil {
-		log.Errorf("failed to query lectures document for breadcrumbs for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		log.Errorf("failed to query events document for breadcrumbs for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
 		return nil, err
 	}
 
@@ -310,45 +310,45 @@ func (l listLecturesJob) process() (interface{}, error) {
 
 	trs, err := htmlquery.QueryAll(doc, "//table[@id='EVENTLIST']/tbody[@class='tablecontent']/tr")
 	if err != nil {
-		log.Errorf("failed to query lectures document for rows for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
+		log.Errorf("failed to query events document for rows for tguid %s and gguid %s\n", l.Tguid, l.Gguid)
 		return nil, err
 	}
 
-	var currentLecture *model.Lecture
+	var currentEvent *model.Event
 	for i, tr := range trs {
 		if htmlquery.SelectAttr(tr, "id") != "" {
-			// Case 1: Lecture row
+			// Case 1: Event row
 
-			currentLecture = &model.Lecture{Categories: categories}
+			currentEvent = &model.Event{Categories: categories}
 			reLecturerId := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 			tds, err := htmlquery.QueryAll(tr, "/td")
 			if err != nil || len(tds) != 6 {
-				log.Errorf("failed to parse lecture columns for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
+				log.Errorf("failed to parse event columns for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
 
 			// LV-Nr
 			a, err := htmlquery.Query(tds[1], "/a")
 			if err != nil {
-				log.Errorf("failed to get lecture id for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
+				log.Errorf("failed to get event id for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
-			currentLecture.Id = htmlquery.InnerText(a)
+			currentEvent.Id = htmlquery.InnerText(a)
 
 			// Titel
 			a, err = htmlquery.Query(tds[2], "/a")
 			if err != nil {
-				log.Errorf("failed to get lecture title for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
+				log.Errorf("failed to get event title for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
-			currentLecture.Name = htmlquery.InnerText(a)
+			currentEvent.Name = htmlquery.InnerText(a)
 
 			// Gguid
 			if href := htmlquery.SelectAttr(a, "href"); href != "" {
 				matches := reGguid.FindStringSubmatch(href)
 				if len(matches) == 2 {
-					currentLecture.Gguid = matches[1]
+					currentEvent.Gguid = matches[1]
 				} else {
 					log.Errorf("failed to find gguid for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 					continue
@@ -361,10 +361,10 @@ func (l listLecturesJob) process() (interface{}, error) {
 			// Art
 			a, err = htmlquery.Query(tds[4], "/a")
 			if err != nil {
-				log.Errorf("failed to get lecture type for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
+				log.Errorf("failed to get event type for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
-			currentLecture.Type = htmlquery.InnerText(a)
+			currentEvent.Type = htmlquery.InnerText(a)
 
 			// Dozenten
 			lecturers := make([]*model.Lecturer, 0)
@@ -393,12 +393,12 @@ func (l listLecturesJob) process() (interface{}, error) {
 				lecturers = append(lecturers, lecturer)
 			}
 
-			currentLecture.Lecturers = lecturers
-			lectures = append(lectures, currentLecture)
+			currentEvent.Lecturers = lecturers
+			events = append(events, currentEvent)
 		} else {
 			// Case 2: Date row
-			if currentLecture == nil {
-				log.Errorf("tried to parse dates without an active lecture for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid)
+			if currentEvent == nil {
+				log.Errorf("tried to parse dates without an active event for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid)
 				continue
 			}
 
@@ -421,12 +421,12 @@ func (l listLecturesJob) process() (interface{}, error) {
 					continue
 				}
 
-				if currentLecture.Dates == nil {
-					currentLecture.Dates = make([]*model.LectureDate, 0)
+				if currentEvent.Dates == nil {
+					currentEvent.Dates = make([]*model.EventDate, 0)
 				}
 
 				if dateEl != nil && roomEl != nil {
-					currentLecture.Dates = append(currentLecture.Dates, &model.LectureDate{
+					currentEvent.Dates = append(currentEvent.Dates, &model.EventDate{
 						Date: htmlquery.InnerText(dateEl),
 						Room: htmlquery.InnerText(roomEl),
 					})
@@ -435,5 +435,5 @@ func (l listLecturesJob) process() (interface{}, error) {
 		}
 	}
 
-	return lectures, nil
+	return events, nil
 }

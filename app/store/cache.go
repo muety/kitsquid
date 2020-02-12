@@ -9,13 +9,13 @@ import (
 
 var (
 	caches         = map[string]*cache.Cache{}
-	lecturesCache  *cache.Cache
+	eventsCache    *cache.Cache
 	facultiesCache *cache.Cache
 	usersCache     *cache.Cache
 )
 
 func initDefaultCaches() {
-	lecturesCache = GetOrInitCache("lectures", false)
+	eventsCache = GetOrInitCache("events", false)
 	facultiesCache = GetOrInitCache("faculties", false)
 	usersCache = GetOrInitCache("users", false)
 }

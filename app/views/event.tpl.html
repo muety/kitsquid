@@ -4,46 +4,46 @@
             <span>&nbsp;ᐅ&nbsp;</span>
             <a href="/" class="underline">Vorlesungen</a>
             <span>&nbsp;ᐅ&nbsp;</span>
-            <a href="#" class="underline">{{ .lecture.Name }}</a>
+            <a href="#" class="underline">{{ .event.Name }}</a>
         </div>
         <div class="flex flex-wrap items-start md:flex-no-wrap">
             <div class="w-full md:w-2/3 lg:w-3/4 rounded relative overflow-hidden shadow-md bg-white mb-8 mr-0 md:mr-2">
                 <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
                     <div class="flex items-center sm:items-start mb-4">
-                        <h1 class="text-2xl inline-block border-b-4 border-kit">{{ .lecture.Name }}</h1>
-                        <div class="relative inline-block m-2 ml-4 py-1 px-2 bg-gray-400 rounded text-md text-gray-700 font-semibold flex-grow-0" title="{{ .lecture.Type }}">
-                            <span class="cursor-default">{{ strIndex 0 .lecture.Type }}</span>
+                        <h1 class="text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
+                        <div class="relative inline-block m-2 ml-4 py-1 px-2 bg-gray-400 rounded text-md text-gray-700 font-semibold flex-grow-0" title="{{ .event.Type }}">
+                            <span class="cursor-default">{{ strIndex 0 .event.Type }}</span>
                         </div>
                     </div>
                     <div class="flex flex-wrap mb-3">
-                        {{ range slice .lecture.Categories 1 }}
+                        {{ range slice .event.Categories 1 }}
                             <div class="rounded bg-gray-400 py-1 px-2 mr-2 mb-1 truncate text-sm" title="{{ . }}">{{ . }}</div>
                         {{ end }}
                     </div>
                     <div class="my-1">
                         <span class="text-md">
                             <i class="cil-user mr-1"></i>
-                            {{ range $i, $e := .lecture.Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
+                            {{ range $i, $e := .event.Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
                         </span>
                     </div>
                     <div class="my-1">
                         <span class="text-md">
                             <i class="cil-building mr-1"></i>
-                            <span class="border-b-2" style="border-color: {{ randomColor (index .lecture.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .lecture.Categories .tplCtx.Constants.FacultyIndex }}</span>
+                            <span class="border-b-2" style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .event.Categories .tplCtx.Constants.FacultyIndex }}</span>
                         </span>
                     </div>
-                    {{ if .lecture.Links }}
+                    {{ if .event.Links }}
                     <div class="my-1">
                         <span class="text-md">
                             <i class="cil-external-link mr-1"></i>
-                            {{ range $i, $l := .lecture.Links }}{{ if $i }}, {{ end }}<a href="{{ $l.Url }}" target="_blank" class="text-kit">{{ $l.Name }}</a>{{ end }}
+                            {{ range $i, $l := .event.Links }}{{ if $i }}, {{ end }}<a href="{{ $l.Url }}" target="_blank" class="text-kit">{{ $l.Name }}</a>{{ end }}
                         </span>
                     </div>
                     {{ end }}
-                    {{ if .lecture.Description }}
+                    {{ if .event.Description }}
                     <div class="my-1 mt-8">
                         <div class="show-li text-sm">
-                            {{ htmlSafe .lecture.Description }}
+                            {{ htmlSafe .event.Description }}
                         </div>
                     </div>
                     {{ end }}
@@ -55,7 +55,7 @@
                     <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Termine</h2>
                     <div class="text-sm">
                         <ul class="">
-                            {{ range .lecture.Dates }}
+                            {{ range .event.Dates }}
                                 <li class="mb-2">
                                     <span><i class="cil-calendar mr-2"></i>{{ .Date }}</span>
                                     <br>

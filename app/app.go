@@ -24,7 +24,7 @@ func init() {
 
 func readCategories(atIndex, minItems int) []string {
 	categoryMap := make(map[string]bool)
-	lectures, err := store.GetLectures()
+	lectures, err := store.GetEvents()
 	if err != nil {
 		log.Fatalf("failed to read categories")
 	}
@@ -44,41 +44,41 @@ func readCategories(atIndex, minItems int) []string {
 }
 
 func _debugScrape() {
-	scraper := scraping.NewLectureScraper()
-	job := scraping.FetchLecturesJob{Semester: model.SemesterWs1819}
+	scraper := scraping.NewEventScraper()
+	job := scraping.FetchEventsJob{Semester: model.SemesterWs1819}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)
 	}
 	log.Flush()
 
-	if err := store.InsertLectures(result.([]*model.Lecture), true); err != nil {
+	if err := store.InsertEvents(result.([]*model.Event), true); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
 }
 
 func _debugScrapeDetails() {
-	scraper := scraping.NewLectureDetailsScraper()
-	ls, err := store.GetLectures()
+	scraper := scraping.NewEventDetailsScraper()
+	ls, err := store.GetEvents()
 	if err != nil {
 		panic(err)
 	}
-	job := scraping.FetchDetailsJob{Lectures: ls}
+	job := scraping.FetchDetailsJob{Events: ls}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)
 	}
 	log.Flush()
 
-	for _, l := range result.([]*model.Lecture) {
-		if err := store.InsertLecture(l, true); err != nil {
+	for _, l := range result.([]*model.Event) {
+		if err := store.InsertEvent(l, true); err != nil {
 			log.Errorf("failed to update lecture %s – %v\n", l.Id, err)
 		}
 	}
 }
 
 func _debugGet() {
-	ls, err := store.FindLectures(&model.LectureQuery{
+	ls, err := store.FindEvents(&model.EventQuery{
 		LecturerIdEq: "0xE4129354DF0A3A4E8EE42CD65C5BCD1C",
 	})
 	if err != nil {

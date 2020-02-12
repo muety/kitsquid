@@ -10,7 +10,7 @@ const (
 	SemesterWs1819 SemesterKey = "WS18/19"
 )
 
-type Lecture struct {
+type Event struct {
 	Id          string
 	Gguid       string
 	Name        string
@@ -18,11 +18,11 @@ type Lecture struct {
 	Description string
 	Categories  []string
 	Links       []*Link
-	Dates       []*LectureDate
+	Dates       []*EventDate
 	Lecturers   []*Lecturer
 }
 
-type LectureDate struct {
+type EventDate struct {
 	Date string
 	Room string
 }
@@ -37,18 +37,18 @@ type Link struct {
 	Url  string
 }
 
-type LectureQuery struct {
+type EventQuery struct {
 	NameLike     string
 	TypeEq       string
 	LecturerIdEq string
 	CategoryIn   []string
 }
 
-func (l *Lecture) Link(baseUrl string) string {
+func (l *Event) Link(baseUrl string) string {
 	return fmt.Sprintf("%s/event.asp?gguid=%s", baseUrl, l.Gguid)
 }
 
-func (l Lecture) String() string {
+func (l Event) String() string {
 	return fmt.Sprintf("[%s] %s (%s) @ %v by %s\n", l.Id, l.Name, l.Type, l.Categories, l.Lecturers)
 }
 
