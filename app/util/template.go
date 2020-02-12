@@ -2,9 +2,8 @@ package util
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/util"
-	"github.com/n1try/kithub2/app/web/errors"
 	"html/template"
 	"strings"
 )
@@ -14,7 +13,7 @@ func GetFuncMap() template.FuncMap {
 		"strIndex":    strIndex,
 		"strRemove":   strRemove,
 		"htmlSafe":    htmlSafe,
-		"randomColor": util.RandomColor,
+		"randomColor": RandomColor,
 	}
 }
 
@@ -36,7 +35,7 @@ func GetTplCtx(c *gin.Context) TplCtx {
 
 	if alert, ok := c.Request.URL.Query()["alert"]; ok {
 		if msg, ok := config.Messages[alert[0]]; ok {
-			alert = append(alert, msg)
+			alerts = append(alerts, msg)
 		}
 	}
 	if err, ok := c.Request.URL.Query()["error"]; ok {
@@ -75,8 +74,6 @@ func MakeError(c *gin.Context, tpl string, status int, error errors.KitHubError,
 
 	c.HTML(status, tpl, h)
 }
-
-// Template funcs
 
 func strIndex(x int, v string) string {
 	return string([]rune(v)[:1])

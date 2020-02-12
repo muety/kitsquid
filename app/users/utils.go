@@ -1,18 +1,18 @@
-package util
+package users
 
 import (
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/model"
+	"github.com/n1try/kithub2/app/util"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func ValidateUser(u *model.User) bool {
+func Validate(u *User) bool {
 	cfg := config.Get()
 	whitelist := config.Get().Auth.Whitelist
 
-	if !ContainsString(u.Degree, cfg.University.Degrees) ||
-		!ContainsString(u.Major, cfg.University.Majors) ||
-		!ContainsString(u.Gender, cfg.University.Genders) {
+	if !util.ContainsString(u.Degree, cfg.University.Degrees) ||
+		!util.ContainsString(u.Major, cfg.University.Majors) ||
+		!util.ContainsString(u.Gender, cfg.University.Genders) {
 		return false
 	}
 
@@ -27,7 +27,7 @@ func ValidateUser(u *model.User) bool {
 	return false
 }
 
-func HashPassword(u *model.User) error {
+func HashPassword(u *User) error {
 	cfg := config.Get()
 	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password+cfg.Auth.Salt), bcrypt.DefaultCost)
 	if err == nil {
@@ -36,7 +36,7 @@ func HashPassword(u *model.User) error {
 	return err
 }
 
-func CheckPasswordHash(u *model.User, plainPassword string) bool {
+func CheckPasswordHash(u *User, plainPassword string) bool {
 	cfg := config.Get()
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainPassword+cfg.Auth.Salt))
 	return err == nil

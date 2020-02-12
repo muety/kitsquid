@@ -1,13 +1,7 @@
-package model
+package events
 
 import (
 	"fmt"
-)
-
-type SemesterKey string
-
-const (
-	SemesterWs1819 SemesterKey = "WS18/19"
 )
 
 type Event struct {
@@ -20,6 +14,18 @@ type Event struct {
 	Links       []*Link
 	Dates       []*EventDate
 	Lecturers   []*Lecturer
+}
+
+func (l *Event) Link(baseUrl string) string {
+	return fmt.Sprintf("%s/event.asp?gguid=%s", baseUrl, l.Gguid)
+}
+
+func (l Event) String() string {
+	return fmt.Sprintf("[%s] %s (%s) @ %v by %s\n", l.Id, l.Name, l.Type, l.Categories, l.Lecturers)
+}
+
+func (l Lecturer) String() string {
+	return l.Name
 }
 
 type EventDate struct {
@@ -42,16 +48,4 @@ type EventQuery struct {
 	TypeEq       string
 	LecturerIdEq string
 	CategoryIn   []string
-}
-
-func (l *Event) Link(baseUrl string) string {
-	return fmt.Sprintf("%s/event.asp?gguid=%s", baseUrl, l.Gguid)
-}
-
-func (l Event) String() string {
-	return fmt.Sprintf("[%s] %s (%s) @ %v by %s\n", l.Id, l.Name, l.Type, l.Categories, l.Lecturers)
-}
-
-func (l Lecturer) String() string {
-	return l.Name
 }

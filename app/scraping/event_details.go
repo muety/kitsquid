@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
-	"github.com/n1try/kithub2/app/model"
+	"github.com/n1try/kithub2/app/events"
 	"golang.org/x/sync/semaphore"
 	"net/url"
 	"strings"
@@ -12,7 +12,7 @@ import (
 )
 
 type FetchDetailsJob struct {
-	Events []*model.Event
+	Events []*events.Event
 }
 
 type EventDetailsScraper struct{}
@@ -29,7 +29,7 @@ func (l EventDetailsScraper) Run(job ScrapeJob) (interface{}, error) {
 }
 
 func (f FetchDetailsJob) process() (interface{}, error) {
-	var updatedEvents = make([]*model.Event, len(f.Events))
+	var updatedEvents = make([]*events.Event, len(f.Events))
 
 	ctx := context.TODO()
 	mtx := &sync.Mutex{}
@@ -41,7 +41,7 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			continue
 		}
 
-		go func(index int, gguid string, existingEvent *model.Event) {
+		go func(index int, gguid string, existingEvent *events.Event) {
 			defer sem.Release(1)
 			u, _ := url.Parse(eventUrl)
 			q := u.Query()
@@ -148,9 +148,9 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			newEvent := *existingEvent
 			newEvent.Description = desc
 
-			newEvent.Links = []*model.Link{{Name: "VVZ", Url: link}}
+			newEvent.Links = []*events.Link{{Name: "VVZ", Url: link}}
 			if extLink != "" {
-				newEvent.Links = append(newEvent.Links, &model.Link{Name: "Link", Url: extLink})
+				newEvent.Links = append(newEvent.Links, &events.Link{Name: "Link", Url: extLink})
 			}
 
 			mtx.Lock()

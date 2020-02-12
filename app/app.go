@@ -4,10 +4,11 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/golang/glog"
+	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/model"
+	"github.com/n1try/kithub2/app/events"
 	"github.com/n1try/kithub2/app/scraping"
-	"github.com/n1try/kithub2/app/store"
+	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/web"
 )
 
@@ -18,48 +19,35 @@ func init() {
 	flag.Parse()
 
 	config.Init()
-	store.Init()
 	web.Init()
+	events.Init(config.Db())
+	users.Init(config.Db())
 }
 
-func readCategories(atIndex, minItems int) []string {
-	categoryMap := make(map[string]bool)
-	lectures, err := store.GetEvents()
-	if err != nil {
-		log.Fatalf("failed to read categories")
-	}
-	for _, l := range lectures {
-		if len(l.Categories) >= minItems {
-			categoryMap[l.Categories[atIndex]] = true
-		}
-	}
-
-	result := make([]string, len(categoryMap))
-	i := 0
-	for k, _ := range categoryMap {
-		result[i] = k
-		i++
-	}
-	return result
+func Run() {
+	web.Start()
+	//_debugScrape()
+	//_debugScrapeDetails()
+	//_debugGet()
 }
 
 func _debugScrape() {
 	scraper := scraping.NewEventScraper()
-	job := scraping.FetchEventsJob{Semester: model.SemesterWs1819}
+	job := scraping.FetchEventsJob{Semester: common.SemesterWs1819}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)
 	}
 	log.Flush()
 
-	if err := store.InsertEvents(result.([]*model.Event), true); err != nil {
+	if err := events.InsertMulti(result.([]*events.Event), true); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
 }
 
 func _debugScrapeDetails() {
 	scraper := scraping.NewEventDetailsScraper()
-	ls, err := store.GetEvents()
+	ls, err := events.GetAll()
 	if err != nil {
 		panic(err)
 	}
@@ -70,26 +58,19 @@ func _debugScrapeDetails() {
 	}
 	log.Flush()
 
-	for _, l := range result.([]*model.Event) {
-		if err := store.InsertEvent(l, true); err != nil {
+	for _, l := range result.([]*events.Event) {
+		if err := events.Insert(l, true); err != nil {
 			log.Errorf("failed to update lecture %s – %v\n", l.Id, err)
 		}
 	}
 }
 
 func _debugGet() {
-	ls, err := store.FindEvents(&model.EventQuery{
+	ls, err := events.FindAll(&events.EventQuery{
 		LecturerIdEq: "0xE4129354DF0A3A4E8EE42CD65C5BCD1C",
 	})
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
 	fmt.Println(ls)
-}
-
-func Run() {
-	web.Start()
-	//_debugScrape()
-	//_debugScrapeDetails()
-	//_debugGet()
 }

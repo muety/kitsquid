@@ -1,25 +1,14 @@
-package model
+package common
 
 import (
 	"regexp"
-	"time"
 )
 
-type UserValidator func(s *User) bool
+type SemesterKey string
 
-type User struct {
-	Id        string    `form:"user" binding:"required"`
-	Password  string    `form:"password" binding:"required"`
-	Active    bool      `form:""`
-	Gender    string    `form:"gender" binding:"required"`
-	Major     string    `form:"major" binding:"required"`
-	Degree    string    `form:"degree" binding:"required"`
-	CreatedAt time.Time `form:""`
-}
-
-func (s *User) IsValid(validator UserValidator) bool {
-	return validator(s)
-}
+const (
+	SemesterWs1819 SemesterKey = "WS18/19"
+)
 
 type UserWhitelistItem struct {
 	MailPrefixPattern string `yaml:"prefix-pattern"`

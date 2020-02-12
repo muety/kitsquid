@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/web/util"
+	"github.com/n1try/kithub2/app/util"
 	"net/http"
 	"os"
 	"os/signal"

@@ -2,8 +2,9 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kithub2/app/web/errors"
-	"github.com/n1try/kithub2/app/web/routes"
+	"github.com/n1try/kithub2/app/common/errors"
+	"github.com/n1try/kithub2/app/events"
+	"github.com/n1try/kithub2/app/users"
 	"net/http"
 )
 
@@ -25,10 +26,8 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/")
 	group.Use(AssetsPush())
 
-	group.GET("/", routes.Index(router))
-	group.GET("/event/:id", routes.GetEvent(router))
-	group.GET("/signup", routes.GetSignup(router))
-	group.POST("/signup", routes.PostSignup(router))
+	events.RegisterRoutes(router, group)
+	users.RegisterRoutes(router, group)
 
 	return group
 }

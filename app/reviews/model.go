@@ -1,4 +1,4 @@
-package model
+package reviews
 
 type Review struct {
 	Id      string

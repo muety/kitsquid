@@ -3,7 +3,7 @@ package config
 import (
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
-	"github.com/n1try/kithub2/app/model"
+	"github.com/n1try/kithub2/app/common"
 	"github.com/timshannon/bolthold"
 	"strconv"
 	"time"
@@ -13,6 +13,11 @@ import (
 var Messages = map[string]string{
 	"signup_success": "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach",
 }
+
+const (
+	KitVvzBaseUrl = "https://campus.kit.edu/live-stud/campus/all"
+	FacultyIdx    = 0
+)
 
 type Config struct {
 	Env  string `default:"development" env:"KITHUB_ENV"`
@@ -28,7 +33,7 @@ type Config struct {
 	Cache map[string]string
 	Auth  struct {
 		Salt      string `default:"0" env:"KITHUB_AUTH_SALT"`
-		Whitelist []model.UserWhitelistItem
+		Whitelist []common.UserWhitelistItem
 	}
 	University struct {
 		Majors  []string
