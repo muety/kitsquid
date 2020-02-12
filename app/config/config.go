@@ -10,9 +10,9 @@ import (
 )
 
 // TODO: Use proper i18n
-const (
-	StrAlertSignupSuccessful = "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach."
-)
+var Messages = map[string]string{
+	"signup_success": "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach",
+}
 
 type Config struct {
 	Env  string `default:"development" env:"KITHUB_ENV"`

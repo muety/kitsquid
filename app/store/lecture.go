@@ -31,7 +31,6 @@ func GetLectures() ([]*model.Lecture, error) {
 func FindLectures(query *model.LectureQuery) ([]*model.Lecture, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
 	if ll, ok := lecturesCache.Get(cacheKey); ok {
-		log.Infof("cache hit for %v\n", cacheKey)
 		return ll.([]*model.Lecture), nil
 	}
 

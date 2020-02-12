@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/util"
+	"github.com/n1try/kithub2/app/web/errors"
 	"html/template"
 	"strings"
 )
@@ -28,9 +29,20 @@ type TplCtx struct {
 }
 
 func GetTplCtx(c *gin.Context) TplCtx {
-	var alerts []string
-	if _, ok := c.Request.URL.Query()["postsignup"]; ok {
-		alerts = []string{config.StrAlertSignupSuccessful}
+	var (
+		alerts = make([]string, 0)
+		errors = make([]string, 0)
+	)
+
+	if alert, ok := c.Request.URL.Query()["alert"]; ok {
+		if msg, ok := config.Messages[alert[0]]; ok {
+			alert = append(alert, msg)
+		}
+	}
+	if err, ok := c.Request.URL.Query()["error"]; ok {
+		if msg, ok := config.Messages[err[0]]; ok {
+			errors = append(errors, msg)
+		}
 	}
 
 	return TplCtx{
@@ -43,7 +55,25 @@ func GetTplCtx(c *gin.Context) TplCtx {
 			VvzBaseUrl:   config.KitVvzBaseUrl,
 		},
 		Alerts: alerts,
+		Errors: errors,
 	}
+}
+
+func MakeError(c *gin.Context, tpl string, status int, error errors.KitHubError, args *gin.H) {
+	tplCtx := GetTplCtx(c)
+	tplCtx.Errors = append(tplCtx.Errors, error.Error())
+
+	h := gin.H{
+		"tplCtx": tplCtx,
+	}
+
+	if args != nil {
+		for k, v := range *args {
+			h[k] = v
+		}
+	}
+
+	c.HTML(status, tpl, h)
 }
 
 // Template funcs

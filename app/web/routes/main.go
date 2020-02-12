@@ -17,7 +17,7 @@ func Index(r *gin.Engine) func(c *gin.Context) {
 		lectures, err := store.FindLectures(nil)
 		if err != nil {
 			c.Error(err)
-			c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+			webutil.MakeError(c, "index", http.StatusInternalServerError, errors.Internal{}, nil)
 			return
 		}
 
@@ -33,7 +33,7 @@ func GetEvent(r *gin.Engine) func(c *gin.Context) {
 		lecture, err := store.GetLecture(c.Param("id"))
 		if err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
-			c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
+			webutil.MakeError(c, "event", http.StatusNotFound, errors.NotFound{}, nil)
 			return
 		}
 
@@ -58,36 +58,43 @@ func GetSignup(r *gin.Engine) func(c *gin.Context) {
 
 func PostSignup(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		cfg := config.Get()
+
 		var user model.User
+
+		h := &gin.H{
+			"whitelist":  cfg.Auth.Whitelist,
+			"university": cfg.University,
+		}
 
 		if err := c.ShouldBind(&user); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
-			c.AbortWithError(http.StatusBadRequest, errors.BadRequest{}).SetType(gin.ErrorTypePublic)
+			webutil.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
 		}
 
 		if !user.IsValid(util.ValidateUser) {
-			c.AbortWithError(http.StatusBadRequest, errors.BadRequest{}).SetType(gin.ErrorTypePublic)
+			webutil.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
 		}
 
 		if err := util.HashPassword(&user); err != nil {
-			c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+			webutil.MakeError(c, "signup", http.StatusInternalServerError, errors.Internal{}, h)
 			return
 		}
 
 		if err := store.InsertUser(&user, false); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
 			if err == bolthold.ErrKeyExists {
-				c.AbortWithError(http.StatusConflict, errors.Conflict{}).SetType(gin.ErrorTypePublic)
+				webutil.MakeError(c, "signup", http.StatusConflict, errors.Conflict{}, h)
 			} else {
-				c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+				webutil.MakeError(c, "signup", http.StatusInternalServerError, errors.Internal{}, h)
 			}
 			return
 		}
 
 		c.Request.URL.Path = "/"
-		c.Request.URL.RawQuery = "postsignup"
+		c.Request.URL.RawQuery = "alert=signup_success"
 		c.Request.Method = http.MethodGet
 		r.HandleContext(c)
 	}

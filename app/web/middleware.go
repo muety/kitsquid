@@ -26,7 +26,7 @@ func ErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
-		if len(c.Errors) == 0 {
+		if len(c.Errors) == 0 || !c.IsAborted() {
 			return
 		}
 
@@ -40,7 +40,7 @@ func ErrorHandler() gin.HandlerFunc {
 		tplCtx := util.GetTplCtx(c)
 		tplCtx.Errors = errors
 
-		c.HTML(c.Writer.Status(), "error", gin.H{
+		c.HTML(c.Writer.Status(), "empty", gin.H{
 			"tplCtx": tplCtx,
 		})
 		return
