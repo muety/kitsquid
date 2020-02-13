@@ -1,8 +1,51 @@
 port: 8080
 addr: 127.0.0.1
 env: development
+url: "http://kithub.example.com"
+
 tls:
   key: etc/key.pem
   cert: etc/cert.pem
+
 db:
-  path: /tmp/kithub.db
+  path: kithub.db
+
+mail:
+  from: mail@example.com
+  smtp:
+    host: mail.example.com
+    port: 25
+    user: mail@example.com
+    password: "shhh"
+
+cache:
+  lectures: 30m
+  faculties: 60m
+  users: 60m
+  sessions: 10m
+
+auth:
+  salt: ssshhh
+  session:
+    timeout: 168h # 7d
+  whitelist:
+    - prefix-pattern: ^u[\w]{4}
+      prefix-display: uxxxx
+      suffix-pattern: \@student.kit.edu$
+      suffix-display: student.kit.edu
+      password-pattern: ^[.*\S]{8,}$
+
+university:
+  degrees:
+    - Bachelor
+    - Master
+    - Sonstiges
+
+  genders:
+    - Männlich
+    - Weiblich
+    - Divers
+
+  majors:
+    - Studiengang 1
+    - Studiengang 2

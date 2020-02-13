@@ -21,8 +21,6 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 
 func postLogout(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		tplCtx, _ := c.Get(config.TemplateContextKey)
-
 		sess, ok := c.Get(config.SessionKey)
 		if !ok {
 			util.MakeError(c, "event", http.StatusNotFound, errors.NotFound{}, nil)
@@ -32,7 +30,7 @@ func postLogout(r *gin.Engine) func(c *gin.Context) {
 		DeleteSession(sess.(*UserSession))
 
 		c.HTML(http.StatusOK, "redirect", gin.H{
-			"tplCtx": tplCtx,
+			"tplCtx": c.MustGet(config.TemplateContextKey),
 			"url":    "/?alert=logout_success",
 		})
 	}
@@ -42,11 +40,9 @@ func getLogin(r *gin.Engine) func(c *gin.Context) {
 	cfg := config.Get()
 
 	return func(c *gin.Context) {
-		tplCtx, _ := c.Get(config.TemplateContextKey)
-
 		c.HTML(http.StatusOK, "login", gin.H{
 			"whitelist": cfg.Auth.Whitelist,
-			"tplCtx":    tplCtx,
+			"tplCtx":    c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
@@ -55,7 +51,6 @@ func postLogin(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var l login
 
-		tplCtx, _ := c.Get(config.TemplateContextKey)
 		h := &gin.H{
 			"whitelist": cfg.Auth.Whitelist,
 		}
@@ -95,7 +90,7 @@ func postLogin(r *gin.Engine) func(c *gin.Context) {
 			true)
 
 		c.HTML(http.StatusOK, "redirect", gin.H{
-			"tplCtx": tplCtx,
+			"tplCtx": c.MustGet(config.TemplateContextKey),
 			"url":    "/",
 		})
 	}
@@ -105,12 +100,10 @@ func getSignup(r *gin.Engine) func(c *gin.Context) {
 	cfg := config.Get()
 
 	return func(c *gin.Context) {
-		tplCtx, _ := c.Get(config.TemplateContextKey)
-
 		c.HTML(http.StatusOK, "signup", gin.H{
 			"whitelist":  cfg.Auth.Whitelist,
 			"university": cfg.University,
-			"tplCtx":     tplCtx,
+			"tplCtx":     c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
@@ -122,7 +115,6 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var user User
 
-		tplCtx, _ := c.Get(config.TemplateContextKey)
 		h := &gin.H{
 			"whitelist":  cfg.Auth.Whitelist,
 			"university": cfg.University,
@@ -155,7 +147,7 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		c.HTML(http.StatusOK, "redirect", gin.H{
-			"tplCtx": tplCtx,
+			"tplCtx": c.MustGet(config.TemplateContextKey),
 			"url":    "/?alert=signup_success",
 		})
 	}

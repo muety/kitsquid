@@ -10,6 +10,7 @@ import (
 	"github.com/n1try/kithub2/app/scraping"
 	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/web"
+	uuid "github.com/satori/go.uuid"
 )
 
 func init() {
@@ -29,6 +30,7 @@ func Run() {
 	//_debugScrape()
 	//_debugScrapeDetails()
 	//_debugGet()
+	//_debugMail()
 }
 
 func _debugScrape() {
@@ -73,4 +75,13 @@ func _debugGet() {
 		fmt.Printf("Error: %v\n", err)
 	}
 	fmt.Println(ls)
+}
+
+func _debugMail() {
+	err := users.SendConfirmationMail(&users.User{
+		Id: "ferdinand@muetsch.io",
+	}, uuid.NewV4().String())
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func MakeError(c *gin.Context, tpl string, status int, error errors.KitHubError, args *gin.H) {
-	tplCtx, _ := c.Get(config.TemplateContextKey)
+	tplCtx := c.MustGet(config.TemplateContextKey)
 	tplCtx.(*TplCtx).Errors = append(tplCtx.(*TplCtx).Errors, error.Error())
 
 	h := gin.H{

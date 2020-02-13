@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/common"
+	"net/smtp"
 	"strconv"
 	"time"
 )
@@ -11,12 +13,22 @@ type Config struct {
 	Env  string `default:"development" env:"KITHUB_ENV"`
 	Port int    `default:"8080" env:"KITHUB_PORT"`
 	Addr string `default:"" env:"KITHUB_ADDR"`
+	Url  string `env:"KITHUB_URL"`
 	Tls  struct {
 		KeyPath  string `default:"etc/key.pem" env:"KITHUB_TLS_KEY"`
 		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
 	}
 	Db struct {
 		Path string `default:"kithub.db" env:"KITHUB_DB_FILE"`
+	}
+	Mail struct {
+		From string `default:"noreply@kithub.eu" env:"KITHUB_MAIL_SENDER"`
+		Smtp struct {
+			Host     string `env:"SMTP_HOST"`
+			Port     int    `default:"25" env:"SMTP_PORT"`
+			User     string `env:"SMTP_USER"`
+			Password string `env:"SMTP_PASSWORD"`
+		}
 	}
 	Cache map[string]string
 	Auth  struct {
@@ -53,6 +65,18 @@ func (c *Config) SessionTimeout() time.Duration {
 		return d
 	}
 	return 0
+}
+
+func (c *Config) SmtpHost() string {
+	return fmt.Sprintf("%s:%d", c.Mail.Smtp.Host, c.Mail.Smtp.Port)
+}
+
+func (c *Config) SmtpAuth() smtp.Auth {
+	return smtp.PlainAuth("", c.Mail.Smtp.User, c.Mail.Smtp.Password, c.Mail.Smtp.Host)
+}
+
+func (c *Config) ActivationLink(token string) string {
+	return fmt.Sprintf("%s/activate?token=%s", c.Url, token)
 }
 
 func (c *Config) IsDev() bool {

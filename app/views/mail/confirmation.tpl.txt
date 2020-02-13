@@ -1,0 +1,7 @@
+Hallo und Willkommen bei KitHub!
+
+Bitte klicke auf den folgenden Link, um deinen Account zu aktivieren:
+{{ .Link }}
+
+Liebe Grüße,
+Dein KitHub Team

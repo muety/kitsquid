@@ -12,9 +12,9 @@
 * [ ] Rating
 * [ ] Comments
 * [ ] Crawl / manually add majors
-* [ ] User system & registration
+* [ ] User activation
 * [ ] Gob -> JSON ?
-* [ ] Admin interface ?
+* [ ] Admin interface ? ([boltdbweb](https://github.com/evnix/boltdbweb))
 
 ## License
 MIT @ [Ferdinand Mütsch](https://muetsch.io)
