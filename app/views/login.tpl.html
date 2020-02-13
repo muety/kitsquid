@@ -1,7 +1,7 @@
 {{ define "content" }}
     <div class="container mx-auto w-full max-w-2xl mt-8">
-        <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post" action="/signup" id="form-signup">
-            <h1 class="text-2xl inline-block border-b-4 border-kit mb-8">Registrieren</h1>
+        <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post" action="/login" id="form-signup">
+            <h1 class="text-2xl inline-block border-b-4 border-kit mb-8">Einloggen</h1>
             <div class="mb-8">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-prefix">Deine KIT E-Mail
                     Adresse</label>
@@ -36,58 +36,20 @@
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                        id="input-signup-password" type="password" placeholder="******************"
                        pattern="{{ (index .whitelist 0).PasswordPattern }}" name="password" required>
-                <p class="text-gray-500 text-xs italic">Das Passwort muss mindestens 8 Zeichen lang sein.</p>
-            </div>
-            <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Dein Geschlecht</label>
-                <fieldset id="fs-signup-gender">
-                    <div class="flex justify-around">
-                        {{ range $i, $g := .university.Genders }}
-                            <label class="mx-3" for="gender-{{ $g }}">
-                                <input class="form-radio" type="radio" name="gender" value="{{ $g }}" id="gender-{{ $g }}" {{ if eq $i 0}}checked="true"{{ end }}>
-                                <span class="ml-2">{{ $g }}</span>
-                            </label>
-                        {{ end }}
-                    </div>
-                </fieldset>
-            </div>
-            <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-major">Dein Studiengang</label>
-                <div class="relative">
-                    <select class="bg-white cursor-pointer shadow-md appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            name="major" id="input-signup-major" required>
-                        {{ range .university.Majors }}
-                            <option>{{ . }}</option>
-                        {{ end }}
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Du studierst im ...</label>
-                <fieldset id="fs-signup-degree">
-                    <div class="flex justify-around">
-                        {{ range $i, $d := .university.Degrees }}
-                            <label class="mx-3" for="degree-{{ $d }}">
-                                <input class="form-radio" type="radio" name="degree" value="{{ $d }}" id="degree-{{ $d }}" {{ if eq $i 0 }}checked="true"{{end}}>
-                                <span class="ml-2">{{ $d }}</span>
-                            </label>
-                        {{ end }}
-                    </div>
-                </fieldset>
             </div>
             <div class="flex items-center justify-center mt-6">
                 <button class="bg-kit hover:bg-kit-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
                         type="submit">
-                    Registrieren
+                    Einloggen
                 </button>
             </div>
             <input type="hidden" value="" id="input-signup-user" name="user">
         </form>
+
+        <div class="mt-12 text-center">
+            <span class="text-gray-500">Du bist noch nicht registriert?</span><br>
+            <a class="text-kit" href="/signup">Melde dich hier an!</a>
+        </div>
     </div>
 
     <script>

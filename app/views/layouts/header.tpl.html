@@ -17,16 +17,34 @@
                 <div class="flex flex-grow w-1/2">
                     <div class="w-full">
                         <div class="relative">
-                            <input class="border border-transparent border-gray-400 placeholder-gray-700 rounded-lg shadow-md bg-white py-1 pr-2 pl-10 block w-full" placeholder="Veranstaltung suchen ...">
+                            <input class="border border-transparent border-gray-400 placeholder-gray-700 rounded-lg shadow-md bg-white py-1 pr-2 pl-10 block w-full"
+                                   placeholder="Veranstaltung suchen ...">
                             <i class="cil-search pointer-events-none absolute inset-y-0 left-0 pl-4 pt-2"></i>
                         </div>
                     </div>
                 </div>
-                <div class="w-1/6 pr-6 lg:pr-0 flex items-center justify-end">
-                    <img src="/assets/images/unknown.png" class="w-8 rounded-full">
-                    <div class="ml-3 text-sm hidden lg:block">
-                        <a class="font-semibold cursor-pointer"><span>uedsf</span> <span><i class="cil-chevron-circle-down-alt ml-1"></i></span></a>
-                    </div>
+                <div class="w-1/6 pr-6 lg:pr-0 flex items-center justify-end relative">
+                    <img src="/assets/images/unknown.png" class="md:hidden w-8 rounded-full mr-3 cursor-pointer" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ else }}toggleLoginButton(){{ end }}; event.stopPropagation()">
+                    <img src="/assets/images/unknown.png" class="hidden md:block w-8 rounded-full mr-3" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
+                    {{ if .tplCtx.User }}
+                        <div class="text-sm hidden lg:block flex flex-col items-center" onclick="toggleLogoutButton(); event.stopPropagation()">
+                            <a class="font-semibold cursor-pointer">
+                                <span>{{ index (strSplit .tplCtx.User.Id "@") 0 }}</span>
+                            </a>
+                        </div>
+                        <form id="form-logout" action="/logout" method="post" class="m-0 hidden"></form>
+                        <button class="hidden absolute bg-kit hover:bg-kit-dark text-white py-2 px-8 border rounded-full text-sm" id="btn-logout">
+                            Ausloggen
+                        </button>
+
+                    {{ else }}
+                        <div class="hidden md:block text-sm">
+                            <a href="/login" class="hover:underline">Einloggen</a>
+                        </div>
+                        <a class="hidden absolute bg-kit hover:bg-kit-dark text-white py-2 px-8 border rounded-full text-sm" id="btn-login" href="/login">
+                            Einloggen
+                        </a>
+                    {{ end }}
                 </div>
             </div>
         </div>

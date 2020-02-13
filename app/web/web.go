@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/util"
 	"net/http"
 	"os"
 	"os/signal"
@@ -30,7 +29,7 @@ func Init() {
 	ginviewConfig.Root = "app/views"
 	ginviewConfig.DisableCache = cfg.Env == "development"
 	ginviewConfig.Extension = ".tpl.html"
-	ginviewConfig.Funcs = util.GetFuncMap()
+	ginviewConfig.Funcs = GetFuncMap()
 
 	router.HTMLRender = ginview.New(ginviewConfig)
 

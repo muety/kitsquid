@@ -10,6 +10,8 @@ type Conflict struct{}
 
 type Internal struct{}
 
+type Unauthorized struct{}
+
 func (n NotFound) Error() string {
 	return "Resource was not found"
 }
@@ -24,4 +26,8 @@ func (b BadRequest) Error() string {
 
 func (c Conflict) Error() string {
 	return "Resource already exists"
+}
+
+func (u Unauthorized) Error() string {
+	return "Invalid user credentials."
 }

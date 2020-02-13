@@ -16,6 +16,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/satori/go.uuid v1.2.0
 	github.com/timshannon/bolthold v0.0.0-20200128153810-cd019dfd9224
 	go.etcd.io/bbolt v1.3.3 // indirect
 	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734

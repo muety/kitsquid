@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/util"
 )
 
 func AssetsPush() gin.HandlerFunc {
@@ -37,12 +36,20 @@ func ErrorHandler() gin.HandlerFunc {
 			}
 		}
 
-		tplCtx := util.GetTplCtx(c)
+		tplCtx := GetTplCtx(c)
 		tplCtx.Errors = errors
 
 		c.HTML(c.Writer.Status(), "empty", gin.H{
 			"tplCtx": tplCtx,
 		})
 		return
+	}
+}
+
+func TemplateContext() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tplCtx := GetTplCtx(c)
+		c.Set(config.TemplateContextKey, &tplCtx)
+		c.Next()
 	}
 }

@@ -3,44 +3,22 @@ package config
 import (
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
-	"github.com/n1try/kithub2/app/common"
 	"github.com/timshannon/bolthold"
-	"strconv"
-	"time"
 )
 
 // TODO: Use proper i18n
 var Messages = map[string]string{
 	"signup_success": "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach",
+	"logout_success": "Du hast dich erfolgreich ausgeloggt",
 }
 
 const (
-	KitVvzBaseUrl = "https://campus.kit.edu/live-stud/campus/all"
-	FacultyIdx    = 0
+	SessionKey         = "kithub_session"
+	UserKey            = "user"
+	TemplateContextKey = "tplCtx"
+	KitVvzBaseUrl      = "https://campus.kit.edu/live-stud/campus/all"
+	FacultyIdx         = 0
 )
-
-type Config struct {
-	Env  string `default:"development" env:"KITHUB_ENV"`
-	Port int    `default:"8080" env:"KITHUB_PORT"`
-	Addr string `default:"" env:"KITHUB_ADDR"`
-	Tls  struct {
-		KeyPath  string `default:"etc/key.pem" env:"KITHUB_TLS_KEY"`
-		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
-	}
-	Db struct {
-		Path string `default:"kithub.db" env:"KITHUB_DB_FILE"`
-	}
-	Cache map[string]string
-	Auth  struct {
-		Salt      string `default:"0" env:"KITHUB_AUTH_SALT"`
-		Whitelist []common.UserWhitelistItem
-	}
-	University struct {
-		Majors  []string
-		Degrees []string
-		Genders []string
-	}
-}
 
 func (c *Config) Validate() error {
 	if c.Auth.Whitelist != nil {
@@ -88,23 +66,4 @@ func Get() *Config {
 
 func Db() *bolthold.Store {
 	return db
-}
-
-func (c *Config) ListenAddr() string {
-	return c.Addr + ":" + strconv.Itoa(c.Port)
-}
-
-func (c *Config) CacheDuration(key string, defaultVal time.Duration) time.Duration {
-	if ds, ok := c.Cache[key]; ok {
-		if d, err := time.ParseDuration(ds); err == nil {
-			return d
-		} else {
-			log.Errorf("failed to parse cache duration for key %s\n", key)
-		}
-	}
-	return defaultVal
-}
-
-func (c *Config) IsDev() bool {
-	return c.Env == "development"
 }

@@ -25,6 +25,8 @@ func RegisterStaticRoutes(router *gin.Engine) {
 func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/")
 	group.Use(AssetsPush())
+	group.Use(users.ExtractUser())
+	group.Use(TemplateContext())
 
 	events.RegisterRoutes(router, group)
 	users.RegisterRoutes(router, group)
