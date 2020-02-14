@@ -10,8 +10,8 @@
                     </a>
                 </div>
                 <div class="md:hidden px-6">
-                    <button class="border rounded text-xl p-2 bg-gray-400 hover:bg-gray-500" id="btn-toggle-sidebar">
-                        <i class="cil-hamburger-menu"></i>
+                    <button class="border rounded text-xl p-2 bg-gray-400 hover:bg-gray-500" id="btn-toggle-sidebar" onclick="toggleSidebar()">
+                        <i class="icon-menu"></i>
                     </button>
                 </div>
                 <div class="flex flex-grow w-1/2">
@@ -19,13 +19,13 @@
                         <div class="relative">
                             <input class="border border-transparent border-gray-400 placeholder-gray-700 rounded-lg shadow-md bg-white py-1 pr-2 pl-10 block w-full"
                                    placeholder="Veranstaltung suchen ...">
-                            <i class="cil-search pointer-events-none absolute inset-y-0 left-0 pl-4 pt-2"></i>
+                            <i class="icon-search pointer-events-none absolute inset-y-0 left-0 pl-4 pt-2"></i>
                         </div>
                     </div>
                 </div>
                 <div class="w-1/6 pr-6 lg:pr-0 flex items-center justify-end relative">
                     <img src="/assets/images/unknown.png" class="md:hidden w-8 rounded-full mr-3 cursor-pointer" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ else }}toggleLoginButton(){{ end }}; event.stopPropagation()">
-                    <img src="/assets/images/unknown.png" class="hidden md:block w-8 rounded-full mr-3" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
+                    <img src="/assets/images/unknown.png" class="hidden md:block w-8 rounded-full mr-3 {{ if .tplCtx.User }}cursor-pointer{{end}}" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
                     {{ if .tplCtx.User }}
                         <div class="text-sm hidden lg:block flex flex-col items-center" onclick="toggleLogoutButton(); event.stopPropagation()">
                             <a class="font-semibold cursor-pointer">
@@ -33,7 +33,7 @@
                             </a>
                         </div>
                         <form id="form-logout" action="/logout" method="post" class="m-0 hidden"></form>
-                        <button class="hidden absolute bg-kit hover:bg-kit-dark text-white py-2 px-8 border rounded-full text-sm" id="btn-logout">
+                        <button class="hidden absolute bg-kit hover:bg-kit-dark text-white py-2 px-8 border rounded-full text-sm" id="btn-logout" onclick="logout()">
                             Ausloggen
                         </button>
 

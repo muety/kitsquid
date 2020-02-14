@@ -22,20 +22,20 @@
                     </div>
                     <div class="my-1">
                         <span class="text-md">
-                            <i class="cil-user mr-1"></i>
+                            <i class="icon-person mr-1"></i>
                             {{ range $i, $e := .event.Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
                         </span>
                     </div>
                     <div class="my-1">
                         <span class="text-md">
-                            <i class="cil-building mr-1"></i>
+                            <i class="icon-building mr-1"></i>
                             <span class="border-b-2" style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .event.Categories .tplCtx.Constants.FacultyIndex }}</span>
                         </span>
                     </div>
                     {{ if .event.Links }}
                     <div class="my-1">
                         <span class="text-md">
-                            <i class="cil-external-link mr-1"></i>
+                            <i class="icon-link-ext mr-1"></i>
                             {{ range $i, $l := .event.Links }}{{ if $i }}, {{ end }}<a href="{{ $l.Url }}" target="_blank" class="text-kit">{{ $l.Name }}</a>{{ end }}
                         </span>
                     </div>
@@ -57,9 +57,9 @@
                         <ul class="">
                             {{ range .event.Dates }}
                                 <li class="mb-2">
-                                    <span><i class="cil-calendar mr-2"></i>{{ .Date }}</span>
+                                    <span><i class="icon-calendar mr-2"></i>{{ .Date }}</span>
                                     <br>
-                                    <span><i class="cil-location-pin mr-2"></i>{{ .Room }}</span>
+                                    <span><i class="icon-location mr-2"></i>{{ .Room }}</span>
                                 </li>
                             {{ end }}
                         </ul>

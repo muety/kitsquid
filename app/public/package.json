@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "",
   "dependencies": {
-    "@coreui/icons": "^1.0.1",
     "jquery": "^3.4.1",
     "tailwindcss": "^1.1.4"
   },

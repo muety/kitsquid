@@ -1,26 +1,19 @@
 $(() => {
-    const btnSidebarToggle = $('#btn-toggle-sidebar'),
-        btnSidebarClose = $('#btn-close-sidebar'),
-        btnLogout = $('#btn-logout'),
-        btnLogin = $('#btn-login'),
-        inputSignupPrefix = $('#input-signup-prefix'),
+    const inputSignupPrefix = $('#input-signup-prefix'),
         inputSignupSuffix = $('#input-signup-suffix'),
         inputSignupUser = $('#input-signup-user'),
         inputSignupPassword = $('#input-signup-password'),
-        formSignup = $('#form-signup'),
-        formLogout = $('#form-logout')
+        formSignup = $('#form-signup')
 
-    $(window).click(function() {
+    $(window).click(function () {
         toggleLogoutButton(false)
         toggleLoginButton(false)
     })
 
-    // Sidebar
-    btnSidebarToggle.click(toggleSidebar)
-    btnSidebarClose.click(toggleSidebar)
-
-    // Login / Logout
-    btnLogout.click(() => formLogout.submit())
+    // Main Alert
+    if (localStorage.getItem('hide_main_alert')) {
+        closeMainAlert()
+    }
 
     // Signup
     if (window.hasOwnProperty('signupConfig')) {
@@ -57,4 +50,21 @@ function toggleLoginButton(forceState) {
 
 function closeAlert(prefix, i) {
     $(`#${prefix}-${i}`).addClass('hidden')
+}
+
+function logout() {
+    $('#form-logout').submit()
+}
+
+function closeMe(event) {
+    $(event.target).addClass('hidden')
+}
+
+function closeParent(event) {
+    closeMe({target: event.target.parentNode})
+}
+
+function closeMainAlert() {
+    $('#alert-main').addClass('hidden')
+    localStorage.setItem('hide_main_alert', 'true')
 }

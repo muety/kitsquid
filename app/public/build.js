@@ -10,15 +10,7 @@ const ASSETS = {
         ...fs.readdirSync(`${ASSET_DIR}/css`).filter(f => !f.includes('tailwind')).map(f => Object.assign({}, { src: `${ASSET_DIR}/css/${f}`, dst: `css/${f}` })),
         ...fs.readdirSync(`${ASSET_DIR}/js`).map(f => Object.assign({}, { src: `${ASSET_DIR}/js/${f}`, dst: `js/${f}` })),
         ...fs.readdirSync(`${ASSET_DIR}/images`).map(f => Object.assign({}, { src: `${ASSET_DIR}/images/${f}`, dst: `images/${f}` })),
-        ...fs.readdirSync(`${ASSET_DIR}/fonts`).map(f => Object.assign({}, { src: `${ASSET_DIR}/fonts/${f}`, dst: `fonts/${f}` }))
-    ]
-}
-
-const CORE_UI_ICONS = {
-    base: 'node_modules/@coreui/icons/',
-    files: [
-        { src: 'css/all.min.css', dst: 'css/icons.min.css' },
-        ...fs.readdirSync('node_modules/@coreui/icons/fonts').map(f => Object.assign({}, { src: `fonts/${f}` }))
+        ...fs.readdirSync(`${ASSET_DIR}/font`).map(f => Object.assign({}, { src: `${ASSET_DIR}/font/${f}`, dst: `font/${f}` }))
     ]
 }
 
@@ -29,7 +21,7 @@ const JQUERY = {
     ]
 }
 
-const configs = [ASSETS, CORE_UI_ICONS, JQUERY]
+const configs = [ASSETS, JQUERY]
 
 function copyAssets() {
     configs.forEach(copyCfg => {

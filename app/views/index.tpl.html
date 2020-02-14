@@ -1,12 +1,12 @@
 {{ define "content" }}
-    <div class="rounded relative overflow-hidden shadow-md bg-white mb-8">
+    <div class="rounded relative overflow-hidden shadow-md bg-white mb-8" id="alert-main">
         <div class="px-6 py-4 text-gray-700 text-sm">
             <h3 class="font-semibold">🎉 Willkommen bei KitHub v2!</h3>
             <p>
                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
             </p>
         </div>
-        <i class="cil-x-circle absolute top-0 right-0 pr-3 pt-2 cursor-pointer"></i>
+        <i class="icon-cancel-circled2 absolute top-0 right-0 pr-3 pt-2 cursor-pointer" onclick="closeMainAlert()"></i>
     </div>
 
     <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Vorlesungen</h1>
@@ -22,7 +22,7 @@
                         </div>
                         <div>
                             <span class="text-xs">
-                                <i class="cil-user"></i>
+                                <i class="icon-person"></i>
                                 {{ range $i, $e := .Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
                             </span>
                         </div>

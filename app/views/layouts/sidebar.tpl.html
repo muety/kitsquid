@@ -2,18 +2,18 @@
     <ul class="text-sm">
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
             <a href="/">
-                <button class="w-full lg:w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/" }} sidebar-item-active {{ end }}">
-                    <i class="cil-education"></i><span class="ml-3">Vorlesungen</span>
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/" }} sidebar-item-active {{ end }}">
+                    <i class="icon-graduation-cap"></i><span class="ml-3">Vorlesungen</span>
                 </button>
             </a>
         </li>
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
-            <button class="w-full lg:w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/account" }} sidebar-item-active {{ end }}">
-                <i class="cil-user"></i><span class="ml-3">Mein Account</span>
+            <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/account" }} sidebar-item-active {{ end }}">
+                <i class="icon-user-circle-o"></i><span class="ml-3">Mein Account</span>
             </button>
         </li>
     </ul>
-    <button class="md:hidden text-4xl absolute top-0 right-0 mt-2 mr-8" id="btn-close-sidebar">
-        <i class="cil-x-circle"></i>
+    <button class="md:hidden text-4xl absolute top-0 right-0 mt-2 mr-8" id="btn-close-sidebar" onclick="toggleSidebar()">
+        <i class="icon-cancel-circled2"></i>
     </button>
 </div>
