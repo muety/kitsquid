@@ -5,6 +5,7 @@ import (
 	"github.com/n1try/kithub2/app/config"
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
+	bolt "go.etcd.io/bbolt"
 	"time"
 )
 
@@ -59,7 +60,7 @@ func GetSession(token string) (*UserSession, error) {
 		return nil, err
 	}
 
-	//sessionsCache.SetDefault(token, &sess)
+	sessionsCache.SetDefault(token, &sess)
 	return &sess, nil
 }
 
@@ -74,4 +75,37 @@ func InsertSession(sess *UserSession, upsert bool) error {
 func DeleteSession(sess *UserSession) error {
 	sessionsCache.Delete(sess.Token)
 	return db.Delete(sess.Token, sess)
+}
+
+func GetToken(token string) (string, error) {
+	var userId string
+	err := db.Bolt().View(func(tx *bolt.Tx) error {
+		v := tx.Bucket([]byte("token")).Get([]byte(token))
+		if v == nil {
+			userId = ""
+		}
+		userId = string(v)
+		return nil
+	})
+	return userId, err
+}
+
+func InsertToken(token, userId string) error {
+	return db.Bolt().Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("token"))
+		if err != nil {
+			return err
+		}
+		return b.Put([]byte(token), []byte(userId))
+	})
+}
+
+func DeleteToken(token string) error {
+	return db.Bolt().Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("token"))
+		if err != nil {
+			return err
+		}
+		return b.Delete([]byte(token))
+	})
 }

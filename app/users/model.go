@@ -21,7 +21,7 @@ type UserSession struct {
 	LastSeen  time.Time
 }
 
-type login struct {
+type Login struct {
 	UserId   string `form:"user" binding:"required"`
 	Password string `form:"password" binding:"required"`
 }

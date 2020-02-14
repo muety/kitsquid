@@ -68,7 +68,7 @@ func SendConfirmationMail(u *User, activationCode string) error {
 
 	var buf bytes.Buffer
 	if err := tpl.Execute(&buf, map[string]string{
-		"Link": cfg.ActivationLink(activationCode),
+		"Link": cfg.ActivationLink(string(activationCode)),
 	}); err != nil {
 		return err
 	}

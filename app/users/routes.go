@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/gin-gonic/gin"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/util"
@@ -17,6 +18,7 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/login", getLogin(router))
 	group.POST("/login", postLogin(router))
 	group.POST("/logout", postLogout(router))
+	group.GET("/activate", apiGetActivate(router))
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
@@ -52,7 +54,7 @@ func getLogin(r *gin.Engine) func(c *gin.Context) {
 
 func postLogin(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var l login
+		var l Login
 
 		h := &gin.H{
 			"whitelist": cfg.Auth.Whitelist,
@@ -65,7 +67,7 @@ func postLogin(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		user, err := Get(l.UserId)
-		if err != nil || !CheckPasswordHash(user, l.Password) {
+		if err != nil || !CheckPasswordHash(user, l.Password) || !user.Active {
 			if err != nil {
 				c.Error(err).SetType(gin.ErrorTypePrivate)
 			}
@@ -149,9 +151,72 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		// TODO: Rollback user creation if token creation fails
+		activationToken := uuid.NewV4().String()
+		if err := InsertToken(activationToken, user.Id); err != nil {
+			util.MakeError(c, "signup", http.StatusInternalServerError, errors.Internal{}, h)
+			return
+		}
+
+		go func(user *User, token string) {
+			if err := SendConfirmationMail(user, token); err != nil {
+				log.Errorf("failed to send confirmation mail to %s – %v", user.Id, err)
+			}
+		}(&user, activationToken)
+
 		c.HTML(http.StatusOK, "redirect", gin.H{
 			"tplCtx": c.MustGet(config.TemplateContextKey),
 			"url":    "/?alert=signup_success",
+		})
+	}
+}
+
+func apiGetActivate(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		makeError := func() {
+			c.HTML(http.StatusNotFound, "redirect", gin.H{
+				"tplCtx": c.MustGet(config.TemplateContextKey),
+				"url":    "/?error=activate_failure",
+			})
+		}
+
+		token := c.Request.URL.Query().Get("token")
+		if token == "" {
+			makeError()
+			return
+		}
+
+		userId, err := GetToken(token)
+		if err != nil {
+			c.Error(err)
+			makeError()
+			return
+		}
+
+		user, err := Get(userId)
+		if err != nil {
+			c.Error(err)
+			makeError()
+			return
+		}
+
+		user.Active = true
+		if err := Insert(user, true); err != nil {
+			c.Error(err)
+			makeError()
+			return
+		}
+
+		go func(token, userId string) {
+			if err := DeleteToken(token); err != nil {
+				log.Errorf("failed to delete token for %s", userId)
+				return
+			}
+		}(token, userId)
+
+		c.HTML(http.StatusNotFound, "redirect", gin.H{
+			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"url":    "/?alert=activate_success",
 		})
 	}
 }
