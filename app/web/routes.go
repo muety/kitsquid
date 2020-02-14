@@ -33,3 +33,13 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 
 	return group
 }
+
+func RegisterApiRoutes(router *gin.Engine) *gin.RouterGroup {
+	group := router.Group("/api")
+	group.Use(users.ExtractUser())
+
+	events.RegisterApiRoutes(router, group)
+	users.RegisterApiRoutes(router, group)
+
+	return group
+}

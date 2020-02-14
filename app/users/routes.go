@@ -19,6 +19,9 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/logout", postLogout(router))
 }
 
+func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
+}
+
 func postLogout(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		sess, ok := c.Get(config.SessionKey)

@@ -9,6 +9,12 @@
         <div class="flex flex-wrap items-start md:flex-no-wrap">
             <div class="w-full md:w-2/3 lg:w-3/4 rounded relative overflow-hidden shadow-md bg-white mb-8 mr-0 md:mr-2">
                 <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
+                    {{ if .tplCtx.User }}
+                    <div class="absolute top-0 text-2xl text-yellow-500 cursor-pointer" style="margin-top: -4px; margin-left: -5px" onclick="toggleBookmarkEvent({{ .event.Id }})">
+                        <i class="{{ if .bookmarked }}hidden{{ end }} icon-bookmark-empty" id="indicator-bookmark-{{ .event.Id }}-empty"></i>
+                        <i class="{{ if not .bookmarked }}hidden{{ end }} icon-bookmark" id="indicator-bookmark-{{ .event.Id }}"></i>
+                    </div>
+                    {{ end }}
                     <div class="flex items-center sm:items-start mb-4">
                         <h1 class="text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
                         <div class="relative inline-block m-2 ml-4 py-1 px-2 bg-gray-400 rounded text-md text-gray-700 font-semibold flex-grow-0" title="{{ .event.Type }}">

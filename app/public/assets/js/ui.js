@@ -68,3 +68,37 @@ function closeMainAlert() {
     $('#alert-main').addClass('hidden')
     localStorage.setItem('hide_main_alert', 'true')
 }
+
+function toggleBookmarkEvent(id) {
+    let indicator = $(`#indicator-bookmark-${id}`)
+    let indicatorEmpty = $(`#indicator-bookmark-${id}-empty`)
+
+    fetch(`/api/event/${id}/bookmark`, {method: 'PUT'})
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    showSnackbar(`Fehler: ${data.error}`)
+                })
+            } else if (response.status === 201) {
+                indicator.removeClass('hidden').addClass('block')
+                indicatorEmpty.addClass('hidden').removeClass('block')
+                showSnackbar('Zu Favoriten hinzugefügt ...')
+            } else if (response.status === 204) {
+                indicator.addClass('hidden').removeClass('block')
+                indicatorEmpty.removeClass('hidden').addClass('block')
+                showSnackbar('Aus Favoriten entfernt ...')
+            }
+        })
+        .catch(() => {
+            showSnackbar('Fehler: Veranstaltung konnte nicht zu den Favoriten hinzugefügt werden')
+        })
+}
+
+function showSnackbar(text) {
+    let sb = $('#snackbar')
+    sb.text(text)
+    sb.removeClass('hidden')
+    setTimeout(() => {
+        sb.addClass('hidden')
+    }, 2000)
+}

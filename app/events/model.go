@@ -49,3 +49,9 @@ type EventQuery struct {
 	LecturerIdEq string
 	CategoryIn   []string
 }
+
+type Bookmark struct {
+	Id       uint64 `boltholdKey:"Id"`
+	UserId   string `boltholdIndex:"UserId"`
+	EntityId string `boltholdIndex:"EntityId"`
+}

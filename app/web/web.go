@@ -37,6 +37,7 @@ func Init() {
 	RegisterStaticRoutes(router)
 	RegisterFallbackRoutes(router)
 	RegisterMainRoutes(router)
+	RegisterApiRoutes(router)
 }
 
 func Start() {

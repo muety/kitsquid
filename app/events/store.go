@@ -14,6 +14,7 @@ var (
 	cfg            *config.Config
 	eventsCache    *cache.Cache
 	facultiesCache *cache.Cache
+	bookmarksCache *cache.Cache
 )
 
 func InitStore(store *bolthold.Store) {
@@ -23,6 +24,7 @@ func InitStore(store *bolthold.Store) {
 
 	eventsCache = cache.New(cfg.CacheDuration("events", 30*time.Minute), cfg.CacheDuration("events", 30*time.Minute)*2)
 	facultiesCache = cache.New(cfg.CacheDuration("faculties", 30*time.Minute), cfg.CacheDuration("faculties", 30*time.Minute)*2)
+	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
 }
 
 func Get(id string) (*Event, error) {
@@ -159,4 +161,35 @@ func CountFaculties() int {
 		return len(fl)
 	}
 	return 0
+}
+
+func FindBookmark(userId, entityId string) (*Bookmark, error) {
+	cacheKey := fmt.Sprintf("find:%s:%s", userId, entityId)
+	if l, ok := bookmarksCache.Get(cacheKey); ok {
+		return l.(*Bookmark), nil
+	}
+
+	var bookmark Bookmark
+	if err := db.FindOne(&bookmark, bolthold.
+		Where("UserId").
+		Eq(userId).
+		Index("UserId").
+		And("EntityId").
+		Eq(entityId).
+		Index("EntityId")); err != nil {
+		return nil, err
+	}
+
+	bookmarksCache.SetDefault(cacheKey, &bookmark)
+	return &bookmark, nil
+}
+
+func InsertBookmark(bookmark *Bookmark) error {
+	bookmarksCache.Flush()
+	return db.Insert(bolthold.NextSequence(), bookmark)
+}
+
+func DeleteBookmark(bookmark *Bookmark) error {
+	bookmarksCache.Flush()
+	return db.Delete(bookmark.Id, bookmark)
 }

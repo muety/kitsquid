@@ -14,6 +14,7 @@ func GetFuncMap() template.FuncMap {
 		"strIndex":    strIndex,
 		"strRemove":   strRemove,
 		"strSplit":    strings.Split,
+		"strPrefix":   strings.HasPrefix,
 		"htmlSafe":    htmlSafe,
 		"randomColor": util.RandomColor,
 	}
