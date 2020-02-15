@@ -22,17 +22,6 @@ const (
 	FacultyIdx         = 0
 )
 
-func (c *Config) Validate() error {
-	if c.Auth.Whitelist != nil {
-		for _, i := range c.Auth.Whitelist {
-			if err := i.Validate(); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 var (
 	config *Config
 	db     *bolthold.Store

@@ -71,7 +71,7 @@ func Start() {
 }
 
 func getServeFunc(srv *http.Server) func() error {
-	if cfg.IsDev() {
+	if cfg.IsDev() || !cfg.Tls.Enable {
 		return func() error {
 			return srv.ListenAndServe()
 		}

@@ -30,18 +30,19 @@ func InitStore(store *bolthold.Store) {
 }
 
 func reindex() {
-	defer func() {
+	r := func(name string) {
 		if r := recover(); r != nil {
-			log.Errorln("failed to reindex user store")
+			log.Errorf("failed to reindex %s store\n", name)
 		}
-	}()
+	}
 
-	for _, t := range []interface{}{&User{}, &Login{}} {
+	for _, t := range []interface{}{&User{}} {
 		tn := reflect.TypeOf(t).String()
 		log.Infof("reindexing %s", tn)
-		if err := db.ReIndex(t, nil); err != nil {
-			log.Errorf("failed to reindex %s – %v\n", tn, err)
-		}
+		func() {
+			defer r(tn)
+			db.ReIndex(t, nil)
+		}()
 	}
 }
 

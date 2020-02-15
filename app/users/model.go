@@ -22,7 +22,7 @@ type UserSession struct {
 }
 
 type Login struct {
-	UserId   string `form:"user" binding:"required" boltholdIndex:"UserId"`
+	UserId   string `form:"user" binding:"required"`
 	Password string `form:"password" binding:"required"`
 }
 

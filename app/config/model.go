@@ -15,6 +15,7 @@ type Config struct {
 	Addr string `default:"" env:"KITHUB_ADDR"`
 	Url  string `env:"KITHUB_URL"`
 	Tls  struct {
+		Enable   bool   `default:"false" env:"KITHUB_TLS"`
 		KeyPath  string `default:"etc/key.pem" env:"KITHUB_TLS_KEY"`
 		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
 	}
@@ -48,6 +49,17 @@ type Config struct {
 		Degrees []string
 		Genders []string
 	}
+}
+
+func (c *Config) Validate() error {
+	if c.Auth.Whitelist != nil {
+		for _, i := range c.Auth.Whitelist {
+			if err := i.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (c *Config) ListenAddr() string {

@@ -4,6 +4,7 @@ env: development
 url: "http://kithub.example.com"
 
 tls:
+  enable: false
   key: etc/key.pem
   cert: etc/cert.pem
 
