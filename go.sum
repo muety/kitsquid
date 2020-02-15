@@ -81,6 +81,8 @@ github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJy
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/timshannon/bolthold v0.0.0-20200128153810-cd019dfd9224 h1:uNz9kfwiLi5gjSer03hQpgcK1WLfjCVOLm5LljAaQEk=
 github.com/timshannon/bolthold v0.0.0-20200128153810-cd019dfd9224/go.mod h1:jUigdmrbdCxcIDEFrq82t4X9805XZfwFZoYUap0ET/U=
+github.com/timshannon/bolthold v0.0.0-20200212163217-8be69b199481 h1:aJ/kPxLE6GQ8VjsMRtKSZrPSAKQPsAyHXUyLGawOJMs=
+github.com/timshannon/bolthold v0.0.0-20200212163217-8be69b199481/go.mod h1:jUigdmrbdCxcIDEFrq82t4X9805XZfwFZoYUap0ET/U=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
 github.com/ugorji/go v1.1.7 h1:/68gy2h+1mWMrwZFeD1kQialdSzAb432dtpeJ42ovdo=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=

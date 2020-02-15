@@ -2,9 +2,11 @@ package events
 
 import (
 	"fmt"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
+	"reflect"
 	"regexp"
 	"time"
 )
@@ -19,12 +21,23 @@ var (
 
 func InitStore(store *bolthold.Store) {
 	cfg = config.Get()
-
 	db = store
+
+	reindex()
 
 	eventsCache = cache.New(cfg.CacheDuration("events", 30*time.Minute), cfg.CacheDuration("events", 30*time.Minute)*2)
 	facultiesCache = cache.New(cfg.CacheDuration("faculties", 30*time.Minute), cfg.CacheDuration("faculties", 30*time.Minute)*2)
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
+}
+
+func reindex() {
+	for _, t := range []interface{}{&Event{}, &Bookmark{}} {
+		tn := reflect.TypeOf(t).String()
+		log.Infof("reindexing %s", tn)
+		if err := db.ReIndex(t, nil); err != nil {
+			log.Errorf("failed to reindex %s – ", tn, err)
+		}
+	}
 }
 
 func Get(id string) (*Event, error) {
@@ -46,7 +59,6 @@ func GetAll() ([]*Event, error) {
 	return FindAll(nil)
 }
 
-// TODO: Use indices!!!
 func FindAll(query *EventQuery) ([]*Event, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
 	if ll, ok := eventsCache.Get(cacheKey); ok {
@@ -55,7 +67,7 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 
 	var foundEvents []*Event
 
-	q := bolthold.Where("Id").Not().Eq("")
+	q := bolthold.Where("Id").Not().Eq("").Index("Id")
 
 	if query != nil {
 		if query.NameLike != "" {

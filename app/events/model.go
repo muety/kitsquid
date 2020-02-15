@@ -5,15 +5,15 @@ import (
 )
 
 type Event struct {
-	Id          string
+	Id          string `boltholdIndex:"Id"`
 	Gguid       string
-	Name        string
-	Type        string
+	Name        string `boltholdIndex:"Name"`
+	Type        string `boltholdIndex:"Type"`
 	Description string
-	Categories  []string
+	Categories  []string `boltholdSliceIndex:"Categories"`
 	Links       []*Link
 	Dates       []*EventDate
-	Lecturers   []*Lecturer
+	Lecturers   []*Lecturer `boltholdSliceIndex:"Lecturers"`
 }
 
 func (l *Event) Link(baseUrl string) string {
@@ -35,7 +35,7 @@ type EventDate struct {
 
 type Lecturer struct {
 	Gguid string
-	Name  string
+	Name  string `boltholdIndex:"Name"`
 }
 
 type Link struct {
