@@ -26,11 +26,11 @@ func init() {
 }
 
 func Run() {
-	web.Start()
+	//web.Start()
 	//_debugScrape()
 	//_debugScrapeDetails()
 	//_debugGet()
-	//_debugMail()
+	_debugMail()
 }
 
 func _debugScrape() {

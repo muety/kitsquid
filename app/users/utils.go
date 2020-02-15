@@ -2,6 +2,7 @@ package users
 
 import (
 	"bytes"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/util"
 	"golang.org/x/crypto/bcrypt"
@@ -68,17 +69,20 @@ func SendConfirmationMail(u *User, activationCode string) error {
 
 	var buf bytes.Buffer
 	if err := tpl.Execute(&buf, map[string]string{
-		"Link": cfg.ActivationLink(string(activationCode)),
+		"recipient": u.Id,
+		"link":      cfg.ActivationLink(activationCode),
 	}); err != nil {
 		return err
 	}
+
+	log.Infof("sending confirmation mail to %s", u.Id)
 
 	if err := smtp.SendMail(
 		cfg.SmtpHost(),
 		cfg.SmtpAuth(),
 		cfg.Mail.From,
 		[]string{u.Id},
-		util.ComposeMail(u.Id, "Aktiviere Deinen KitHub Account", buf.String())); err != nil {
+		buf.Bytes()); err != nil {
 		return err
 	}
 

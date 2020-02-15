@@ -1,7 +1,11 @@
+Content-Type: text/plain; charset=UTF-8
+To: {{ .recipient }}
+Subject: Aktiviere deinen KitHub Account
+
 Hallo und Willkommen bei KitHub!
 
 Bitte klicke auf den folgenden Link, um deinen Account zu aktivieren:
-{{ .Link }}
+{{ .link }}
 
 Liebe Grüße,
 Dein KitHub Team
