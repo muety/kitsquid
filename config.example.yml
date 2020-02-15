@@ -9,6 +9,7 @@ tls:
 
 db:
   path: kithub.db
+  encoding: gob # json or gob
 
 mail:
   from: mail@example.com
@@ -23,11 +24,15 @@ cache:
   faculties: 60m
   users: 60m
   sessions: 10m
+  bookmarks: 30m
 
 auth:
   salt: ssshhh
   session:
     timeout: 168h # 7d
+  admin:
+    user: user@example.com
+    password: secretpassword
   whitelist:
     - prefix-pattern: ^u[\w]{4}
       prefix-display: uxxxx

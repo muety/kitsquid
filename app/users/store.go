@@ -2,10 +2,12 @@ package users
 
 import (
 	"fmt"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
 	bolt "go.etcd.io/bbolt"
+	"reflect"
 	"time"
 )
 
@@ -18,11 +20,56 @@ var (
 
 func InitStore(store *bolthold.Store) {
 	cfg = config.Get()
-
 	db = store
 
 	usersCache = cache.New(cfg.CacheDuration("users", 30*time.Minute), cfg.CacheDuration("users", 30*time.Minute)*2)
 	sessionsCache = cache.New(cfg.CacheDuration("sessions", 30*time.Minute), cfg.CacheDuration("sessions", 30*time.Minute)*2)
+
+	setup()
+	reindex()
+}
+
+func reindex() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorln("failed to reindex user store")
+		}
+	}()
+
+	for _, t := range []interface{}{&User{}, &Login{}} {
+		tn := reflect.TypeOf(t).String()
+		log.Infof("reindexing %s", tn)
+		if err := db.ReIndex(t, nil); err != nil {
+			log.Errorf("failed to reindex %s – %v\n", tn, err)
+		}
+	}
+}
+
+func setup() {
+	if cfg.Auth.Admin.User != "" {
+		if _, err := Get(cfg.Auth.Admin.User); err != nil {
+			log.Infof("creating admin user %s", cfg.Auth.Admin.User)
+			admin := &User{
+				Id:        cfg.Auth.Admin.User,
+				Password:  cfg.Auth.Admin.Password,
+				Active:    true,
+				Gender:    "",
+				Major:     "",
+				Degree:    "",
+				CreatedAt: time.Now(),
+			}
+
+			if err := HashPassword(admin); err != nil {
+				log.Errorf("failed to hash admin password – %v\n", err)
+				return
+			}
+
+			if err := Insert(admin, false); err != nil {
+				log.Errorf("failed to create admin user – %v\n", err)
+				return
+			}
+		}
+	}
 }
 
 func Get(id string) (*User, error) {

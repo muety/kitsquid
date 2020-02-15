@@ -46,6 +46,7 @@ func NewSessionValidator(cfg *config.Config, resolveUser UserResolver) UserSessi
 	}
 }
 
+// Inplace!
 func HashPassword(u *User) error {
 	cfg := config.Get()
 	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password+cfg.Auth.Salt), bcrypt.DefaultCost)

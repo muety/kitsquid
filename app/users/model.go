@@ -5,9 +5,9 @@ import (
 )
 
 type User struct {
-	Id        string    `form:"user" binding:"required"`
+	Id        string    `form:"user" binding:"required" boltholdIndex:"Id"`
 	Password  string    `form:"password" binding:"required"`
-	Active    bool      `form:""`
+	Active    bool      `form:"" boltholdIndex:"Active"`
 	Gender    string    `form:"gender" binding:"required"`
 	Major     string    `form:"major" binding:"required"`
 	Degree    string    `form:"degree" binding:"required"`
@@ -22,7 +22,7 @@ type UserSession struct {
 }
 
 type Login struct {
-	UserId   string `form:"user" binding:"required"`
+	UserId   string `form:"user" binding:"required" boltholdIndex:"UserId"`
 	Password string `form:"password" binding:"required"`
 }
 

@@ -23,22 +23,31 @@ func InitStore(store *bolthold.Store) {
 	cfg = config.Get()
 	db = store
 
-	reindex()
-
 	eventsCache = cache.New(cfg.CacheDuration("events", 30*time.Minute), cfg.CacheDuration("events", 30*time.Minute)*2)
 	facultiesCache = cache.New(cfg.CacheDuration("faculties", 30*time.Minute), cfg.CacheDuration("faculties", 30*time.Minute)*2)
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
+
+	setup()
+	reindex()
 }
 
 func reindex() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorln("failed to reindex event store")
+		}
+	}()
+
 	for _, t := range []interface{}{&Event{}, &Bookmark{}} {
 		tn := reflect.TypeOf(t).String()
 		log.Infof("reindexing %s", tn)
 		if err := db.ReIndex(t, nil); err != nil {
-			log.Errorf("failed to reindex %s – ", tn, err)
+			log.Errorf("failed to reindex %s – %v\n", tn, err)
 		}
 	}
 }
+
+func setup() {}
 
 func Get(id string) (*Event, error) {
 	cacheKey := fmt.Sprintf("get:%s", id)

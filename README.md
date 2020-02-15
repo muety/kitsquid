@@ -9,9 +9,7 @@
 * [ ] Semester indicator
 * [ ] Rating
 * [ ] Comments
-* [ ] Crawl / manually add majors
-* [ ] Gob -> JSON ?
-* [ ] Admin interface ? ([boltdbweb](https://github.com/evnix/boltdbweb))
+* [ ] Admin interface ? ([boltdbweb](https://github.com/evnix/boltdbweb) middleware)
 
 ## License
 MIT @ [Ferdinand Mütsch](https://muetsch.io)

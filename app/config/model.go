@@ -19,7 +19,8 @@ type Config struct {
 		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
 	}
 	Db struct {
-		Path string `default:"kithub.db" env:"KITHUB_DB_FILE"`
+		Path     string `default:"kithub.db" env:"KITHUB_DB_FILE"`
+		Encoding string `default:"gob" env:"KITHUB_DB_ENCODING"`
 	}
 	Mail struct {
 		From string `default:"noreply@kithub.eu" env:"KITHUB_MAIL_SENDER"`
@@ -35,6 +36,10 @@ type Config struct {
 		Salt    string `default:"0" env:"KITHUB_AUTH_SALT"`
 		Session struct {
 			Timeout string `default:"1d" env:"KITHUB_AUTH_SESSION_TIMEOUT"`
+		}
+		Admin struct {
+			User     string `env:"KITHUB_ADMIN_USER"`
+			Password string `env:"KITHUB_ADMIN_PASSWORD"`
 		}
 		Whitelist []common.UserWhitelistItem
 	}

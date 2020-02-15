@@ -160,7 +160,7 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 
 		go func(user *User, token string) {
 			if err := SendConfirmationMail(user, token); err != nil {
-				log.Errorf("failed to send confirmation mail to %s – %v", user.Id, err)
+				log.Errorf("failed to send confirmation mail to %s – %v\n", user.Id, err)
 			}
 		}(&user, activationToken)
 
@@ -209,7 +209,7 @@ func apiGetActivate(r *gin.Engine) func(c *gin.Context) {
 
 		go func(token, userId string) {
 			if err := DeleteToken(token); err != nil {
-				log.Errorf("failed to delete token for %s", userId)
+				log.Errorf("failed to delete token for %s\n", userId)
 				return
 			}
 		}(token, userId)

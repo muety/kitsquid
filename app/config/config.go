@@ -53,7 +53,16 @@ func Init() {
 	}
 
 	// Init database
-	if _db, err := bolthold.Open(config.Db.Path, 0600, nil); err != nil {
+	dbOpts := &bolthold.Options{}
+	if config.Db.Encoding == "json" {
+		dbOpts.Encoder = JsonEncode
+		dbOpts.Decoder = JsonDecode
+	} else {
+		dbOpts.Encoder = GobEncode
+		dbOpts.Decoder = GobDecode
+	}
+
+	if _db, err := bolthold.Open(config.Db.Path, 0600, dbOpts); err != nil {
 		log.Fatalf("failed to open database — %v\n", err)
 	} else {
 		db = _db
