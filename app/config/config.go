@@ -1,9 +1,11 @@
 package config
 
 import (
+	"encoding/json"
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
 	"github.com/timshannon/bolthold"
+	"strings"
 )
 
 // TODO: Use proper i18n
@@ -42,13 +44,14 @@ func Init() {
 	}
 
 	// Init database
-	dbOpts := &bolthold.Options{}
-	if config.Db.Encoding == "json" {
-		dbOpts.Encoder = JsonEncode
-		dbOpts.Decoder = JsonDecode
-	} else {
-		dbOpts.Encoder = GobEncode
-		dbOpts.Decoder = GobDecode
+	dbOpts := &bolthold.Options{
+		Encoder: bolthold.DefaultEncode,
+		Decoder: bolthold.DefaultDecode,
+	}
+
+	if strings.ToLower(config.Db.Encoding) == "json" {
+		dbOpts.Encoder = json.Marshal
+		dbOpts.Decoder = json.Unmarshal
 	}
 
 	if _db, err := bolthold.Open(config.Db.Path, 0600, dbOpts); err != nil {
