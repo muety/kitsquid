@@ -9,11 +9,11 @@ import (
 )
 
 func RegisterFallbackRoutes(router *gin.Engine) {
-	router.NoMethod(func(c *gin.Context) {
+	router.NoMethod(ErrorHandle(), func(c *gin.Context) {
 		c.AbortWithError(http.StatusMethodNotAllowed, errors.NotFound{}).SetType(gin.ErrorTypePublic)
 	})
 
-	router.NoRoute(func(c *gin.Context) {
+	router.NoRoute(ErrorHandle(), func(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
 	})
 }
@@ -24,7 +24,7 @@ func RegisterStaticRoutes(router *gin.Engine) {
 
 func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/")
-	group.Use(AssetsPush())
+	group.Use(ErrorHandle())
 	group.Use(users.ExtractUser())
 	group.Use(TemplateContext())
 
@@ -36,6 +36,7 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 
 func RegisterApiRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/api")
+	group.Use(ApiErrorHandle())
 	group.Use(users.ExtractUser())
 
 	events.RegisterApiRoutes(router, group)

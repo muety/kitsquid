@@ -23,7 +23,6 @@ func Init() {
 	router = gin.Default()
 
 	router.Use(gin.Recovery())
-	router.Use(ErrorHandler())
 
 	ginviewConfig := goview.DefaultConfig
 	ginviewConfig.Root = "app/views"
