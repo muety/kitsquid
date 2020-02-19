@@ -4,6 +4,7 @@ import (
 	"fmt"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/config"
+	"github.com/n1try/kithub2/app/util"
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
 	"reflect"
@@ -82,11 +83,11 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 	if query != nil {
 		if query.NameLike != "" {
 			if re, err := regexp.Compile("(?i)" + query.NameLike); err == nil {
-				q.And("Name").RegExp(re)
+				q.And("Name").RegExp(re).Index("Name")
 			}
 		}
 		if query.TypeEq != "" {
-			q.And("Type").Eq(query.TypeEq)
+			q.And("Type").Eq(query.TypeEq).Index("Type")
 		}
 		if query.LecturerIdEq != "" {
 			q.And("Lecturers").MatchFunc(func(ra *bolthold.RecordAccess) (bool, error) {
@@ -100,8 +101,16 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 				return false, nil
 			})
 		}
+		if query.SemesterEq != "" {
+			q.And("Semesters").ContainsAny(query.SemesterEq)
+		}
 		if len(query.CategoryIn) > 0 {
-			q.And("Categories").ContainsAny(query.CategoryIn)
+			// Isn't there a better solution?!
+			cats := make([]interface{}, len(query.CategoryIn))
+			for i, c := range query.CategoryIn {
+				cats[i] = c
+			}
+			q.And("Categories").ContainsAny(cats...)
 		}
 	}
 
@@ -120,6 +129,13 @@ func Insert(event *Event, upsert bool) error {
 	if upsert {
 		f = db.Upsert
 	}
+
+	if upsert {
+		if existing, err := Get(event.Id); err == nil {
+			mergeSemesters(event, existing)
+		}
+	}
+
 	return f(event.Id, event)
 }
 
@@ -138,13 +154,28 @@ func InsertMulti(events []*Event, upsert bool) error {
 	}
 	defer tx.Rollback()
 
-	for _, l := range events {
-		if err := f(tx, l.Id, l); err != nil {
+	for _, e := range events {
+		if upsert {
+			if existing, err := Get(e.Id); err == nil {
+				mergeSemesters(e, existing)
+			}
+		}
+
+		if err := f(tx, e.Id, e); err != nil {
 			return err
 		}
 	}
 
 	return tx.Commit()
+}
+
+// Inplace
+func mergeSemesters(newEvent, existingEvent *Event) {
+	for _, c := range existingEvent.Semesters {
+		if !util.ContainsString(c, newEvent.Semesters) {
+			newEvent.Semesters = append(newEvent.Semesters, c)
+		}
+	}
 }
 
 func GetFaculties() ([]string, error) {

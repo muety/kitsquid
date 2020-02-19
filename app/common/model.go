@@ -7,8 +7,11 @@ import (
 type SemesterKey string
 
 const (
-	SemesterWs1819 SemesterKey = "WS18/19"
+	SemesterWs1920 SemesterKey = "WS19/20"
+	SemesterWs1718 SemesterKey = "WS17/18"
 )
+
+var SemesterKeys = []SemesterKey{SemesterWs1920, SemesterWs1718}
 
 type UserWhitelistItem struct {
 	MailPrefixPattern string `yaml:"prefix-pattern"`

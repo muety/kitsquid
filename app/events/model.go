@@ -13,7 +13,8 @@ type Event struct {
 	Categories  []string `boltholdSliceIndex:"Categories"`
 	Links       []*Link
 	Dates       []*EventDate
-	Lecturers   []*Lecturer `boltholdSliceIndex:"Lecturers"`
+	Lecturers   []*Lecturer
+	Semesters   []string `boltholdSliceIndex:"Semesters"`
 }
 
 func (l *Event) Link(baseUrl string) string {
@@ -47,6 +48,7 @@ type EventQuery struct {
 	NameLike     string
 	TypeEq       string
 	LecturerIdEq string
+	SemesterEq   string
 	CategoryIn   []string
 }
 

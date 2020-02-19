@@ -2,6 +2,7 @@ package events
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/users"
@@ -43,6 +44,11 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		semester := common.SemesterKeys[len(common.SemesterKeys)-1]
+		if s := c.Request.URL.Query().Get("semester"); s != "" {
+			semester = common.SemesterKey(s)
+		}
+
 		var bookmarked bool
 		var user *users.User
 		if u, ok := c.Get(config.UserKey); ok {
@@ -53,9 +59,10 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		c.HTML(http.StatusOK, "event", gin.H{
-			"event":      event,
-			"bookmarked": bookmarked,
-			"tplCtx":     c.MustGet(config.TemplateContextKey),
+			"event":         event,
+			"bookmarked":    bookmarked,
+			"semesterQuery": semester,
+			"tplCtx":        c.MustGet(config.TemplateContextKey),
 		})
 	}
 }

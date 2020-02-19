@@ -2,6 +2,7 @@ package util
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/config"
 )
@@ -30,6 +31,7 @@ type TplCtx struct {
 		FacultyIndex int
 		VvzBaseUrl   string
 	}
-	Alerts []string
-	Errors []string
+	Alerts       []string
+	Errors       []string
+	SemesterKeys []common.SemesterKey
 }

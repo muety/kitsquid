@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'kithub';
-  src: url('../font/kithub.eot?8587557');
-  src: url('../font/kithub.eot?8587557#iefix') format('embedded-opentype'),
-       url('../font/kithub.woff2?8587557') format('woff2'),
-       url('../font/kithub.woff?8587557') format('woff'),
-       url('../font/kithub.ttf?8587557') format('truetype'),
-       url('../font/kithub.svg?8587557#kithub') format('svg');
+  src: url('../font/kithub.eot?33080431');
+  src: url('../font/kithub.eot?33080431#iefix') format('embedded-opentype'),
+       url('../font/kithub.woff2?33080431') format('woff2'),
+       url('../font/kithub.woff?33080431') format('woff'),
+       url('../font/kithub.ttf?33080431') format('truetype'),
+       url('../font/kithub.svg?33080431#kithub') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'kithub';
-    src: url('../font/kithub.svg?8587557#kithub') format('svg');
+    src: url('../font/kithub.svg?33080431#kithub') format('svg');
   }
 }
 */
@@ -71,4 +71,5 @@
 .icon-building:before { content: '\f0f7'; } /* '' */
 .icon-graduation-cap:before { content: '\f19d'; } /* '' */
 .icon-building-filled:before { content: '\f1ad'; } /* '' */
+.icon-calendar-check-o:before { content: '\f274'; } /* '' */
 .icon-user-circle-o:before { content: '\f2be'; } /* '' */

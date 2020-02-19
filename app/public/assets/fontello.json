@@ -107,6 +107,12 @@
       "css": "bookmark",
       "code": 59401,
       "src": "fontawesome"
+    },
+    {
+      "uid": "9de4ac1aec6b1cca1929e1407eecf3db",
+      "css": "calendar-check-o",
+      "code": 62068,
+      "src": "fontawesome"
     }
   ]
 }

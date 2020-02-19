@@ -5,7 +5,7 @@ import (
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/common"
-	events2 "github.com/n1try/kithub2/app/events"
+	model "github.com/n1try/kithub2/app/events"
 	"github.com/n1try/kithub2/app/util"
 	"golang.org/x/sync/semaphore"
 	"golang.org/x/text/language"
@@ -29,8 +29,9 @@ type listEventCategoriesJob struct {
 }
 
 type listEventsJob struct {
-	Tguid string
-	Gguid string
+	Tguid    string
+	Gguid    string
+	Semester string
 }
 
 type eventFaculty struct {
@@ -57,11 +58,11 @@ func (l EventScraper) Run(job ScrapeJob) (interface{}, error) {
 }
 
 func (l FetchEventsJob) process() (interface{}, error) {
-	var events = make([]*events2.Event, 0)
+	var events = make([]*model.Event, 0)
 	var categories = make([]*eventCategory, 0)
 	var faculties = make([]*eventFaculty, 0)
 
-	makeError := func(err error) ([]*events2.Event, error) {
+	makeError := func(err error) ([]*model.Event, error) {
 		return events, err
 	}
 
@@ -91,8 +92,8 @@ func (l FetchEventsJob) process() (interface{}, error) {
 	mtx := &sync.Mutex{}
 	sem := semaphore.NewWeighted(int64(maxWorkers))
 
-	eventMap := make(map[string]*events2.Event)
-	addEvents := func(eventList []*events2.Event) {
+	eventMap := make(map[string]*model.Event)
+	addEvents := func(eventList []*model.Event) {
 		for _, l := range eventList {
 			if item, ok := eventMap[l.Id]; !ok {
 				eventMap[l.Id] = l
@@ -115,11 +116,9 @@ func (l FetchEventsJob) process() (interface{}, error) {
 			continue
 		}
 
-		catId := cat.Gguid
-
-		go func() {
+		go func(tguid, gguid, semester string) {
 			defer sem.Release(1)
-			job := listEventsJob{Tguid: tguid, Gguid: catId}
+			job := listEventsJob{Tguid: tguid, Gguid: gguid, Semester: semester}
 			result, err := job.process()
 			if err != nil {
 				log.Errorf("failed to fetch events – %v\n", err)
@@ -127,10 +126,10 @@ func (l FetchEventsJob) process() (interface{}, error) {
 			}
 
 			mtx.Lock()
-			addEvents(result.([]*events2.Event))
+			addEvents(result.([]*model.Event))
 			mtx.Unlock()
 			log.Flush()
-		}()
+		}(tguid, cat.Gguid, string(l.Semester))
 	}
 
 	if err := sem.Acquire(ctx, int64(maxWorkers)); err != nil {
@@ -138,7 +137,7 @@ func (l FetchEventsJob) process() (interface{}, error) {
 	}
 
 	i := 0
-	events = make([]*events2.Event, len(eventMap))
+	events = make([]*model.Event, len(eventMap))
 	for _, l := range eventMap {
 		events[i] = l
 		i++
@@ -233,7 +232,7 @@ func (l listEventCategoriesJob) process() (interface{}, error) {
 }
 
 func (l listEventsJob) process() (interface{}, error) {
-	events := make([]*events2.Event, 0)
+	events := make([]*model.Event, 0)
 
 	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 	reStripPagetitle := regexp.MustCompile(`.+: +(.+) +\(.+\)`)
@@ -314,12 +313,12 @@ func (l listEventsJob) process() (interface{}, error) {
 		return nil, err
 	}
 
-	var currentEvent *events2.Event
+	var currentEvent *model.Event
 	for i, tr := range trs {
 		if htmlquery.SelectAttr(tr, "id") != "" {
 			// Case 1: Event row
 
-			currentEvent = &events2.Event{Categories: categories}
+			currentEvent = &model.Event{Categories: categories, Semesters: []string{l.Semester}}
 			reLecturerId := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 			tds, err := htmlquery.QueryAll(tr, "/td")
@@ -367,14 +366,14 @@ func (l listEventsJob) process() (interface{}, error) {
 			currentEvent.Type = htmlquery.InnerText(a)
 
 			// Dozenten
-			lecturers := make([]*events2.Lecturer, 0)
+			lecturers := make([]*model.Lecturer, 0)
 			as, err := htmlquery.QueryAll(tds[3], "/a")
 			if err != nil {
 				log.Errorf("failed to get lecturers for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
 			for _, a := range as {
-				lecturer := &events2.Lecturer{}
+				lecturer := &model.Lecturer{}
 				lecturer.Name = htmlquery.InnerText(a)
 
 				if href := htmlquery.SelectAttr(a, "href"); href != "" {
@@ -422,11 +421,11 @@ func (l listEventsJob) process() (interface{}, error) {
 				}
 
 				if currentEvent.Dates == nil {
-					currentEvent.Dates = make([]*events2.EventDate, 0)
+					currentEvent.Dates = make([]*model.EventDate, 0)
 				}
 
 				if dateEl != nil && roomEl != nil {
-					currentEvent.Dates = append(currentEvent.Dates, &events2.EventDate{
+					currentEvent.Dates = append(currentEvent.Dates, &model.EventDate{
 						Date: htmlquery.InnerText(dateEl),
 						Room: htmlquery.InnerText(roomEl),
 					})

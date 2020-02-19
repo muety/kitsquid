@@ -35,7 +35,7 @@ func Run() {
 
 func _debugScrape() {
 	scraper := scraping.NewEventScraper()
-	job := scraping.FetchEventsJob{Semester: common.SemesterWs1819}
+	job := scraping.FetchEventsJob{Semester: common.SemesterWs1920}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)
@@ -69,7 +69,7 @@ func _debugScrapeDetails() {
 
 func _debugGet() {
 	ls, err := events.FindAll(&events.EventQuery{
-		LecturerIdEq: "0xE4129354DF0A3A4E8EE42CD65C5BCD1C",
+		SemesterEq: string(common.SemesterWs1920),
 	})
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)

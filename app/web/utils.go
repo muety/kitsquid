@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/util"
@@ -11,6 +12,7 @@ import (
 
 func GetFuncMap() template.FuncMap {
 	return template.FuncMap{
+		"add":         add,
 		"strIndex":    strIndex,
 		"strRemove":   strRemove,
 		"strSplit":    strings.Split,
@@ -52,8 +54,9 @@ func GetTplCtx(c *gin.Context) util.TplCtx {
 			FacultyIndex: config.FacultyIdx,
 			VvzBaseUrl:   config.KitVvzBaseUrl,
 		},
-		Alerts: alerts,
-		Errors: errors,
+		Alerts:       alerts,
+		Errors:       errors,
+		SemesterKeys: common.SemesterKeys,
 	}
 }
 
@@ -63,6 +66,10 @@ func strIndex(x int, v string) string {
 
 func strRemove(str, needle string) string {
 	return strings.ReplaceAll(str, needle, "")
+}
+
+func add(a, b int) int {
+	return a + b
 }
 
 func htmlSafe(html string) template.HTML {
