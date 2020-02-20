@@ -50,6 +50,8 @@ type EventQuery struct {
 	LecturerIdEq string
 	SemesterEq   string
 	CategoryIn   []string
+	Skip         int
+	Limit        int
 }
 
 type Bookmark struct {

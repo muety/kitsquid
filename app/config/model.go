@@ -44,6 +44,9 @@ type Config struct {
 		}
 		Whitelist []common.UserWhitelistItem
 	}
+	Misc struct {
+		Pagesize int
+	}
 	University struct {
 		Majors  []string
 		Degrees []string

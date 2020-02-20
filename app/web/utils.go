@@ -7,6 +7,9 @@ import (
 	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/util"
 	"html/template"
+	"math"
+	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -19,6 +22,7 @@ func GetFuncMap() template.FuncMap {
 		"strPrefix":   strings.HasPrefix,
 		"htmlSafe":    htmlSafe,
 		"randomColor": util.RandomColor,
+		"paginate":    paginate,
 	}
 }
 
@@ -45,6 +49,7 @@ func GetTplCtx(c *gin.Context) util.TplCtx {
 	}
 
 	return util.TplCtx{
+		Url:  c.Request.URL.String(),
 		Path: c.FullPath(),
 		User: user,
 		Constants: struct {
@@ -74,4 +79,36 @@ func add(a, b int) int {
 
 func htmlSafe(html string) template.HTML {
 	return template.HTML(html)
+}
+
+func paginate(path string, direction int) string {
+	u, err := url.Parse(path)
+	if err != nil {
+		return ""
+	}
+
+	var (
+		limit  = config.Get().Misc.Pagesize
+		offset = 0
+	)
+
+	if l, err := strconv.Atoi(u.Query().Get("limit")); err == nil {
+		limit = l
+	}
+	if o, err := strconv.Atoi(u.Query().Get("offset")); err == nil {
+		offset = o
+	}
+
+	if direction < 0 {
+		offset = int(math.Max(0, float64(offset-limit)))
+	} else {
+		offset += limit
+	}
+
+	q := u.Query()
+	q.Set("limit", strconv.Itoa(limit))
+	q.Set("offset", strconv.Itoa(offset))
+	u.RawQuery = q.Encode()
+
+	return u.String()
 }

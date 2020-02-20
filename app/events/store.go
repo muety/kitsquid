@@ -83,7 +83,7 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 	if query != nil {
 		if query.NameLike != "" {
 			if re, err := regexp.Compile("(?i)" + query.NameLike); err == nil {
-				q.And("Name").RegExp(re).Index("Name")
+				q.And("Name").RegExp(re)
 			}
 		}
 		if query.TypeEq != "" {
@@ -112,9 +112,15 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 			}
 			q.And("Categories").ContainsAny(cats...)
 		}
+		if query.Skip > 0 {
+			q.Skip(query.Skip)
+		}
+		if query.Limit > 0 {
+			q.Limit(query.Limit)
+		}
 	}
 
-	err := db.Find(&foundEvents, q)
+	err := db.Find(&foundEvents, q.SortBy("Name"))
 	if err == nil {
 		eventsCache.SetDefault(cacheKey, foundEvents)
 	}
@@ -132,7 +138,7 @@ func Insert(event *Event, upsert bool) error {
 
 	if upsert {
 		if existing, err := Get(event.Id); err == nil {
-			mergeSemesters(event, existing)
+			updateEvent(event, existing)
 		}
 	}
 
@@ -157,7 +163,7 @@ func InsertMulti(events []*Event, upsert bool) error {
 	for _, e := range events {
 		if upsert {
 			if existing, err := Get(e.Id); err == nil {
-				mergeSemesters(e, existing)
+				updateEvent(e, existing)
 			}
 		}
 
@@ -170,7 +176,7 @@ func InsertMulti(events []*Event, upsert bool) error {
 }
 
 // Inplace
-func mergeSemesters(newEvent, existingEvent *Event) {
+func updateEvent(newEvent, existingEvent *Event) {
 	for _, c := range existingEvent.Semesters {
 		if !util.ContainsString(c, newEvent.Semesters) {
 			newEvent.Semesters = append(newEvent.Semesters, c)

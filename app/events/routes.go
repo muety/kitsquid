@@ -8,6 +8,8 @@ import (
 	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/util"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
@@ -21,7 +23,8 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 
 func getEvents(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		events, err := FindAll(nil)
+		eventQuery := buildEventQuery(c.Request.URL.Query())
+		events, err := FindAll(eventQuery)
 		if err != nil {
 			c.Error(err)
 			util.MakeError(c, "index", http.StatusInternalServerError, errors.Internal{}, nil)
@@ -30,6 +33,8 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 
 		c.HTML(http.StatusOK, "index", gin.H{
 			"events": events,
+			"limit":  eventQuery.Limit,
+			"offset": eventQuery.Skip,
 			"tplCtx": c.MustGet(config.TemplateContextKey),
 		})
 	}
@@ -104,5 +109,33 @@ func apiPutBookmark(r *gin.Engine) func(c *gin.Context) {
 
 			c.Status(http.StatusNoContent)
 		}
+	}
+}
+
+func buildEventQuery(v url.Values) *EventQuery {
+	var (
+		limit  = config.Get().Misc.Pagesize
+		offset = 0
+	)
+
+	if limitStr := v.Get("limit"); limitStr != "" {
+		if limitInt, err := strconv.Atoi(limitStr); err == nil {
+			limit = limitInt
+		}
+	}
+	if offsetStr := v.Get("offset"); offsetStr != "" {
+		if offsetInt, err := strconv.Atoi(offsetStr); err == nil {
+			offset = offsetInt
+		}
+	}
+
+	return &EventQuery{
+		NameLike:     v.Get("name"),
+		TypeEq:       v.Get("type"),
+		LecturerIdEq: v.Get("lecturer_id"),
+		SemesterEq:   v.Get("semester"),
+		CategoryIn:   v["category"],
+		Skip:         offset,
+		Limit:        limit,
 	}
 }

@@ -26,6 +26,7 @@ func MakeError(c *gin.Context, tpl string, status int, error errors.KitHubError,
 
 type TplCtx struct {
 	User      interface{}
+	Url       string
 	Path      string
 	Constants struct {
 		FacultyIndex int
