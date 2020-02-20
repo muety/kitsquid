@@ -47,7 +47,6 @@ type Config struct {
 	University struct {
 		Majors  []string
 		Degrees []string
-		Genders []string
 	}
 }
 

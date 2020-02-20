@@ -5,10 +5,10 @@
 <body class="bg-gray-200 text-gray-700 pb-8">
     <div>
         {{ include "layouts/header" }}
-        <div class="w-full lg:w-3/4 mx-auto overflow-x-hidden md:overflow-auto">
+        <div class="w-full xl:w-3/4 mx-auto overflow-x-hidden md:overflow-auto">
             <div class="md:flex">
                 {{ include "layouts/sidebar" }}
-                <div id="main-content" class="mt-32 h-full z-90 w-full md:block md:w-3/4 lg:w-5/6 px-6 md:pl-0 lg:px-0">
+                <div id="main-content" class="mt-32 h-full z-90 w-full md:block lg:w-5/6 px-6 md:pl-0 xl:px-0">
                     {{ include "layouts/alert" }}
                     {{ template "content" . }}
                 </div>

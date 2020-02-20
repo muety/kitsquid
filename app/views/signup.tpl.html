@@ -2,6 +2,9 @@
     <div class="container mx-auto w-full max-w-2xl mt-8">
         <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post" action="/signup" id="form-signup">
             <h1 class="text-2xl inline-block border-b-4 border-kit mb-8">Registrieren</h1>
+            <div class="mb-8 p-1 flex justify-center">
+                <img src="/assets/images/unknown.png" class="rounded-full w-24 border-2 border-gray-500" id="img-avatar">
+            </div>
             <div class="mb-8">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-prefix">Deine KIT E-Mail
                     Adresse</label>
@@ -31,8 +34,7 @@
                 </div>
             </div>
             <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-password">Dein
-                    Passwort</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-password">Dein Passwort</label>
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                        id="input-signup-password" type="password" placeholder="******************"
                        pattern="{{ (index .whitelist 0).PasswordPattern }}" name="password" required>
@@ -42,12 +44,18 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2">Dein Geschlecht</label>
                 <fieldset id="fs-signup-gender">
                     <div class="flex justify-around">
-                        {{ range $i, $g := .university.Genders }}
-                            <label class="mx-3" for="gender-{{ $g }}">
-                                <input class="form-radio" type="radio" name="gender" value="{{ $g }}" id="gender-{{ $g }}" {{ if eq $i 0}}checked="true"{{ end }}>
-                                <span class="ml-2">{{ $g }}</span>
-                            </label>
-                        {{ end }}
+                        <label class="mx-3" for="gender-male">
+                            <input class="form-radio" type="radio" name="gender" value="male" id="gender-male" checked>
+                            <span class="ml-2">Männlich</span>
+                        </label>
+                        <label class="mx-3" for="gender-female">
+                            <input class="form-radio" type="radio" name="gender" value="female" id="gender-female">
+                            <span class="ml-2">Weiblich</span>
+                        </label>
+                        <label class="mx-3" for="gender-human">
+                            <input class="form-radio" type="radio" name="gender" value="human" id="gender-human">
+                            <span class="ml-2">Divers</span>
+                        </label>
                     </div>
                 </fieldset>
             </div>

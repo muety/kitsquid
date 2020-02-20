@@ -3,6 +3,7 @@ package users
 import (
 	"bytes"
 	log "github.com/golang/glog"
+	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/util"
 	"golang.org/x/crypto/bcrypt"
@@ -17,7 +18,7 @@ func NewUserValidator(cfg *config.Config) UserValidator {
 
 		if !util.ContainsString(u.Degree, cfg.University.Degrees) ||
 			!util.ContainsString(u.Major, cfg.University.Majors) ||
-			!util.ContainsString(u.Gender, cfg.University.Genders) {
+			!util.ContainsString(u.Gender, common.Genders) {
 			return false
 		}
 

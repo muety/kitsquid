@@ -1,8 +1,8 @@
 <div id="header">
     <div class="flex absolute top-0 inset-x-0 h-16 z-100 pt-8 items-center">
-        <div class="w-full lg:w-3/4 relative mx-auto px-6">
+        <div class="w-full xl:w-3/4 relative mx-auto px-6">
             <div class="flex items-center -mx-6 justify-between">
-                <div class="hidden md:block w-1/4 lg:w-1/6 pl-0 md:pr-4 lg:pr-8">
+                <div class="hidden md:block w-1/4 lg:w-1/6 pl-0 md:pl-4 xl:pl-0 md:pr-4 lg:pr-8">
                     <a href="/">
                         <div class="text-3xl font-semibold">
                             <span class="text-kit">KIT</span><span>Hub</span><span class="text-sm">v2</span>
@@ -23,9 +23,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-1/6 pr-6 lg:pr-0 flex items-center justify-end relative">
-                    <img src="/assets/images/unknown.png" class="md:hidden w-8 rounded-full mr-3 cursor-pointer" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ else }}toggleLoginButton(){{ end }}; event.stopPropagation()">
-                    <img src="/assets/images/unknown.png" class="hidden md:block w-8 rounded-full mr-3 {{ if .tplCtx.User }}cursor-pointer{{end}}" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
+                <div class="w-1/6 pr-6 xl:pr-0 flex items-center justify-end relative">
+                    <img src="{{ if .tplCtx.User }}https://avatars.dicebear.com/v2/{{ .tplCtx.User.Gender }}/{{ index (strSplit .tplCtx.User.Id "@") 0 }}.svg{{ else }}/assets/images/unknown.png{{ end }}" class="md:hidden w-8 rounded-full border-2 border-gray-500 mr-3 cursor-pointer" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ else }}toggleLoginButton(){{ end }}; event.stopPropagation()">
+                    <img src="{{ if .tplCtx.User }}https://avatars.dicebear.com/v2/{{ .tplCtx.User.Gender }}/{{ index (strSplit .tplCtx.User.Id "@") 0 }}.svg{{ else }}/assets/images/unknown.png{{ end }}" class="hidden md:block w-8 rounded-full border-2 border-gray-500 mr-3 {{ if .tplCtx.User }}cursor-pointer{{end}}" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
                     {{ if .tplCtx.User }}
                         <div class="text-sm hidden lg:block flex flex-col items-center" onclick="toggleLogoutButton(); event.stopPropagation()">
                             <a class="font-semibold cursor-pointer">

@@ -3,7 +3,9 @@ $(() => {
         inputSignupSuffix = $('#input-signup-suffix'),
         inputSignupUser = $('#input-signup-user'),
         inputSignupPassword = $('#input-signup-password'),
-        formSignup = $('#form-signup')
+        inputSignupGender = $('input[type=radio][name="gender"]'),
+        formSignup = $('#form-signup'),
+        imgAvatar = $('#img-avatar')
 
     $(window).click(function () {
         toggleLogoutButton(false)
@@ -29,6 +31,23 @@ $(() => {
             let user = `${inputSignupPrefix.val()}@${inputSignupSuffix.val()}`
             inputSignupUser.val(user)
         })
+
+        let debounce = null
+        inputSignupPrefix.keyup(() => {
+            if (debounce) clearTimeout(debounce)
+            debounce = setTimeout(updateAvatar, 250)
+        })
+        inputSignupGender.change(updateAvatar)
+    }
+
+    function updateAvatar() {
+        let re = new RegExp(inputSignupPrefix.attr('pattern'), 'i')
+        let valid = inputSignupPrefix.val().match(re)
+        let gender = $('input[type=radio][name="gender"]:checked').val()
+        let avatarUrl = valid
+            ? `https://avatars.dicebear.com/v2/${gender}/${inputSignupPrefix.val()}.svg`
+            : '/assets/images/unknown.png'
+        imgAvatar.attr('src', avatarUrl)
     }
 })
 

@@ -12,6 +12,7 @@ const (
 )
 
 var SemesterKeys = []SemesterKey{SemesterWs1920, SemesterWs1718}
+var Genders = []string{"male", "female", "human"}
 
 type UserWhitelistItem struct {
 	MailPrefixPattern string `yaml:"prefix-pattern"`
