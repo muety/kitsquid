@@ -102,7 +102,7 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 			})
 		}
 		if query.SemesterEq != "" {
-			q.And("Semesters").ContainsAny(query.SemesterEq)
+			q.And("Semesters").Contains(query.SemesterEq).Index("Semesters")
 		}
 		if len(query.CategoryIn) > 0 {
 			// Isn't there a better solution?!
