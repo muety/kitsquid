@@ -113,6 +113,18 @@
       "css": "calendar-check-o",
       "code": 62068,
       "src": "fontawesome"
+    },
+    {
+      "uid": "56f2eac13d2b397ff4a54dc38f783b95",
+      "css": "snowflake-o",
+      "code": 62172,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "ivmsk67zo1yb1tthd3ugi4xnb3get418",
+      "css": "sun",
+      "code": 59402,
+      "src": "typicons"
     }
   ]
 }

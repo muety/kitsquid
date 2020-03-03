@@ -48,8 +48,10 @@ type Config struct {
 		Pagesize int
 	}
 	University struct {
-		Majors  []string
-		Degrees []string
+		Majors               []string
+		Degrees              []string
+		WinterSemesterPrefix string `default:"WS"`
+		SummerSemesterPrefix string `default:"SS"`
 	}
 }
 

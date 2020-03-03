@@ -2,6 +2,8 @@ package events
 
 import (
 	"fmt"
+	"github.com/n1try/kithub2/app/config"
+	"strings"
 )
 
 type Event struct {
@@ -19,6 +21,26 @@ type Event struct {
 
 func (l *Event) Link(baseUrl string) string {
 	return fmt.Sprintf("%s/event.asp?gguid=%s", baseUrl, l.Gguid)
+}
+
+func (l *Event) InWinter() bool {
+	cfg := config.Get()
+	for _, s := range l.Semesters {
+		if strings.HasPrefix(s, cfg.University.WinterSemesterPrefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *Event) InSummer() bool {
+	cfg := config.Get()
+	for _, s := range l.Semesters {
+		if strings.HasPrefix(s, cfg.University.SummerSemesterPrefix) {
+			return true
+		}
+	}
+	return false
 }
 
 func (l Event) String() string {

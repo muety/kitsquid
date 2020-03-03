@@ -18,7 +18,7 @@
                 <a href="event/{{ .Id }}">
                 <div class="h-full rounded relative overflow-hidden shadow-md hover:shadow-lg bg-white event-card">
                     <div class="h-full rounded-bl rounded-tl w-05 absolute faculty-indicator" style="background-color: {{ randomColor (index .Categories $.tplCtx.Constants.FacultyIndex) }}" title="{{ index .Categories 0 }}"></div>
-                    <div class="pl-4 pr-8 py-2 text-gray-700 text-sm">
+                    <div class="pl-4 pr-10 py-2 text-gray-700 text-sm">
                         <div>
                             <span class="font-semibold">{{ .Name }}</span>
                         </div>
@@ -34,8 +34,20 @@
                             {{ end }}
                         </div>
                     </div>
-                    <div class="absolute top-0 right-0 m-2 p-1 bg-gray-400 rounded text-xs text-gray-700 font-semibold" title="{{ .Type }}">
-                        <span class="cursor-default">{{ strIndex 0 .Type }}</span>
+                    <div class="absolute top-0 right-0 flex flex-col m-2">
+                        <div class="p-1 bg-gray-400 rounded text-xs text-gray-700 font-semibold text-center" title="{{ .Type }}">
+                            <span class="cursor-default">{{ strIndex 0 .Type }}</span>
+                        </div>
+                        {{ if .InWinter }}
+                        <div class="mt-1 p-1 bg-blue-200 rounded text-sm text-blue-800 font-semibold flex items-center" title="Wintersemester">
+                            <span class="cursor-default"><i class="icon-snowflake-o"></i></span>
+                        </div>
+                        {{ end }}
+                        {{ if .InSummer }}
+                            <div class="mt-1 p-1 bg-orange-200 rounded text-sm text-orange-600 font-semibold flex items-center" title="Sommersemester">
+                                <span class="cursor-default"><i class="icon-sun"></i></span>
+                            </div>
+                        {{ end }}
                     </div>
                 </div>
                 </a>

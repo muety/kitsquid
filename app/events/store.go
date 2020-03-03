@@ -110,7 +110,7 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 			for i, c := range query.CategoryIn {
 				cats[i] = c
 			}
-			q.And("Categories").ContainsAny(cats...)
+			q.And("Categories").ContainsAny(cats...).Index("Categories")
 		}
 		if query.Skip > 0 {
 			q.Skip(query.Skip)
