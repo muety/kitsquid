@@ -16,8 +16,8 @@ var (
 	db             *bolthold.Store
 	cfg            *config.Config
 	eventsCache    *cache.Cache
-	facultiesCache *cache.Cache
 	bookmarksCache *cache.Cache
+	miscCache      *cache.Cache
 )
 
 func InitStore(store *bolthold.Store) {
@@ -25,7 +25,7 @@ func InitStore(store *bolthold.Store) {
 	db = store
 
 	eventsCache = cache.New(cfg.CacheDuration("events", 30*time.Minute), cfg.CacheDuration("events", 30*time.Minute)*2)
-	facultiesCache = cache.New(cfg.CacheDuration("faculties", 30*time.Minute), cfg.CacheDuration("faculties", 30*time.Minute)*2)
+	miscCache = cache.New(cfg.CacheDuration("faculties", 30*time.Minute), cfg.CacheDuration("faculties", 30*time.Minute)*2)
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
 
 	setup()
@@ -106,11 +106,15 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 		}
 		if len(query.CategoryIn) > 0 {
 			// Isn't there a better solution?!
-			cats := make([]interface{}, len(query.CategoryIn))
-			for i, c := range query.CategoryIn {
-				cats[i] = c
+			cats := make([]interface{}, 0)
+			for _, c := range query.CategoryIn {
+				if c != "" {
+					cats = append(cats, c)
+				}
 			}
-			q.And("Categories").ContainsAny(cats...).Index("Categories")
+			if len(cats) > 0 {
+				q.And("Categories").ContainsAny(cats...).Index("Categories")
+			}
 		}
 		if query.Skip > 0 {
 			q.Skip(query.Skip)
@@ -129,7 +133,7 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 
 func Insert(event *Event, upsert bool) error {
 	eventsCache.Flush()
-	facultiesCache.Flush()
+	miscCache.Flush()
 
 	f := db.Insert
 	if upsert {
@@ -147,7 +151,7 @@ func Insert(event *Event, upsert bool) error {
 
 func InsertMulti(events []*Event, upsert bool) error {
 	eventsCache.Flush()
-	facultiesCache.Flush()
+	miscCache.Flush()
 
 	f := db.TxInsert
 	if upsert {
@@ -185,8 +189,8 @@ func updateEvent(newEvent, existingEvent *Event) {
 }
 
 func GetFaculties() ([]string, error) {
-	cacheKey := "get:all"
-	if fl, ok := facultiesCache.Get(cacheKey); ok {
+	cacheKey := "get:faculties"
+	if fl, ok := miscCache.Get(cacheKey); ok {
 		return fl.([]string), nil
 	}
 
@@ -211,7 +215,7 @@ func GetFaculties() ([]string, error) {
 		i++
 	}
 
-	facultiesCache.SetDefault("get:all", faculties)
+	miscCache.SetDefault(cacheKey, faculties)
 	return faculties, nil
 }
 
@@ -220,6 +224,97 @@ func CountFaculties() int {
 		return len(fl)
 	}
 	return 0
+}
+
+func GetCategories() ([]string, error) {
+	cacheKey := "get:categories"
+	if fl, ok := miscCache.Get(cacheKey); ok {
+		return fl.([]string), nil
+	}
+
+	categoryMap := make(map[string]bool)
+	events, err := GetAll()
+	if err != nil {
+		return []string{}, err
+	}
+
+	for _, l := range events {
+		for _, c := range l.Categories {
+			if _, ok := categoryMap[c]; !ok {
+				categoryMap[c] = true
+			}
+		}
+	}
+
+	var i int
+	categories := make([]string, len(categoryMap))
+	for k := range categoryMap {
+		categories[i] = k
+		i++
+	}
+
+	miscCache.SetDefault(cacheKey, categories)
+	return categories, nil
+}
+
+func GetTypes() ([]string, error) {
+	cacheKey := "get:types"
+	if fl, ok := miscCache.Get(cacheKey); ok {
+		return fl.([]string), nil
+	}
+
+	typeMap := make(map[string]bool)
+	events, err := GetAll()
+	if err != nil {
+		return []string{}, err
+	}
+
+	for _, l := range events {
+		if _, ok := typeMap[l.Type]; !ok {
+			typeMap[l.Type] = true
+		}
+	}
+
+	var i int
+	types := make([]string, len(typeMap))
+	for k := range typeMap {
+		types[i] = k
+		i++
+	}
+
+	miscCache.SetDefault(cacheKey, types)
+	return types, nil
+}
+
+func GetLecturers() ([]*Lecturer, error) {
+	cacheKey := "get:lecturers"
+	if fl, ok := miscCache.Get(cacheKey); ok {
+		return fl.([]*Lecturer), nil
+	}
+
+	lecturerMap := make(map[string]*Lecturer)
+	events, err := GetAll()
+	if err != nil {
+		return []*Lecturer{}, err
+	}
+
+	for _, l := range events {
+		for _, le := range l.Lecturers {
+			if _, ok := lecturerMap[le.Gguid]; !ok {
+				lecturerMap[le.Gguid] = le
+			}
+		}
+	}
+
+	var i int
+	lecturers := make([]*Lecturer, len(lecturerMap))
+	for _, v := range lecturerMap {
+		lecturers[i] = v
+		i++
+	}
+
+	miscCache.SetDefault(cacheKey, lecturers)
+	return lecturers, nil
 }
 
 func FindBookmark(userId, entityId string) (*Bookmark, error) {

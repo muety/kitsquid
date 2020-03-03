@@ -31,11 +31,18 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		categories, _ := GetCategories()
+		types, _ := GetTypes()
+		lecturers, _ := GetLecturers()
+
 		c.HTML(http.StatusOK, "index", gin.H{
-			"events": events,
-			"limit":  eventQuery.Limit,
-			"offset": eventQuery.Skip,
-			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"events":     events,
+			"types":      types,
+			"categories": categories,
+			"lecturers":  lecturers,
+			"limit":      eventQuery.Limit,
+			"offset":     eventQuery.Skip,
+			"tplCtx":     c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
