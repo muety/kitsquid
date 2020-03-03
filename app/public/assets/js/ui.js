@@ -5,7 +5,13 @@ $(() => {
         inputSignupPassword = $('#input-signup-password'),
         inputSignupGender = $('input[type=radio][name="gender"]'),
         formSignup = $('#form-signup'),
+        formFilter = $('#form-event-filter'),
         imgAvatar = $('#img-avatar')
+
+    $.urlParam = function (name) {
+        let results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.search);
+        return (results !== null) ? results[1] || 0 : null;
+    }
 
     $(window).click(function () {
         toggleLogoutButton(false)
@@ -48,6 +54,15 @@ $(() => {
             ? `https://avatars.dicebear.com/v2/${gender}/${inputSignupPrefix.val()}.svg`
             : '/assets/images/unknown.png'
         imgAvatar.attr('src', avatarUrl)
+    }
+
+    // Filtering
+    if (formFilter) {
+        for (let filter of ['type', 'category', 'lecturer_id']) {
+            let param = decodeURIComponent($.urlParam(filter) || '').split('+').join(' ')
+            let optionExists = param && !!(formFilter.find(`#select-event-${filter} option[value="${param}"]`))
+            formFilter.find(`#select-event-${filter}`).val(optionExists ? param : '')
+        }
     }
 })
 
