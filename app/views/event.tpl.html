@@ -7,104 +7,162 @@
             <a href="#" class="underline">{{ .event.Name }}</a>
         </div>
         <div class="flex flex-wrap items-start md:flex-no-wrap">
-            <div class="w-full md:w-2/3 lg:w-3/4 rounded relative overflow-hidden shadow-md bg-white mb-8 mr-0 md:mr-2">
-                <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
-                    {{ if .tplCtx.User }}
-                    <div class="absolute top-0 text-2xl text-yellow-500 cursor-pointer" style="margin-top: -4px; margin-left: -5px" onclick="toggleBookmarkEvent({{ .event.Id }})">
-                        <i class="{{ if .bookmarked }}hidden{{ end }} icon-bookmark-empty" id="indicator-bookmark-{{ .event.Id }}-empty"></i>
-                        <i class="{{ if not .bookmarked }}hidden{{ end }} icon-bookmark" id="indicator-bookmark-{{ .event.Id }}"></i>
-                    </div>
-                    {{ end }}
-                    <div class="flex items-center sm:items-start mb-4">
-                        <h1 class="text-xl md:text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
-                        <div class="relative inline-block m-2 ml-4 flex">
-                            <div class="py-1 px-2 bg-gray-400 rounded text-xs md:text-base text-gray-700 font-semibold flex-grow-0" title="{{ .event.Type }}">
-                                <span class="cursor-default">{{ strIndex 0 .event.Type }}</span>
+            <div class="w-full md:w-2/3 lg:w-3/4 mb-8 mr-0 md:mr-2 flex flex-col">
+                <div class="w-full rounded relative shadow-md bg-white mb-2">
+                    <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
+                        {{ if .tplCtx.User }}
+                            <div class="absolute top-0 text-2xl text-yellow-500 cursor-pointer"
+                                 style="margin-top: -4px; margin-left: -5px"
+                                 onclick="toggleBookmarkEvent({{ .event.Id }})">
+                                <i class="{{ if .bookmarked }}hidden{{ end }} icon-bookmark-empty"
+                                   id="indicator-bookmark-{{ .event.Id }}-empty"></i>
+                                <i class="{{ if not .bookmarked }}hidden{{ end }} icon-bookmark"
+                                   id="indicator-bookmark-{{ .event.Id }}"></i>
                             </div>
-                            {{ if .event.InWinter }}
-                            <div class="ml-1 px-2 bg-blue-200 rounded text-xs md:text-base text-blue-800 font-semibold flex items-center flex-grow-0" title="Wintersemester">
-                                <span class="cursor-default"><i class="icon-snowflake-o"></i></span>
+                        {{ end }}
+                        <div class="flex items-center sm:items-start mb-4">
+                            <h1 class="text-xl md:text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
+                            <div class="relative inline-block m-2 ml-4 flex">
+                                <div class="py-1 px-2 bg-gray-400 rounded text-xs md:text-base text-gray-700 font-semibold flex-grow-0"
+                                     title="{{ .event.Type }}">
+                                    <span class="cursor-default">{{ strIndex 0 .event.Type }}</span>
+                                </div>
+                                {{ if .event.InWinter }}
+                                    <div class="ml-1 px-2 bg-blue-200 rounded text-xs md:text-base text-blue-800 font-semibold flex items-center flex-grow-0"
+                                         title="Wintersemester">
+                                        <span class="cursor-default"><i class="icon-snowflake-o"></i></span>
+                                    </div>
+                                {{ end }}
+                                {{ if .event.InSummer }}
+                                    <div class="ml-1 px-2 bg-orange-200 rounded text-xs md:text-base text-orange-600 font-semibold flex items-center flex-grow-0"
+                                         title="Sommersemester">
+                                        <span class="cursor-default"><i class="icon-sun"></i></span>
+                                    </div>
+                                {{ end }}
                             </div>
-                            {{ end }}
-                            {{ if .event.InSummer }}
-                            <div class="ml-1 px-2 bg-orange-200 rounded text-xs md:text-base text-orange-600 font-semibold flex items-center flex-grow-0" title="Sommersemester">
-                                <span class="cursor-default"><i class="icon-sun"></i></span>
-                            </div>
-                            {{ end }}
                         </div>
-                    </div>
-                    {{ if not (eq .semesterQuery (index .tplCtx.SemesterKeys (add (len .tplCtx.SemesterKeys) -1))) }}
-                    <div class="my-8" id="alert-different-semester">
-                        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded relative" role="alert">
-                            <span class="block sm:inline text-sm">⚠️ Die dargestellten Angaben beziehen sich auf <strong>{{ index .event.Semesters (add (len .event.Semesters) -1) }}</strong> und können damit vom angefragten Semester abweichen.</span>
-                            <span class="absolute top-0 bottom-0 right-0 px-2 py-1">
-                                <svg class="fill-current h-6 w-6 text-yellow-500" onclick="closeAlert('alert', 'different-semester')" role="button" xmlns="http://www.w3.org/2000/svg"
+                        {{ if not (eq .semesterQuery (index .tplCtx.SemesterKeys (add (len .tplCtx.SemesterKeys) -1))) }}
+                            <div class="my-8" id="alert-different-semester">
+                                <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded relative"
+                                     role="alert">
+                                    <span class="block sm:inline text-sm">⚠️ Die dargestellten Angaben beziehen sich auf <strong>{{ index .event.Semesters (add (len .event.Semesters) -1) }}</strong> und können damit vom angefragten Semester abweichen.</span>
+                                    <span class="absolute top-0 bottom-0 right-0 px-2 py-1">
+                                <svg class="fill-current h-6 w-6 text-yellow-500"
+                                     onclick="closeAlert('alert', 'different-semester')" role="button"
+                                     xmlns="http://www.w3.org/2000/svg"
                                      viewBox="0 0 20 20"><title>Close</title><path
                                             d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
                             </span>
-                        </div>
-                    </div>
-                    {{ end }}
-                    <div class="flex flex-wrap mb-3">
-                        {{ range slice .event.Categories 1 }}
-                            <div class="rounded bg-gray-400 py-1 px-2 mr-2 mb-1 truncate text-xs md:text-sm" title="{{ . }}">{{ . }}</div>
+                                </div>
+                            </div>
                         {{ end }}
-                    </div>
-                    <div class="my-1">
-                        <div class="text-sm md:text-base flex items-center">
-                            <i class="icon-person mr-1"></i>
-                            {{ range $i, $e := .event.Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
-                        </div>
-                    </div>
-                    <div class="my-1">
-                        <div class="text-sm md:text-base flex items-center">
-                            <i class="icon-building mr-1"></i>
-                            <span class="border-b-2" style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .event.Categories .tplCtx.Constants.FacultyIndex }}</span>
-                        </div>
-                    </div>
-                    <div class="my-2">
-                        <div class="text-sm md:text-base flex items-center">
-                            <i class="icon-calendar-check-o mr-1"></i>
-                            {{ range .event.Semesters }}
-                                <div class="rounded border-gray-500 border-2 mr-2 px-1 truncate text-xs inline-block" title="{{ . }}">{{ . }}</div>
+                        <div class="flex flex-wrap mb-3">
+                            {{ range slice .event.Categories 1 }}
+                                <div class="rounded bg-gray-400 py-1 px-2 mr-2 mb-1 truncate text-xs md:text-sm"
+                                     title="{{ . }}">{{ . }}</div>
                             {{ end }}
                         </div>
-                    </div>
-                    {{ if .event.Links }}
-                    <div class="my-1">
-                        <div class="text-sm md:text-base flex items-center">
-                            <i class="icon-link-ext mr-1"></i>
-                            {{ range $i, $l := .event.Links }}{{ if $i }}, {{ end }}<a href="{{ $l.Url }}" target="_blank" class="text-kit">{{ $l.Name }}</a>{{ end }}
+                        <div class="my-1">
+                            <div class="text-sm md:text-base flex items-center">
+                                <i class="icon-person mr-1"></i>
+                                {{ range $i, $e := .event.Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
+                            </div>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ if .event.Description }}
-                    <div class="my-1 mt-8">
-                        <div class="show-li text-sm">
-                            {{ htmlSafe .event.Description }}
+                        <div class="my-1">
+                            <div class="text-sm md:text-base flex items-center">
+                                <i class="icon-building mr-1"></i>
+                                <span class="border-b-2"
+                                      style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .event.Categories .tplCtx.Constants.FacultyIndex }}</span>
+                            </div>
                         </div>
+                        <div class="my-2">
+                            <div class="text-sm md:text-base flex items-center">
+                                <i class="icon-calendar-check-o mr-1"></i>
+                                {{ range .event.Semesters }}
+                                    <div class="rounded border-gray-500 border-2 mr-2 px-1 truncate text-xs inline-block"
+                                         title="{{ . }}">{{ . }}</div>
+                                {{ end }}
+                            </div>
+                        </div>
+                        {{ if .event.Links }}
+                            <div class="my-1">
+                                <div class="text-sm md:text-base flex items-center">
+                                    <i class="icon-link-ext mr-1"></i>
+                                    {{ range $i, $l := .event.Links }}{{ if $i }}, {{ end }}<a href="{{ $l.Url }}"
+                                                                                               target="_blank"
+                                                                                               class="text-kit">{{ $l.Name }}</a>{{ end }}
+                                </div>
+                            </div>
+                        {{ end }}
+                        {{ if .event.Description }}
+                            <div class="my-1 mt-8">
+                                <div class="show-li text-sm">
+                                    {{ htmlSafe .event.Description }}
+                                </div>
+                            </div>
+                        {{ end }}
                     </div>
-                    {{ end }}
+                </div>
+
+                <div class="w-full rounded relative shadow-md bg-white mt-2">
+                    <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-6 mb-4">
+                        <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Kommentare</h2>
+
+                        {{ if .tplCtx.User }}
+                        <form action="/comments" method="post" id="form-comments">
+                            <textarea id="input-comment-text" name="text"
+                                      class="w-full focus:shadow-md rounded border p-4"
+                                      placeholder="Neuen Kommentar verfassen" required></textarea>
+                            <input type="hidden" name="event_id" value="{{ .event.Id }}">
+                            <button id="btn-comments-submit" class="bg-kit hover:bg-kit-dark text-white text-sm font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mt-2 float-right"
+                                    type="submit">Posten
+                            </button>
+                        </form>
+                        {{ end }}
+
+                        {{ if and .tplCtx.User .comments }}
+                        <div class="mt-16 flex flex-col">
+                            {{ range .comments }}
+                            <div class="w-full relative rounded-lg p-4 bg-gray-200 text-sm my-2">
+                                <div class="w-full flex items-center mb-1">
+                                    <p class="text-kit font-semibold mr-1">{{ index (strSplit .UserId "@") 0 }}</p>
+                                    <p class="text-2xs ml-1 flex-grow">{{ .CreatedAt | date }}</p>
+                                    {{ if eq .UserId $.tplCtx.User.Id }}
+                                    <form action="/comments/delete" method="post" class="m-0">
+                                        <input type="hidden" name="id" value="{{ .Id }}">
+                                        <p><button type="submit"><i class="icon-trash-empty mr-1"></i></button></p>
+                                    </form>
+                                    {{ end }}
+                                    <p class="text-kit font-semibold">#{{ .Index }}</p>
+                                </div>
+                                <p>{{ .Text | noescape }}</p>
+                            </div>
+                            {{ end }}
+                        </div>
+                        {{ else }}
+                        <p>Bitte logge dich ein, um Kommentare lesen zu können.</p>
+                        {{ end }}
+                    </div>
                 </div>
             </div>
 
             {{ if .event.Dates }}
-            <div class="w-full md:w-1/3 lg:w-1/4 flex-shrink-0 rounded relative overflow-hidden shadow-md bg-white mb-8 ml-0 md:ml-2">
-                <div class="px-4 py-2 md:px-6 md:py-4">
-                    <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Termine</h2>
-                    <div class="text-sm">
-                        <ul class="">
-                            {{ range .event.Dates }}
-                                <li class="mb-2">
-                                    <span><i class="icon-calendar mr-2"></i>{{ .Date }}</span>
-                                    <br>
-                                    <span><i class="icon-location mr-2"></i>{{ .Room }}</span>
-                                </li>
-                            {{ end }}
-                        </ul>
+                <div class="w-full md:w-1/3 lg:w-1/4 flex-shrink-0 rounded relative overflow-hidden shadow-md bg-white mb-8 ml-0 md:ml-2">
+                    <div class="px-4 py-2 md:px-6 md:py-4">
+                        <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Termine</h2>
+                        <div class="text-sm">
+                            <ul class="">
+                                {{ range .event.Dates }}
+                                    <li class="mb-2">
+                                        <span><i class="icon-calendar mr-2"></i>{{ .Date }}</span>
+                                        <br>
+                                        <span><i class="icon-location mr-2"></i>{{ .Room }}</span>
+                                    </li>
+                                {{ end }}
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
             {{ end }}
         </div>
     {{ end }}

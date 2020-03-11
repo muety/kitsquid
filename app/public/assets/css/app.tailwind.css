@@ -9,6 +9,7 @@
 .sidebar-item-active {
     @apply bg-kit;
     @apply text-white;
+    @apply shadow-md;
 }
 
 .sidebar-item-active:hover {

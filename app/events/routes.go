@@ -2,6 +2,7 @@ package events
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/config"
@@ -70,9 +71,24 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			}
 		}
 
+		var comms []*comments.Comment
+		if user != nil {
+			comms, err = comments.Find(&comments.CommentQuery{
+				EventIdEq: event.Id,
+				UserIdEq:  user.Id,
+				ActiveEq:  true,
+			})
+			if err != nil {
+				c.Error(err).SetType(gin.ErrorTypePrivate)
+				util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
+				return
+			}
+		}
+
 		c.HTML(http.StatusOK, "event", gin.H{
 			"event":         event,
 			"bookmarked":    bookmarked,
+			"comments":      comms,
 			"semesterQuery": semester,
 			"tplCtx":        c.MustGet(config.TemplateContextKey),
 		})

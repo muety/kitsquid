@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetFuncMap() template.FuncMap {
@@ -23,6 +24,8 @@ func GetFuncMap() template.FuncMap {
 		"htmlSafe":    htmlSafe,
 		"randomColor": util.RandomColor,
 		"paginate":    paginate,
+		"date":        formatDate,
+		"noescape":    noescape,
 	}
 }
 
@@ -111,4 +114,12 @@ func paginate(path string, direction int) string {
 	u.RawQuery = q.Encode()
 
 	return u.String()
+}
+
+func formatDate(t time.Time) string {
+	return t.Format(time.RFC822)
+}
+
+func noescape(s string) template.HTML {
+	return template.HTML(s)
 }

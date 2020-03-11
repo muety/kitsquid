@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/events"
 	"github.com/n1try/kithub2/app/users"
@@ -30,6 +31,7 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 
 	events.RegisterRoutes(router, group)
 	users.RegisterRoutes(router, group)
+	comments.RegisterRoutes(router, group)
 
 	return group
 }

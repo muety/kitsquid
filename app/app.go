@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/golang/glog"
+	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/events"
@@ -23,6 +24,7 @@ func init() {
 	web.Init()
 	events.Init(config.Db())
 	users.Init(config.Db())
+	comments.Init(config.Db())
 }
 
 func Run() {
