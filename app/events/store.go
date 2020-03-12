@@ -132,27 +132,21 @@ func FindAll(query *EventQuery) ([]*Event, error) {
 }
 
 func Insert(event *Event, upsert bool) error {
-	eventsCache.Flush()
-	miscCache.Flush()
-
 	f := db.Insert
-	if upsert {
-		f = db.Upsert
-	}
 
 	if upsert {
 		if existing, err := Get(event.Id); err == nil {
+			f = db.Upsert
 			updateEvent(event, existing)
 		}
 	}
 
+	eventsCache.Flush()
+	miscCache.Flush()
 	return f(event.Id, event)
 }
 
 func InsertMulti(events []*Event, upsert bool) error {
-	eventsCache.Flush()
-	miscCache.Flush()
-
 	f := db.TxInsert
 	if upsert {
 		f = db.TxUpsert
@@ -176,6 +170,8 @@ func InsertMulti(events []*Event, upsert bool) error {
 		}
 	}
 
+	eventsCache.Flush()
+	miscCache.Flush()
 	return tx.Commit()
 }
 

@@ -1,3 +1,5 @@
+const KEY_MAIN_RATING = 'overall'
+
 $(() => {
     const inputSignupPrefix = $('#input-signup-prefix'),
         inputSignupSuffix = $('#input-signup-suffix'),
@@ -6,11 +8,12 @@ $(() => {
         inputSignupGender = $('input[type=radio][name="gender"]'),
         formSignup = $('#form-signup'),
         formFilter = $('#form-event-filter'),
-        imgAvatar = $('#img-avatar')
+        imgAvatar = $('#img-avatar'),
+        ratingContainers = $('div[id^="star-rating"]')
 
     $.urlParam = function (name) {
-        let results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.search);
-        return (results !== null) ? results[1] || 0 : null;
+        let results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.search)
+        return (results !== null) ? results[1] || 0 : null
     }
 
     $(window).click(function () {
@@ -44,6 +47,18 @@ $(() => {
             debounce = setTimeout(updateAvatar, 250)
         })
         inputSignupGender.change(updateAvatar)
+    }
+
+    if (ratingContainers.length && eventId) {
+        ratingContainers.each((i, c) => {
+            c = $(c)
+            let key = c.attr('id').split('-')[2]
+            c.find('.star').each((j, el) => {
+                el = $(el)
+                let val = parseInt(el.attr('data-value'))
+                el.click(() => postRating(key, val))
+            })
+        })
     }
 
     function updateAvatar() {
@@ -101,6 +116,56 @@ function closeParent(event) {
 function closeMainAlert() {
     $('#alert-main').addClass('hidden')
     localStorage.setItem('hide_main_alert', 'true')
+}
+
+function updateUserReview(userRatings) {
+    Object.entries(userRatings).forEach(([k, v]) => {
+        $(`#star-rating-${k} .star`).each((i, el) => {
+            el = $(el)
+            let val = el.attr('data-value')
+            el.toggleClass('checked', val == v)
+        })
+    })
+}
+
+function updateAverageRatings(averageRatings) {
+    Object.entries(averageRatings).forEach(([k, v]) => {
+        $(`#rating-average-${k}`).text(v)
+    })
+
+    if (averageRatings.hasOwnProperty(KEY_MAIN_RATING)) {
+        $('#event-rating').text(averageRatings[KEY_MAIN_RATING])
+    }
+}
+
+function postRating(key, value) {
+    fetch(`/api/reviews`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            'event_id': eventId,
+            'ratings': {
+                [key]: value
+            }
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    showSnackbar(`Fehler: ${data.error}`)
+                })
+            } else if (response.status === 200) {
+                showSnackbar('Bewertung abgegeben')
+                return response.json().then((data) => {
+                    updateUserReview(data.userRatings)
+                    updateAverageRatings(data.averageRatings)
+                })
+            } else {
+                showSnackbar('Fehler: Bewertung konnte nicht abgegeben werden')
+            }
+        })
+        .catch(() => {
+            showSnackbar('Fehler: Bewertung konnte nicht abgegeben werden')
+        })
 }
 
 function toggleBookmarkEvent(id) {

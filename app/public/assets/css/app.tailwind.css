@@ -83,3 +83,7 @@
 .star:hover, .star:hover ~ .star {
     @apply text-yellow-500;
 }
+
+.star.checked, .star.checked ~ .star {
+    @apply text-yellow-500;
+}

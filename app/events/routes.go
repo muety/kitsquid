@@ -1,11 +1,13 @@
 package events
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/config"
+	"github.com/n1try/kithub2/app/reviews"
 	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/util"
 	"net/http"
@@ -36,14 +38,25 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 		types, _ := GetTypes()
 		lecturers, _ := GetLecturers()
 
+		eventRatings := make(map[string]float32)
+		for _, e := range events {
+			eventRatings[e.Id] = 0
+			if averages, err := reviews.GetAverages(e.Id); err == nil {
+				if avg, ok := averages[reviews.KeyMainRating]; ok {
+					eventRatings[e.Id] = avg
+				}
+			}
+		}
+
 		c.HTML(http.StatusOK, "index", gin.H{
-			"events":     events,
-			"types":      types,
-			"categories": categories,
-			"lecturers":  lecturers,
-			"limit":      eventQuery.Limit,
-			"offset":     eventQuery.Skip,
-			"tplCtx":     c.MustGet(config.TemplateContextKey),
+			"events":       events,
+			"types":        types,
+			"eventRatings": eventRatings,
+			"categories":   categories,
+			"lecturers":    lecturers,
+			"limit":        eventQuery.Limit,
+			"offset":       eventQuery.Skip,
+			"tplCtx":       c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
@@ -72,12 +85,20 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		var comms []*comments.Comment
+		var userReview *reviews.Review
+		var averageRatings map[string]float32
+
 		if user != nil {
 			comms, err = comments.Find(&comments.CommentQuery{
 				EventIdEq: event.Id,
 				UserIdEq:  user.Id,
 				ActiveEq:  true,
 			})
+
+			userReview, err = reviews.Get(fmt.Sprintf("%s:%s", user.Id, event.Id))
+
+			averageRatings, err = reviews.GetAverages(event.Id)
+
 			if err != nil {
 				c.Error(err).SetType(gin.ErrorTypePrivate)
 				util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
@@ -86,11 +107,13 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		c.HTML(http.StatusOK, "event", gin.H{
-			"event":         event,
-			"bookmarked":    bookmarked,
-			"comments":      comms,
-			"semesterQuery": semester,
-			"tplCtx":        c.MustGet(config.TemplateContextKey),
+			"event":          event,
+			"bookmarked":     bookmarked,
+			"comments":       comms,
+			"userReview":     userReview,
+			"averageRatings": averageRatings,
+			"semesterQuery":  semester,
+			"tplCtx":         c.MustGet(config.TemplateContextKey),
 		})
 	}
 }

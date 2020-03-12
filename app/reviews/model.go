@@ -1,8 +1,15 @@
 package reviews
 
+const KeyMainRating = "overall"
+
 type Review struct {
-	Id      string
-	EventId string
-	Comment string
-	Ratings map[string]uint8
+	Id      string           `json:"" boltholdKey:"Id"`
+	EventId string           `json:"event_id" boltholdIndex:"EventId"`
+	UserId  string           `json:"" boltholdIndex:"UserId"`
+	Ratings map[string]uint8 `json:"ratings"`
+}
+
+type ReviewQuery struct {
+	EventIdEq string
+	UserIdEq  string
 }

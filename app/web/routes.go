@@ -5,6 +5,7 @@ import (
 	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/events"
+	"github.com/n1try/kithub2/app/reviews"
 	"github.com/n1try/kithub2/app/users"
 	"net/http"
 )
@@ -32,6 +33,7 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	events.RegisterRoutes(router, group)
 	users.RegisterRoutes(router, group)
 	comments.RegisterRoutes(router, group)
+	reviews.RegisterRoutes(router, group)
 
 	return group
 }
@@ -43,6 +45,8 @@ func RegisterApiRoutes(router *gin.Engine) *gin.RouterGroup {
 
 	events.RegisterApiRoutes(router, group)
 	users.RegisterApiRoutes(router, group)
+	comments.RegisterApiRoutes(router, group)
+	reviews.RegisterApiRoutes(router, group)
 
 	return group
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/config"
 	"github.com/n1try/kithub2/app/events"
+	"github.com/n1try/kithub2/app/reviews"
 	"github.com/n1try/kithub2/app/scraping"
 	"github.com/n1try/kithub2/app/users"
 	"github.com/n1try/kithub2/app/web"
@@ -25,6 +26,7 @@ func init() {
 	events.Init(config.Db())
 	users.Init(config.Db())
 	comments.Init(config.Db())
+	reviews.Init(config.Db())
 }
 
 func Run() {

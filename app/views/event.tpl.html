@@ -23,7 +23,7 @@
                         <div class="flex items-center sm:items-start mb-4">
                             <h1 class="text-xl md:text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
                             <div class="relative inline-block m-2 ml-4 flex">
-                                <div class="py-1 px-2 bg-gray-400 rounded text-xs md:text-base text-gray-700 font-semibold flex-grow-0"
+                                <div class="py-1 px-2 bg-gray-400 rounded text-xs md:text-base text-gray-700 font-semibold flex-grow-0 flex items-center"
                                      title="{{ .event.Type }}">
                                     <span class="cursor-default">{{ strIndex 0 .event.Type }}</span>
                                 </div>
@@ -42,7 +42,7 @@
                                 {{ if .tplCtx.User }}
                                     <div class="ml-1 px-2 bg-yellow-300 rounded text-xs md:text-base text-yellow-700 font-semibold flex items-center flex-grow-0"
                                          title="Gesamtbewertung">
-                                        <span class="cursor-default"><i class="icon-star"></i> 4.7</span>
+                                        <span class="cursor-default"><i class="icon-star"></i> <span id="event-rating">{{ index .averageRatings "overall" }}</span></span>
                                     </div>
                                 {{ end }}
                             </div>
@@ -186,91 +186,66 @@
                                 {{ if .tplCtx.User }}
                                     <div class="mb-6">
                                         <div class="label text-sm mb-1">
-                                            <span class="font-semibold">Gesamtbewertung</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; 4.7)</span>
+                                            <span class="font-semibold">Insgesamt</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-overall">{{ index .averageRatings "overall" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer" title="Wie bewertest du diese Veranstaltung insgesamt?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">schlecht</span>
                                             <div class="rating float-left whitespace-no-wrap" id="star-rating-overall">
-                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
-                                            </div>
+                                                <span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "overall") 5) }} checked {{ end }} cursor-pointer" data-value="5"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "overall") 4) }} checked {{ end }} cursor-pointer" data-value="4"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "overall") 3) }} checked {{ end }} cursor-pointer" data-value="3"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "overall") 2) }} checked {{ end }} cursor-pointer" data-value="2"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "overall") 1) }} checked {{ end }} cursor-pointer" data-value="1"></span></div>
                                             <span class="text-2xs w-full text-right">sehr gut</span>
                                         </div>
                                     </div>
                                     <div class="mb-6">
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Anspruch</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; 3.2)</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-demand">{{ index .averageRatings "demand" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer" title="Wie bewertest du den inhaltlichen Anspruch dieser Veranstaltung?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">unange-messen</span>
                                             <div class="rating float-left whitespace-no-wrap" id="star-rating-demand">
-                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
-                                            </div>
+                                                <span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "demand") 5) }} checked {{ end }} cursor-pointer" data-value="5"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "demand") 4) }} checked {{ end }} cursor-pointer" data-value="4"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "demand") 3) }} checked {{ end }} cursor-pointer" data-value="3"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "demand") 2) }} checked {{ end }} cursor-pointer" data-value="2"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "demand") 1) }} checked {{ end }} cursor-pointer" data-value="1"></span></div>
                                             <span class="text-2xs w-full text-right">genau richtig</span>
                                         </div>
                                     </div>
                                     <div class="mb-6">
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Zeitaufwand</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; 4.4)</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-effort">{{ index .averageRatings "effort" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer" title="Wie bewertest du den zeitlichen Aufwand, der für diese Veranstaltung notwendig ist?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">unange-messen</span>
                                             <div class="rating float-left whitespace-no-wrap" id="star-rating-effort">
-                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
-                                            </div>
+                                                <span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "effort") 5) }} checked {{ end }} cursor-pointer" data-value="5"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "effort") 4) }} checked {{ end }} cursor-pointer" data-value="4"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "effort") 3) }} checked {{ end }} cursor-pointer" data-value="3"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "effort") 2) }} checked {{ end }} cursor-pointer" data-value="2"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "effort") 1) }} checked {{ end }} cursor-pointer" data-value="1"></span></div>
                                             <span class="text-2xs w-full text-right">genau richtig</span>
                                         </div>
                                     </div>
                                     <div class="mb-6">
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Praxisrelevanz</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; 4.4)</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-relevance">{{ index .averageRatings "relevance" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer" title="Für wie praxisrelevant und sinnvoll für dein weiteres Studium und deine Karriere hälst du diese Veranstaltung inhaltlich?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">unnötig</span>
                                             <div class="rating float-left whitespace-no-wrap" id="star-rating-relevance">
-                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
-                                            </div>
-                                            <span class="text-2xs w-full text-right">essentiell</span>
+                                                <span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "relevance") 5) }} checked {{ end }} cursor-pointer" data-value="5"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "relevance") 4) }} checked {{ end }} cursor-pointer" data-value="4"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "relevance") 3) }} checked {{ end }} cursor-pointer" data-value="3"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "relevance") 2) }} checked {{ end }} cursor-pointer" data-value="2"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "relevance") 1) }} checked {{ end }} cursor-pointer" data-value="1"></span></div>
+                                            <span class="text-2xs w-full text-right">wichtig</span>
                                         </div>
                                     </div>
                                     <div class="mb-6">
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Dozent</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; 5.0)</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-lecturer">{{ index .averageRatings "lecturer" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer" title="Wie sympathisch und kompetent schätzt du den Dozent (Prof., Übungsleiter, Tutor, ...) dieser Veranstaltung ein?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">doof</span>
                                             <div class="rating float-left whitespace-no-wrap" id="star-rating-lecturer">
-                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
-                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
-                                            </div>
+                                                <span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "lecturer") 5) }} checked {{ end }}cursor-pointer" data-value="5"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "lecturer") 4) }} checked {{ end }}cursor-pointer" data-value="4"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "lecturer") 3) }} checked {{ end }}cursor-pointer" data-value="3"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "lecturer") 2) }} checked {{ end }}cursor-pointer" data-value="2"></span><span class="icon-star star {{ if and .userReview (eq (index .userReview.Ratings "lecturer") 1) }} checked {{ end }}cursor-pointer" data-value="1"></span></div>
                                             <span class="text-2xs w-full text-right">super</span>
                                         </div>
                                     </div>
@@ -282,4 +257,7 @@
                 </div>
         </div>
     {{ end }}
+    <script>
+        let eventId = {{ .event.Id }}
+    </script>
 {{ end }}
