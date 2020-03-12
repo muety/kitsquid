@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.clear {
+    clear: both;
+}
+
 .text-2xs {
     font-size: 0.65rem;
 }
@@ -63,4 +67,19 @@
     display: inline-block;
     width: 1em;
     margin-left: -1em;
+}
+
+.rating {
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+
+.rating > .star {
+    @apply text-gray-300;
+    @apply inline-block;
+    @apply relative;
+}
+
+.star:hover, .star:hover ~ .star {
+    @apply text-yellow-500;
 }

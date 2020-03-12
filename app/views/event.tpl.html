@@ -39,6 +39,12 @@
                                         <span class="cursor-default"><i class="icon-sun"></i></span>
                                     </div>
                                 {{ end }}
+                                {{ if .tplCtx.User }}
+                                    <div class="ml-1 px-2 bg-yellow-300 rounded text-xs md:text-base text-yellow-700 font-semibold flex items-center flex-grow-0"
+                                         title="Gesamtbewertung">
+                                        <span class="cursor-default"><i class="icon-star"></i> 4.7</span>
+                                    </div>
+                                {{ end }}
                             </div>
                         </div>
                         {{ if not (eq .semesterQuery (index .tplCtx.SemesterKeys (add (len .tplCtx.SemesterKeys) -1))) }}
@@ -109,61 +115,171 @@
                         <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Kommentare</h2>
 
                         {{ if .tplCtx.User }}
-                        <form action="/comments" method="post" id="form-comments">
-                            <textarea id="input-comment-text" name="text"
-                                      class="w-full focus:shadow-md rounded border p-4"
-                                      placeholder="Neuen Kommentar verfassen" required></textarea>
-                            <input type="hidden" name="event_id" value="{{ .event.Id }}">
-                            <button id="btn-comments-submit" class="bg-kit hover:bg-kit-dark text-white text-sm font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mt-2 float-right"
-                                    type="submit">Posten
-                            </button>
-                        </form>
+                            <form action="/comments" method="post" id="form-comments">
+                                <textarea id="input-comment-text" name="text"
+                                          class="w-full focus:shadow-md rounded border p-4"
+                                          placeholder="Schreibe einen Kommentar zu dieser Veranstaltung. Was hat dir (nicht) gefallen? Welche Tipps kannst du deinen Kommilitonen geben?" required></textarea>
+                                <input type="hidden" name="event_id" value="{{ .event.Id }}">
+                                <button id="btn-comments-submit"
+                                        class="bg-kit hover:bg-kit-dark text-white text-sm font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mt-2 float-right"
+                                        type="submit">Posten
+                                </button>
+                            </form>
                         {{ end }}
 
                         {{ if and .tplCtx.User .comments }}
-                        <div class="mt-16 flex flex-col">
-                            {{ range .comments }}
-                            <div class="w-full relative rounded-lg p-4 bg-gray-200 text-sm my-2">
-                                <div class="w-full flex items-center mb-1">
-                                    <p class="text-kit font-semibold mr-1">{{ index (strSplit .UserId "@") 0 }}</p>
-                                    <p class="text-2xs ml-1 flex-grow">{{ .CreatedAt | date }}</p>
-                                    {{ if eq .UserId $.tplCtx.User.Id }}
-                                    <form action="/comments/delete" method="post" class="m-0">
-                                        <input type="hidden" name="id" value="{{ .Id }}">
-                                        <p><button type="submit"><i class="icon-trash-empty mr-1"></i></button></p>
-                                    </form>
-                                    {{ end }}
-                                    <p class="text-kit font-semibold">#{{ .Index }}</p>
-                                </div>
-                                <p>{{ .Text | noescape }}</p>
+                            <div class="mt-16 flex flex-col">
+                                {{ range .comments }}
+                                    <div class="w-full relative rounded-lg p-4 bg-gray-200 text-sm my-2">
+                                        <div class="w-full flex items-center mb-1">
+                                            <p class="text-kit font-semibold mr-1">{{ index (strSplit .UserId "@") 0 }}</p>
+                                            <p class="text-2xs ml-1 flex-grow">{{ .CreatedAt | date }}</p>
+                                            {{ if eq .UserId $.tplCtx.User.Id }}
+                                                <form action="/comments/delete" method="post" class="m-0">
+                                                    <input type="hidden" name="id" value="{{ .Id }}">
+                                                    <p>
+                                                        <button type="submit"><i class="icon-trash-empty mr-1"></i>
+                                                        </button>
+                                                    </p>
+                                                </form>
+                                            {{ end }}
+                                            <p class="text-kit font-semibold">#{{ .Index }}</p>
+                                        </div>
+                                        <p>{{ .Text | noescape }}</p>
+                                    </div>
+                                {{ end }}
                             </div>
-                            {{ end }}
-                        </div>
+                        {{ else if and .tplCtx.User (not .comments) }}
+                            <p>Keine Kommentare</p>
                         {{ else }}
-                        <p>Bitte logge dich ein, um Kommentare lesen zu können.</p>
+                            <p><i class="icon-info-circled"></i> Bitte logge dich ein, um Kommentare lesen zu können.</p>
                         {{ end }}
                     </div>
                 </div>
             </div>
 
-            {{ if .event.Dates }}
-                <div class="w-full md:w-1/3 lg:w-1/4 flex-shrink-0 rounded relative overflow-hidden shadow-md bg-white mb-8 ml-0 md:ml-2">
-                    <div class="px-4 py-2 md:px-6 md:py-4">
-                        <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Termine</h2>
-                        <div class="text-sm">
-                            <ul class="">
-                                {{ range .event.Dates }}
-                                    <li class="mb-2">
-                                        <span><i class="icon-calendar mr-2"></i>{{ .Date }}</span>
-                                        <br>
-                                        <span><i class="icon-location mr-2"></i>{{ .Room }}</span>
-                                    </li>
-                                {{ end }}
-                            </ul>
+            <div class="flex flex-col w-full md:w-1/3 lg:w-1/4 flex-shrink-0 mb-8 ml-0 md:ml-2">
+                    {{ if .event.Dates }}
+                        <div class="rounded relative overflow-hidden shadow-md bg-white mb-4">
+                            <div class="px-4 py-2 md:px-6 md:py-4">
+                                <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Termine</h2>
+                                <div class="text-sm">
+                                    <ul class="">
+                                        {{ range .event.Dates }}
+                                            <li class="mb-2">
+                                                <span><i class="icon-calendar mr-2"></i>{{ .Date }}</span>
+                                                <br>
+                                                <span><i class="icon-location mr-2"></i>{{ .Room }}</span>
+                                            </li>
+                                        {{ end }}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    {{ end }}
+
+                    <div class="rounded relative overflow-hidden shadow-md bg-white">
+                            <div class="px-4 py-2 md:px-6 md:py-4">
+                                <div>
+                                    <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Bewertungen</h2>
+                                </div>
+                                {{ if .tplCtx.User }}
+                                    <div class="mb-6">
+                                        <div class="label text-sm mb-1">
+                                            <span class="font-semibold">Gesamtbewertung</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; 4.7)</span>
+                                            <i class="icon-info-circled cursor-pointer" title="Wie bewertest du diese Veranstaltung insgesamt?"></i>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-2xs w-full text-left">schlecht</span>
+                                            <div class="rating float-left whitespace-no-wrap" id="star-rating-overall">
+                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
+                                            </div>
+                                            <span class="text-2xs w-full text-right">sehr gut</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-6">
+                                        <div class="label text-sm mb-1">
+                                            <span class="font-semibold">Anspruch</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; 3.2)</span>
+                                            <i class="icon-info-circled cursor-pointer" title="Wie bewertest du den inhaltlichen Anspruch dieser Veranstaltung?"></i>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-2xs w-full text-left">unange-messen</span>
+                                            <div class="rating float-left whitespace-no-wrap" id="star-rating-demand">
+                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
+                                            </div>
+                                            <span class="text-2xs w-full text-right">genau richtig</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-6">
+                                        <div class="label text-sm mb-1">
+                                            <span class="font-semibold">Zeitaufwand</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; 4.4)</span>
+                                            <i class="icon-info-circled cursor-pointer" title="Wie bewertest du den zeitlichen Aufwand, der für diese Veranstaltung notwendig ist?"></i>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-2xs w-full text-left">unange-messen</span>
+                                            <div class="rating float-left whitespace-no-wrap" id="star-rating-effort">
+                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
+                                            </div>
+                                            <span class="text-2xs w-full text-right">genau richtig</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-6">
+                                        <div class="label text-sm mb-1">
+                                            <span class="font-semibold">Praxisrelevanz</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; 4.4)</span>
+                                            <i class="icon-info-circled cursor-pointer" title="Für wie praxisrelevant und sinnvoll für dein weiteres Studium und deine Karriere hälst du diese Veranstaltung inhaltlich?"></i>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-2xs w-full text-left">unnötig</span>
+                                            <div class="rating float-left whitespace-no-wrap" id="star-rating-relevance">
+                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
+                                            </div>
+                                            <span class="text-2xs w-full text-right">essentiell</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-6">
+                                        <div class="label text-sm mb-1">
+                                            <span class="font-semibold">Dozent</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; 5.0)</span>
+                                            <i class="icon-info-circled cursor-pointer" title="Wie sympathisch und kompetent schätzt du den Dozent (Prof., Übungsleiter, Tutor, ...) dieser Veranstaltung ein?"></i>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-2xs w-full text-left">doof</span>
+                                            <div class="rating float-left whitespace-no-wrap" id="star-rating-lecturer">
+                                                <span class="icon-star star cursor-pointer" data-value="5"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="4"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="3"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="2"></span>
+                                                <span class="icon-star star cursor-pointer" data-value="1"></span>
+                                            </div>
+                                            <span class="text-2xs w-full text-right">super</span>
+                                        </div>
+                                    </div>
+                                {{ else }}
+                                    <p class="text-sm"><i class="icon-info-circled"></i> Bitte logge dich ein, um Bewertungen sehen zu können.</p>
+                                {{ end }}
+                            </div>
+                        </div>
                 </div>
-            {{ end }}
         </div>
     {{ end }}
 {{ end }}
