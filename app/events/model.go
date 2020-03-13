@@ -58,7 +58,7 @@ type EventDate struct {
 
 type Lecturer struct {
 	Gguid string
-	Name  string `boltholdIndex:"Name"`
+	Name  string
 }
 
 type Link struct {
@@ -74,6 +74,27 @@ type EventQuery struct {
 	CategoryIn   []string
 	Skip         int
 	Limit        int
+}
+
+type EventSearchResultItem struct {
+	Id        string   `json:"id"`
+	Name      string   `json:"name"`
+	Type      string   `json:"type"`
+	Lecturers []string `json:"lecturers"`
+}
+
+func NewEventSearchResultItem(event *Event) *EventSearchResultItem {
+	lecturers := make([]string, len(event.Lecturers))
+	for i, l := range event.Lecturers {
+		lecturers[i] = l.Name
+	}
+
+	return &EventSearchResultItem{
+		Id:        event.Id,
+		Name:      event.Name,
+		Type:      event.Type,
+		Lecturers: lecturers,
+	}
 }
 
 type Bookmark struct {

@@ -6,6 +6,7 @@ $(() => {
         inputSignupUser = $('#input-signup-user'),
         inputSignupPassword = $('#input-signup-password'),
         inputSignupGender = $('input[type=radio][name="gender"]'),
+        inputSearch = $('#input-search'),
         formSignup = $('#form-signup'),
         formFilter = $('#form-event-filter'),
         imgAvatar = $('#img-avatar'),
@@ -19,6 +20,7 @@ $(() => {
     $(window).click(function () {
         toggleLogoutButton(false)
         toggleLoginButton(false)
+        displaySearchResults(null)
     })
 
     // Main Alert
@@ -79,6 +81,21 @@ $(() => {
             formFilter.find(`#select-event-${filter}`).val(optionExists ? param : '')
         }
     }
+
+    let searchDebounce
+    if (inputSearch) {
+        inputSearch.keyup(() => {
+            if (searchDebounce) clearTimeout(searchDebounce)
+            searchDebounce = setTimeout(() => {
+                let q = inputSearch.val()
+                if (q !== '') {
+                    performSearch(q)
+                } else {
+                    displaySearchResults(null)
+                }
+            }, 500)
+        })
+    }
 })
 
 function toggleSidebar() {
@@ -138,9 +155,33 @@ function updateAverageRatings(averageRatings) {
     }
 }
 
+function performSearch(q) {
+    fetch(`/api/event/search?q=${q}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    showSnackbar(`Fehler: ${data.error}`)
+                })
+            } else if (response.status === 200) {
+                return response.json().then(displaySearchResults)
+            }
+        })
+        .catch(() => {
+        })
+}
+
 function postRating(key, value) {
     fetch(`/api/reviews`, {
         method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
             'event_id': eventId,
             'ratings': {
@@ -200,4 +241,35 @@ function showSnackbar(text) {
     setTimeout(() => {
         sb.addClass('hidden')
     }, 2000)
+}
+
+function displaySearchResults(data) {
+    if (!data || !data.length) {
+        $('#search-results').toggleClass('hidden', true)
+    } else {
+        $('#search-results').toggleClass('hidden', false)
+        let list = $('#search-results-list')
+        list.empty()
+        data.forEach(item => {
+            list.append(renderSearchResultItem(item))
+        })
+    }
+}
+
+function renderSearchResultItem(data) {
+    let eventTpl = `<li class="cursor-pointer hover:bg-gray-100 my-1 py-1 px-2 rounded">
+                        <a class="flex items-center justify-start" href="/event/${data.id}">
+                            <div class="inline-block py-1 px-2 bg-gray-400 rounded text-2xs text-gray-700 font-semibold text-center" title="${data.type}">
+                                <span class="cursor-default">${data.type[0]}</span>
+                            </div>
+                            <div class="ml-3">[${data.id}] ${data.name}</div>
+                            <div class="ml-3">
+                                <span class="text-xs whitespace-no-wrap">
+                                    <i class="icon-person"></i>
+                                    <span>${data.lecturers.join(', ')}</span>
+                                </span>
+                            </div>
+                        </a>
+                    </li>`
+    return $(eventTpl)
 }

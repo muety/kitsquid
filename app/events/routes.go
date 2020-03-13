@@ -21,6 +21,7 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
+	group.GET("/event/search", apiSearchEvents(router))
 	group.PUT("/event/:id/bookmark", apiPutBookmark(router))
 }
 
@@ -118,6 +119,32 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 	}
 }
 
+func apiSearchEvents(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		values := c.Request.URL.Query()
+
+		// TODO: Add ability to search by ID
+		eventQuery := &EventQuery{
+			NameLike: values.Get("q"),
+			Limit:    10,
+		}
+
+		events, err := FindAll(eventQuery)
+		if err != nil {
+			c.Error(err)
+			c.AbortWithError(http.StatusInternalServerError, errors.Internal{})
+			return
+		}
+
+		eventVms := make([]*EventSearchResultItem, len(events))
+		for i, e := range events {
+			eventVms[i] = NewEventSearchResultItem(e)
+		}
+
+		c.JSON(http.StatusOK, eventVms)
+	}
+}
+
 func apiPutBookmark(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var user *users.User
@@ -149,7 +176,7 @@ func apiPutBookmark(r *gin.Engine) func(c *gin.Context) {
 		} else {
 			if err := DeleteBookmark(bm); err != nil {
 				c.Error(err)
-				c.AbortWithError(500, errors.Internal{}).SetType(gin.ErrorTypePublic)
+				c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
 				return
 			}
 
