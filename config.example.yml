@@ -22,10 +22,12 @@ mail:
 
 cache:
   lectures: 30m
-  faculties: 60m
+  misc: 60m
   users: 60m
   sessions: 10m
   bookmarks: 30m
+  comments: 30m
+  reviews: 30m
 
 auth:
   salt: ssshhh
