@@ -25,7 +25,7 @@ func InitStore(store *bolthold.Store) {
 	db = store
 
 	eventsCache = cache.New(cfg.CacheDuration("events", 30*time.Minute), cfg.CacheDuration("events", 30*time.Minute)*2)
-	miscCache = cache.New(cfg.CacheDuration("faculties", 30*time.Minute), cfg.CacheDuration("faculties", 30*time.Minute)*2)
+	miscCache = cache.New(cfg.CacheDuration("misc", 30*time.Minute), cfg.CacheDuration("misc", 30*time.Minute)*2)
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
 
 	setup()
