@@ -161,6 +161,18 @@
       "css": "info-circled",
       "code": 59407,
       "src": "fontawesome"
+    },
+    {
+      "uid": "98687378abd1faf8f6af97c254eb6cd6",
+      "css": "cog-alt",
+      "code": 59408,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e99461abfef3923546da8d745372c995",
+      "css": "cog",
+      "code": 59409,
+      "src": "fontawesome"
     }
   ]
 }

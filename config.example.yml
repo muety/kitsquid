@@ -33,9 +33,8 @@ auth:
   salt: ssshhh
   session:
     timeout: 168h # 7d
-  admin:
-    user: user@example.com
-    password: secretpassword
+  admins:
+    - "admin@example.com"
   whitelist:
     - prefix-pattern: ^u[\w]{4}
       prefix-display: uxxxx

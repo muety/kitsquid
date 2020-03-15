@@ -2,16 +2,40 @@
     <ul class="text-sm">
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
             <a href="/">
-                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 hover:shadow-md py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if or (eq .tplCtx.Path "/") (strPrefix .tplCtx.Path "/event") }} sidebar-item-active {{ end }}">
-                    <i class="icon-graduation-cap md:hidden lg:inline-block"></i><span class="ml-3">Vorlesungen</span>
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if or (eq .tplCtx.Path "/") (strPrefix .tplCtx.Path "/event") }} sidebar-item-active {{ end }}">
+                    <i class="icon-graduation-cap md:hidden lg:inline-block"></i><span class="ml-3">Veranstaltungen</span>
                 </button>
             </a>
         </li>
+        {{ if .tplCtx.User }}
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
-            <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 hover:shadow-md py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/account" }} sidebar-item-active {{ end }}">
-                <i class="icon-user-circle-o md:hidden lg:inline-block"></i><span class="ml-3">Mein Account</span>
-            </button>
+            <a href="/me/bookmarks">
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/me/bookmarks" }} sidebar-item-active {{ end }}">
+                    <i class="icon-bookmark md:hidden lg:inline-block"></i><span class="ml-3">Favoriten</span>
+                </button>
+            </a>
         </li>
+        {{ end }}
+        {{ if .tplCtx.User }}
+        <li class="py-2 pr-3 lg:pr-0 md:py-1">
+            <a href="/me">
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/me" }} sidebar-item-active {{ end }}">
+                    <i class="icon-user-circle-o md:hidden lg:inline-block"></i><span class="ml-3">Mein Account</span>
+                </button>
+            </a>
+        </li>
+        {{ end }}
+        {{ if .tplCtx.User }}
+        {{ if .tplCtx.User.IsAdmin }}
+        <li class="py-2 pr-3 lg:pr-0 md:py-1">
+            <a href="/admin">
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/admin" }} sidebar-item-active {{ end }}">
+                    <i class="icon-cog-alt md:hidden lg:inline-block"></i><span class="ml-3">Admin</span>
+                </button>
+            </a>
+        </li>
+        {{ end }}
+        {{ end }}
     </ul>
     <button class="md:hidden text-4xl absolute top-0 right-0 mt-2 mr-8" id="btn-close-sidebar" onclick="toggleSidebar()">
         <i class="icon-cancel-circled2"></i>

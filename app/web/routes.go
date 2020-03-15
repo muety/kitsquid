@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/n1try/kithub2/app/admin"
 	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common/errors"
 	"github.com/n1try/kithub2/app/events"
@@ -34,6 +35,7 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	users.RegisterRoutes(router, group)
 	comments.RegisterRoutes(router, group)
 	reviews.RegisterRoutes(router, group)
+	admin.RegisterRoutes(router, group)
 
 	return group
 }
@@ -47,6 +49,7 @@ func RegisterApiRoutes(router *gin.Engine) *gin.RouterGroup {
 	users.RegisterApiRoutes(router, group)
 	comments.RegisterApiRoutes(router, group)
 	reviews.RegisterApiRoutes(router, group)
+	admin.RegisterApiRoutes(router, group)
 
 	return group
 }

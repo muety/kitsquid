@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/n1try/kithub2/app/config"
 	"time"
 )
 
@@ -34,6 +35,15 @@ type UserSessionValidator func(s *UserSession) bool
 
 func (s *User) IsValid(validator UserValidator) bool {
 	return validator(s)
+}
+
+func (s *User) IsAdmin() bool {
+	for _, a := range config.Get().Auth.Admins {
+		if a == s.Id {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *UserSession) IsValid(validator UserSessionValidator) bool {

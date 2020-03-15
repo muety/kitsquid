@@ -38,10 +38,7 @@ type Config struct {
 		Session struct {
 			Timeout string `default:"1d" env:"KITHUB_AUTH_SESSION_TIMEOUT"`
 		}
-		Admin struct {
-			User     string `env:"KITHUB_ADMIN_USER"`
-			Password string `env:"KITHUB_ADMIN_PASSWORD"`
-		}
+		Admins    []string `env:"KITHUB_AUTH_ADMIN_USERS"`
 		Whitelist []common.UserWhitelistItem
 	}
 	Misc struct {
