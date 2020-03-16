@@ -13,18 +13,15 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
-	group.PUT("/reviews", apiPutReview(router))
+	group.PUT("/reviews", CheckUser(), apiPutReview(router))
 }
 
 func apiPutReview(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var review Review
 
-		user, _ := c.Get(config.UserKey)
-		if user == nil {
-			c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{}).SetType(gin.ErrorTypePublic)
-			return
-		}
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
 
 		if err := c.ShouldBindJSON(&review); err != nil || !ratingValid(&review) {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -32,7 +29,7 @@ func apiPutReview(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		review.UserId = user.(*users.User).Id
+		review.UserId = user.Id
 
 		if err := Insert(&review, true); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)

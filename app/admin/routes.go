@@ -9,7 +9,7 @@ import (
 )
 
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
-	group.GET("/admin", CheckAdmin(), index(router))
+	group.GET("/admin", CheckAdmin(), getIndex(router))
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
@@ -17,7 +17,7 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/admin/flush", CheckAdmin(), apiAdminFlush(router))
 }
 
-func index(r *gin.Engine) func(c *gin.Context) {
+func getIndex(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, "admin", gin.H{
 			"entities": entities,

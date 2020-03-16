@@ -1,0 +1,30 @@
+{{ define "content" }}
+    <div class="px-4">
+    <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Account</h1>
+    <div>
+        <h2 class="text-lg inline-block text-kit mb-2">Passwort ändern</h2>
+        <form id="form-password-change" action="/account" method="post">
+            <div class="w-full lg:w-2/3">
+                <div class="flex w-full">
+                    <div class="w-1/2 pr-2">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="input-password-old">Altes
+                            Passwort</label>
+                        <input type="password" id="input-password-old" placeholder="********" name="old" pattern="^[.*\S]{8,}$" class="bg-white appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-1 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="w-1/2 pl-2">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="input-password-new">Neues
+                            Passwort</label>
+                        <input type="password" id="input-password-new" placeholder="********" name="new" pattern="^[.*\S]{8,}$" class="bg-white appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-1 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                </div>
+                <div class="w-full flex justify-end mt-8">
+                    <button class="bg-kit hover:bg-kit-dark text-white font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
+                            type="submit">
+                        Speichern
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+{{ end }}

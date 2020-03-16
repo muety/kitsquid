@@ -14,13 +14,19 @@ import (
 
 func NewUserValidator(cfg *config.Config) UserValidator {
 	return func(u *User) bool {
-		whitelist := config.Get().Auth.Whitelist
-
 		if !util.ContainsString(u.Degree, cfg.University.Degrees) ||
 			!util.ContainsString(u.Major, cfg.University.Majors) ||
 			!util.ContainsString(u.Gender, common.Genders) {
 			return false
 		}
+
+		return NewUserCredentialsValidator(cfg)(u)
+	}
+}
+
+func NewUserCredentialsValidator(cfg *config.Config) UserCredentialsValidator {
+	return func(u *User) bool {
+		whitelist := cfg.Auth.Whitelist
 
 		for _, w := range whitelist {
 			if w.MailDomainRegex().Match([]byte(u.Id)) &&

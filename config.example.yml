@@ -40,7 +40,6 @@ auth:
       prefix-display: uxxxx
       suffix-pattern: \@student.kit.edu$
       suffix-display: student.kit.edu
-      password-pattern: ^[.*\S]{8,}$
 
 university:
   degrees:

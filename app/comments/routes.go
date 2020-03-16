@@ -15,8 +15,8 @@ import (
 )
 
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
-	group.POST("/comments", postComment(router))
-	group.POST("/comments/delete", deleteComment(router))
+	group.POST("/comments", CheckUser(), postComment(router))
+	group.POST("/comments/delete", CheckUser(), deleteComment(router))
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
@@ -26,11 +26,8 @@ func postComment(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var comment Comment
 
-		user, _ := c.Get(config.UserKey)
-		if user == nil {
-			util.MakeError(c, "event", http.StatusUnauthorized, errors.Unauthorized{}, nil)
-			return
-		}
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
 
 		if err := c.ShouldBind(&comment); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -46,7 +43,7 @@ func postComment(r *gin.Engine) func(c *gin.Context) {
 		comment.Text = text
 		comment.Active = true // TODO: Admin functionality to activate comments
 		comment.CreatedAt = time.Now()
-		comment.UserId = user.(*users.User).Id
+		comment.UserId = user.Id
 		if maxIdx, err := GetMaxIndexByEvent(comment.EventId); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
@@ -73,11 +70,8 @@ func deleteComment(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var comment commentDelete
 
-		user, _ := c.Get(config.UserKey)
-		if user == nil {
-			util.MakeError(c, "event", http.StatusUnauthorized, errors.Unauthorized{}, nil)
-			return
-		}
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
 
 		if err := c.ShouldBind(&comment); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -92,7 +86,7 @@ func deleteComment(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		if existing.UserId != user.(*users.User).Id {
+		if existing.UserId != user.Id {
 			util.MakeError(c, "event", http.StatusUnauthorized, errors.Unauthorized{}, nil)
 			return
 		}

@@ -9,8 +9,8 @@
         </li>
         {{ if .tplCtx.User }}
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
-            <a href="/me/bookmarks">
-                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/me/bookmarks" }} sidebar-item-active {{ end }}">
+            <a href="/bookmarks">
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/bookmarks" }} sidebar-item-active {{ end }}">
                     <i class="icon-bookmark md:hidden lg:inline-block"></i><span class="ml-3">Favoriten</span>
                 </button>
             </a>
@@ -18,9 +18,9 @@
         {{ end }}
         {{ if .tplCtx.User }}
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
-            <a href="/me">
-                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/me" }} sidebar-item-active {{ end }}">
-                    <i class="icon-user-circle-o md:hidden lg:inline-block"></i><span class="ml-3">Mein Account</span>
+            <a href="/account">
+                <button class="w-5/6 hover:bg-gray-400 hover:text-gray-700 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/account" }} sidebar-item-active {{ end }}">
+                    <i class="icon-user-circle-o md:hidden lg:inline-block"></i><span class="ml-3">Account</span>
                 </button>
             </a>
         </li>

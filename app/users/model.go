@@ -34,13 +34,24 @@ type Login struct {
 	Password string `form:"password" binding:"required"`
 }
 
+type passwordChange struct {
+	OldPassword string `form:"old" binding:"required"`
+	NewPassword string `form:"new" binding:"required"`
+}
+
 type UserValidator func(s *User) bool
 
 type UserResolver func(id string) (*User, error)
 
+type UserCredentialsValidator func(s *User) bool
+
 type UserSessionValidator func(s *UserSession) bool
 
 func (s *User) IsValid(validator UserValidator) bool {
+	return validator(s)
+}
+
+func (s *User) HasValidCredentials(validator UserCredentialsValidator) bool {
 	return validator(s)
 }
 

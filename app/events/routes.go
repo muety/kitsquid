@@ -3,6 +3,7 @@ package events
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	log "github.com/golang/glog"
 	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/common/errors"
@@ -17,12 +18,13 @@ import (
 
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/", getEvents(router))
+	group.GET("/bookmarks", CheckUser(), getBookmarks(router))
 	group.GET("/event/:id", getEvent(router))
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/event/search", apiSearchEvents(router))
-	group.PUT("/event/:id/bookmark", apiPutBookmark(router))
+	group.PUT("/event/:id/bookmark", CheckUser(), apiPutBookmark(router))
 }
 
 func getEvents(r *gin.Engine) func(c *gin.Context) {
@@ -62,6 +64,45 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 	}
 }
 
+func getBookmarks(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
+
+		bookmarks, err := FindBookmarks(user.Id)
+		if err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "bookmarks", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
+		}
+
+		events := make([]*Event, len(bookmarks))
+		for i, b := range bookmarks {
+			if e, err := Get(b.EntityId); err != nil {
+				log.Errorf("failed to get bookmarked event %s – %v\n", b.EntityId, err)
+			} else {
+				events[i] = e
+			}
+		}
+
+		eventRatings := make(map[string]float32)
+		for _, e := range events {
+			eventRatings[e.Id] = 0
+			if averages, err := reviews.GetAverages(e.Id); err == nil {
+				if avg, ok := averages[reviews.KeyMainRating]; ok {
+					eventRatings[e.Id] = avg
+				}
+			}
+		}
+
+		c.HTML(http.StatusOK, "bookmarks", gin.H{
+			"events":       events,
+			"eventRatings": eventRatings,
+			"tplCtx":       c.MustGet(config.TemplateContextKey),
+		})
+	}
+}
+
 func getEvent(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		event, err := Get(c.Param("id"))
@@ -77,8 +118,10 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		var bookmarked bool
+
 		var user *users.User
-		if u, ok := c.Get(config.UserKey); ok {
+		u, _ := c.Get(config.UserKey)
+		if u != nil {
 			user = u.(*users.User)
 			if _, err := FindBookmark(user.Id, event.Id); err == nil {
 				bookmarked = true
@@ -147,13 +190,8 @@ func apiSearchEvents(r *gin.Engine) func(c *gin.Context) {
 
 func apiPutBookmark(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var user *users.User
-		if u, ok := c.Get(config.UserKey); !ok {
-			c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{}).SetType(gin.ErrorTypePublic)
-			return
-		} else {
-			user = u.(*users.User)
-		}
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
 
 		event, err := Get(c.Param("id"))
 		if err != nil {

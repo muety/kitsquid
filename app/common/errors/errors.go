@@ -29,5 +29,5 @@ func (c Conflict) Error() string {
 }
 
 func (u Unauthorized) Error() string {
-	return "Invalid user credentials."
+	return "Not authorized"
 }

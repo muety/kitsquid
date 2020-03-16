@@ -371,6 +371,24 @@ func FindBookmark(userId, entityId string) (*Bookmark, error) {
 	return &bookmark, nil
 }
 
+func FindBookmarks(userId string) ([]*Bookmark, error) {
+	cacheKey := fmt.Sprintf("find:%s", userId)
+	if l, ok := bookmarksCache.Get(cacheKey); ok {
+		return l.([]*Bookmark), nil
+	}
+
+	var bookmarks []*Bookmark
+	if err := db.Find(&bookmarks, bolthold.
+		Where("UserId").
+		Eq(userId).
+		Index("UserId")); err != nil {
+		return nil, err
+	}
+
+	bookmarksCache.SetDefault(cacheKey, bookmarks)
+	return bookmarks, nil
+}
+
 func InsertBookmark(bookmark *Bookmark) error {
 	bookmarksCache.Flush()
 	return db.Insert(bolthold.NextSequence(), bookmark)

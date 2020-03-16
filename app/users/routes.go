@@ -14,11 +14,14 @@ import (
 
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/signup", getSignup(router))
-	group.POST("/signup", postSignup(router))
 	group.GET("/login", getLogin(router))
+	group.GET("/account", CheckUser(), getAccount(router))
+	group.GET("/activate", getActivate(router))
+
+	group.POST("/signup", postSignup(router))
 	group.POST("/login", postLogin(router))
-	group.POST("/logout", postLogout(router))
-	group.GET("/activate", apiGetActivate(router))
+	group.POST("/account", CheckUser(), postAccount(router))
+	group.POST("/logout", CheckUser(), postLogout(router))
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
@@ -115,7 +118,7 @@ func getSignup(r *gin.Engine) func(c *gin.Context) {
 
 func postSignup(r *gin.Engine) func(c *gin.Context) {
 	cfg := config.Get()
-	validator := NewUserValidator(config.Get())
+	validator := NewUserValidator(cfg)
 
 	return func(c *gin.Context) {
 		var user User
@@ -171,7 +174,60 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 	}
 }
 
-func apiGetActivate(r *gin.Engine) func(c *gin.Context) {
+func getAccount(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.HTML(http.StatusOK, "account", gin.H{
+			"tplCtx": c.MustGet(config.TemplateContextKey),
+		})
+	}
+}
+
+func postAccount(r *gin.Engine) func(c *gin.Context) {
+	cfg := config.Get()
+	validator := NewUserCredentialsValidator(cfg)
+
+	return func(c *gin.Context) {
+		var change passwordChange
+
+		u, _ := c.Get(config.UserKey)
+		user := u.(*User)
+
+		if err := c.ShouldBind(&change); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "account", http.StatusBadRequest, errors.BadRequest{}, nil)
+			return
+		}
+
+		if !CheckPasswordHash(user, change.OldPassword) {
+			util.MakeError(c, "account", http.StatusUnauthorized, errors.Unauthorized{}, nil)
+			return
+		}
+
+		if !user.HasValidCredentials(validator) {
+			util.MakeError(c, "account", http.StatusBadRequest, errors.BadRequest{}, nil)
+			return
+		}
+
+		user.Password = change.NewPassword
+		if err := HashPassword(user); err != nil {
+			util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
+		}
+
+		if err := Insert(user, true); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
+		}
+
+		c.HTML(http.StatusOK, "redirect", gin.H{
+			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"url":    "/account?alert=password_change_success",
+		})
+	}
+}
+
+func getActivate(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		makeError := func() {
 			c.HTML(http.StatusNotFound, "redirect", gin.H{

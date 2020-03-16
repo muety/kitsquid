@@ -10,10 +10,11 @@ import (
 
 // TODO: Use proper i18n
 var Messages = map[string]string{
-	"signup_success":   "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach",
-	"logout_success":   "Du hast dich erfolgreich ausgeloggt",
-	"activate_failure": "Dein Account konnte nicht aktiviert werden. Bitte wende dich an den Admin",
-	"activate_success": "Dein Account ist aktiviert. Du kannst dich jetzt einloggen",
+	"signup_success":          "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach",
+	"logout_success":          "Du hast dich erfolgreich ausgeloggt",
+	"activate_failure":        "Dein Account konnte nicht aktiviert werden. Bitte wende dich an den Admin",
+	"activate_success":        "Dein Account ist aktiviert. Du kannst dich jetzt einloggen",
+	"password_change_success": "Dein Password wurde aktualisiert",
 }
 
 const (
