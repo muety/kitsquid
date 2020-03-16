@@ -15,6 +15,13 @@ type User struct {
 	CreatedAt time.Time `form:""`
 }
 
+type UserQuery struct {
+	ActiveEq bool
+	GenderEq string
+	MajorEq  string
+	DegreeEq string
+}
+
 type UserSession struct {
 	Token     string
 	UserId    string

@@ -23,10 +23,10 @@ func InitStore(store *bolthold.Store) {
 	commentsCache = cache.New(cfg.CacheDuration("comments", 30*time.Minute), cfg.CacheDuration("comments", 30*time.Minute)*2)
 
 	setup()
-	reindex()
+	Reindex()
 }
 
-func reindex() {
+func Reindex() {
 	r := func(name string) {
 		if r := recover(); r != nil {
 			log.Errorf("failed to reindex %s store\n", name)
@@ -41,6 +41,11 @@ func reindex() {
 			db.ReIndex(t, nil)
 		}()
 	}
+}
+
+func FlushCaches() {
+	log.Infoln("flushing comments caches")
+	commentsCache.Flush()
 }
 
 func setup() {}
@@ -93,6 +98,29 @@ func Find(query *CommentQuery) ([]*Comment, error) {
 		commentsCache.SetDefault(cacheKey, foundComments)
 	}
 	return foundComments, err
+}
+
+func GetAll() ([]*Comment, error) {
+	inactive, err := Find(&CommentQuery{
+		ActiveEq: false,
+	})
+	if err != nil {
+		return []*Comment{}, err
+	}
+	active, err := Find(&CommentQuery{
+		ActiveEq: true,
+	})
+
+	all := make([]*Comment, len(active)+len(inactive))
+	for i, c := range inactive {
+		all[i] = c
+	}
+
+	for i, c := range active {
+		all[i+len(inactive)] = c
+	}
+
+	return all, nil
 }
 
 func Insert(comment *Comment, upsert bool) error {

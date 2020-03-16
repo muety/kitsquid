@@ -24,10 +24,10 @@ func InitStore(store *bolthold.Store) {
 	reviewsCache = cache.New(cfg.CacheDuration("reviews", 30*time.Minute), cfg.CacheDuration("reviews", 30*time.Minute)*2)
 
 	setup()
-	reindex()
+	Reindex()
 }
 
-func reindex() {
+func Reindex() {
 	r := func(name string) {
 		if r := recover(); r != nil {
 			log.Errorf("failed to reindex %s store\n", name)
@@ -42,6 +42,11 @@ func reindex() {
 			db.ReIndex(t, nil)
 		}()
 	}
+}
+
+func FlushCaches() {
+	log.Infoln("flushing reviews caches")
+	reviewsCache.Flush()
 }
 
 func setup() {}
@@ -87,6 +92,10 @@ func Find(query *ReviewQuery) ([]*Review, error) {
 		reviewsCache.SetDefault(cacheKey, foundReviews)
 	}
 	return foundReviews, err
+}
+
+func GetAll() ([]*Review, error) {
+	return Find(&ReviewQuery{})
 }
 
 func GetAverages(eventId string) (map[string]float32, error) {
@@ -140,6 +149,11 @@ func Insert(review *Review, upsert bool) error {
 
 	reviewsCache.Flush()
 	return f(review.Id, review)
+}
+
+func Delete(key string) error {
+	defer reviewsCache.Flush()
+	return db.Delete(key, &Review{})
 }
 
 // Inplace

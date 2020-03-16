@@ -28,7 +28,7 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 func getEvents(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		eventQuery := buildEventQuery(c.Request.URL.Query())
-		events, err := FindAll(eventQuery)
+		events, err := Find(eventQuery)
 		if err != nil {
 			c.Error(err)
 			util.MakeError(c, "index", http.StatusInternalServerError, errors.Internal{}, nil)
@@ -129,7 +129,7 @@ func apiSearchEvents(r *gin.Engine) func(c *gin.Context) {
 			Limit:    10,
 		}
 
-		events, err := FindAll(eventQuery)
+		events, err := Find(eventQuery)
 		if err != nil {
 			c.Error(err)
 			c.AbortWithError(http.StatusInternalServerError, errors.Internal{})

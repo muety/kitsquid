@@ -26,10 +26,10 @@ func InitStore(store *bolthold.Store) {
 	sessionsCache = cache.New(cfg.CacheDuration("sessions", 30*time.Minute), cfg.CacheDuration("sessions", 30*time.Minute)*2)
 
 	setup()
-	reindex()
+	Reindex()
 }
 
-func reindex() {
+func Reindex() {
 	r := func(name string) {
 		if r := recover(); r != nil {
 			log.Errorf("failed to reindex %s store\n", name)
@@ -44,6 +44,12 @@ func reindex() {
 			db.ReIndex(t, nil)
 		}()
 	}
+}
+
+func FlushCaches() {
+	log.Infoln("flushing users caches")
+	usersCache.Flush()
+	sessionsCache.Flush()
 }
 
 func setup() {
@@ -64,6 +70,60 @@ func Get(id string) (*User, error) {
 	return &user, nil
 }
 
+func Find(query *UserQuery) ([]*User, error) {
+	cacheKey := fmt.Sprintf("find:%v", query)
+	if ll, ok := usersCache.Get(cacheKey); ok {
+		return ll.([]*User), nil
+	}
+
+	var foundUsers []*User
+
+	q := bolthold.
+		Where("Id").Not().Eq("").Index("Id").
+		And("Active").Eq(query.ActiveEq).Index("Active")
+
+	if query != nil {
+		if query.GenderEq != "" {
+			q.And("Gender").Eq(query.GenderEq)
+		}
+		if query.MajorEq != "" {
+			q.And("Major").Eq(query.MajorEq)
+		}
+		if query.DegreeEq != "" {
+			q.And("Degree").Eq(query.DegreeEq)
+		}
+	}
+
+	err := db.Find(&foundUsers, q.SortBy("CreatedAt"))
+	if err == nil {
+		usersCache.SetDefault(cacheKey, foundUsers)
+	}
+	return foundUsers, err
+}
+
+func GetAll() ([]*User, error) {
+	inactive, err := Find(&UserQuery{
+		ActiveEq: false,
+	})
+	if err != nil {
+		return []*User{}, err
+	}
+	active, err := Find(&UserQuery{
+		ActiveEq: true,
+	})
+
+	all := make([]*User, len(active)+len(inactive))
+	for i, u := range inactive {
+		all[i] = u
+	}
+
+	for i, u := range active {
+		all[i+len(inactive)] = u
+	}
+
+	return all, nil
+}
+
 func Insert(user *User, upsert bool) error {
 	usersCache.Flush()
 
@@ -72,6 +132,26 @@ func Insert(user *User, upsert bool) error {
 		f = db.Upsert
 	}
 	return f(user.Id, user)
+}
+
+func Delete(key string) error {
+	defer usersCache.Flush()
+	return db.Delete(key, &User{})
+}
+
+func GetAllSessions() ([]*UserSession, error) {
+	cacheKey := "get:all"
+	if ss, ok := sessionsCache.Get(cacheKey); ok {
+		return ss.([]*UserSession), nil
+	}
+
+	var sessions []*UserSession
+	if err := db.Find(&sessions, &bolthold.Query{}); err != nil {
+		return sessions, err
+	}
+
+	sessionsCache.SetDefault(cacheKey, sessions)
+	return sessions, nil
 }
 
 func GetSession(token string) (*UserSession, error) {

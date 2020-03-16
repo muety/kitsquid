@@ -29,10 +29,10 @@ func InitStore(store *bolthold.Store) {
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
 
 	setup()
-	reindex()
+	Reindex()
 }
 
-func reindex() {
+func Reindex() {
 	r := func(name string) {
 		if r := recover(); r != nil {
 			log.Errorf("failed to reindex %s store\n", name)
@@ -47,6 +47,13 @@ func reindex() {
 			db.ReIndex(t, nil)
 		}()
 	}
+}
+
+func FlushCaches() {
+	log.Infoln("flushing events caches")
+	eventsCache.Flush()
+	miscCache.Flush()
+	bookmarksCache.Flush()
 }
 
 func setup() {}
@@ -67,13 +74,13 @@ func Get(id string) (*Event, error) {
 }
 
 func GetAll() ([]*Event, error) {
-	return FindAll(nil)
+	return Find(nil)
 }
 
-func FindAll(query *EventQuery) ([]*Event, error) {
+func Find(query *EventQuery) ([]*Event, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
-	if ll, ok := eventsCache.Get(cacheKey); ok {
-		return ll.([]*Event), nil
+	if ee, ok := eventsCache.Get(cacheKey); ok {
+		return ee.([]*Event), nil
 	}
 
 	var foundEvents []*Event
@@ -173,6 +180,13 @@ func InsertMulti(events []*Event, upsert bool) error {
 	eventsCache.Flush()
 	miscCache.Flush()
 	return tx.Commit()
+}
+
+func Delete(key string) error {
+	defer eventsCache.Flush()
+	defer miscCache.Flush()
+
+	return db.Delete(key, &Event{})
 }
 
 // Inplace
@@ -311,6 +325,29 @@ func GetLecturers() ([]*Lecturer, error) {
 
 	miscCache.SetDefault(cacheKey, lecturers)
 	return lecturers, nil
+}
+
+func GetBookmark(key uint64) (*Bookmark, error) {
+	var bookmark Bookmark
+	if err := db.Get(key, &bookmark); err != nil {
+		return nil, err
+	}
+	return &bookmark, nil
+}
+
+func GetAllBookmarks() ([]*Bookmark, error) {
+	cacheKey := "get:bookmark:all"
+	if bb, ok := eventsCache.Get(cacheKey); ok {
+		return bb.([]*Bookmark), nil
+	}
+
+	var bookmarks []*Bookmark
+	if err := db.Find(&bookmarks, &bolthold.Query{}); err != nil {
+		return bookmarks, err
+	}
+
+	bookmarksCache.SetDefault(cacheKey, bookmarks)
+	return bookmarks, nil
 }
 
 func FindBookmark(userId, entityId string) (*Bookmark, error) {

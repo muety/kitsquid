@@ -41,9 +41,13 @@ func ApiErrorHandle() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(c.Writer.Status(), map[string]string{
-			"error": c.Errors.ByType(gin.ErrorTypePublic).Last().Error(),
-		})
+		if c.Errors.ByType(gin.ErrorTypePublic).Last() != nil {
+			c.JSON(c.Writer.Status(), map[string]string{
+				"error": c.Errors.ByType(gin.ErrorTypePublic).Last().Error(),
+			})
+		} else {
+			c.Status(c.Writer.Status())
+		}
 
 		return
 	}

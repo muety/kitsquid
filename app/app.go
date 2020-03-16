@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/golang/glog"
+	"github.com/n1try/kithub2/app/admin"
 	"github.com/n1try/kithub2/app/comments"
 	"github.com/n1try/kithub2/app/common"
 	"github.com/n1try/kithub2/app/config"
@@ -27,6 +28,7 @@ func init() {
 	users.Init(config.Db())
 	comments.Init(config.Db())
 	reviews.Init(config.Db())
+	admin.Init(config.Db())
 }
 
 func Run() {
@@ -72,7 +74,7 @@ func _debugScrapeDetails() {
 }
 
 func _debugGet() {
-	ls, err := events.FindAll(&events.EventQuery{
+	ls, err := events.Find(&events.EventQuery{
 		SemesterEq: string(common.SemesterWs1920),
 	})
 	if err != nil {
