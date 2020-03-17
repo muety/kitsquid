@@ -1,7 +1,7 @@
 port: 8080
 addr: 127.0.0.1
 env: development
-url: "http://kithub.example.com"
+url: "http://kitsquid.example.com"
 
 tls:
   enable: false
@@ -9,7 +9,7 @@ tls:
   cert: etc/cert.pem
 
 db:
-  path: kithub.db
+  path: kitsquid.db
   encoding: gob # json or gob
 
 mail:

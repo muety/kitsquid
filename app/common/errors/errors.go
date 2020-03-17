@@ -1,6 +1,6 @@
 package errors
 
-type KitHubError error
+type KitSquidError error
 
 type NotFound struct{}
 

@@ -18,7 +18,7 @@ var Messages = map[string]string{
 }
 
 const (
-	SessionKey         = "kithub_session"
+	SessionKey         = "kitsquid_session"
 	UserKey            = "user"
 	TemplateContextKey = "tplCtx"
 	KitVvzBaseUrl      = "https://campus.kit.edu/live-stud/campus/all"

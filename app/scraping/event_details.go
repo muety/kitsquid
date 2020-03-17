@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
-	"github.com/n1try/kithub2/app/events"
+	"github.com/n1try/kitsquid/app/events"
 	"golang.org/x/sync/semaphore"
 	"net/url"
 	"strings"

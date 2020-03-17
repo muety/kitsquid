@@ -1,6 +1,6 @@
 package main
 
-import "github.com/n1try/kithub2/app"
+import "github.com/n1try/kitsquid/app"
 
 func main() {
 	app.Run()

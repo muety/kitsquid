@@ -3,9 +3,9 @@ package users
 import (
 	"bytes"
 	log "github.com/golang/glog"
-	"github.com/n1try/kithub2/app/common"
-	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/util"
+	"github.com/n1try/kitsquid/app/common"
+	"github.com/n1try/kitsquid/app/config"
+	"github.com/n1try/kitsquid/app/util"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/smtp"

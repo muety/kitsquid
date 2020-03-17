@@ -3,28 +3,28 @@ package config
 import (
 	"fmt"
 	log "github.com/golang/glog"
-	"github.com/n1try/kithub2/app/common"
+	"github.com/n1try/kitsquid/app/common"
 	"net/smtp"
 	"strconv"
 	"time"
 )
 
 type Config struct {
-	Env  string `default:"development" env:"KITHUB_ENV"`
-	Port int    `default:"8080" env:"KITHUB_PORT"`
-	Addr string `default:"" env:"KITHUB_ADDR"`
-	Url  string `env:"KITHUB_URL"`
+	Env  string `default:"development" env:"KITSQUID_ENV"`
+	Port int    `default:"8080" env:"KITSQUID_PORT"`
+	Addr string `default:"" env:"KITSQUID_ADDR"`
+	Url  string `env:"KITSQUID_URL"`
 	Tls  struct {
-		Enable   bool   `default:"false" env:"KITHUB_TLS"`
-		KeyPath  string `default:"etc/key.pem" env:"KITHUB_TLS_KEY"`
-		CertPath string `default:"etc/cert.pem" env:"KITHUB_TLS_CERT"`
+		Enable   bool   `default:"false" env:"KITSQUID_TLS"`
+		KeyPath  string `default:"etc/key.pem" env:"KITSQUID_TLS_KEY"`
+		CertPath string `default:"etc/cert.pem" env:"KITSQUID_TLS_CERT"`
 	}
 	Db struct {
-		Path     string `default:"kithub.db" env:"KITHUB_DB_FILE"`
-		Encoding string `default:"gob" env:"KITHUB_DB_ENCODING"`
+		Path     string `default:"kitsquid.db" env:"KITSQUID_DB_FILE"`
+		Encoding string `default:"gob" env:"KITSQUID_DB_ENCODING"`
 	}
 	Mail struct {
-		From string `default:"noreply@kithub.eu" env:"KITHUB_MAIL_SENDER"`
+		From string `default:"noreply@kitsquid.eu" env:"KITSQUID_MAIL_SENDER"`
 		Smtp struct {
 			Host     string `env:"SMTP_HOST"`
 			Port     int    `default:"25" env:"SMTP_PORT"`
@@ -34,11 +34,11 @@ type Config struct {
 	}
 	Cache map[string]string
 	Auth  struct {
-		Salt    string `default:"0" env:"KITHUB_AUTH_SALT"`
+		Salt    string `default:"0" env:"KITSQUID_AUTH_SALT"`
 		Session struct {
-			Timeout string `default:"1d" env:"KITHUB_AUTH_SESSION_TIMEOUT"`
+			Timeout string `default:"1d" env:"KITSQUID_AUTH_SESSION_TIMEOUT"`
 		}
-		Admins    []string `env:"KITHUB_AUTH_ADMIN_USERS"`
+		Admins    []string `env:"KITSQUID_AUTH_ADMIN_USERS"`
 		Whitelist []common.UserWhitelistItem
 	}
 	Misc struct {

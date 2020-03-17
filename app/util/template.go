@@ -2,12 +2,12 @@ package util
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kithub2/app/common"
-	"github.com/n1try/kithub2/app/common/errors"
-	"github.com/n1try/kithub2/app/config"
+	"github.com/n1try/kitsquid/app/common"
+	"github.com/n1try/kitsquid/app/common/errors"
+	"github.com/n1try/kitsquid/app/config"
 )
 
-func MakeError(c *gin.Context, tpl string, status int, error errors.KitHubError, args *gin.H) {
+func MakeError(c *gin.Context, tpl string, status int, error errors.KitSquidError, args *gin.H) {
 	tplCtx := c.MustGet(config.TemplateContextKey)
 	tplCtx.(*TplCtx).Errors = append(tplCtx.(*TplCtx).Errors, error.Error())
 

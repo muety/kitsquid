@@ -1,11 +1,11 @@
 Content-Type: text/plain; charset=UTF-8
 To: {{ .recipient }}
-Subject: Aktiviere deinen KitHub Account
+Subject: Aktiviere deinen KitSquid Account
 
-Hallo und Willkommen bei KitHub!
+🐙 Hallo und Willkommen bei KitSquid!
 
 Bitte klicke auf den folgenden Link, um deinen Account zu aktivieren:
 {{ .link }}
 
 Liebe Grüße,
-Dein KitHub Team
+Dein KitSquid Team

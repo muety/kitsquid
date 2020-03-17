@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kithub2/app/config"
+	"github.com/n1try/kitsquid/app/config"
 )
 
 func ErrorHandle() gin.HandlerFunc {

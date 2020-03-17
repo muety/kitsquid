@@ -2,10 +2,10 @@ package admin
 
 import (
 	"encoding/json"
-	"github.com/n1try/kithub2/app/comments"
-	"github.com/n1try/kithub2/app/events"
-	"github.com/n1try/kithub2/app/reviews"
-	"github.com/n1try/kithub2/app/users"
+	"github.com/n1try/kitsquid/app/comments"
+	"github.com/n1try/kitsquid/app/events"
+	"github.com/n1try/kitsquid/app/reviews"
+	"github.com/n1try/kitsquid/app/users"
 	"github.com/timshannon/bolthold"
 	"strconv"
 )

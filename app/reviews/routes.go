@@ -3,9 +3,9 @@ package reviews
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kithub2/app/common/errors"
-	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/users"
+	"github.com/n1try/kitsquid/app/common/errors"
+	"github.com/n1try/kitsquid/app/config"
+	"github.com/n1try/kitsquid/app/users"
 	"net/http"
 )
 

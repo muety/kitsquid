@@ -1,6 +1,6 @@
 package scraping
 
-import "github.com/n1try/kithub2/app/config"
+import "github.com/n1try/kitsquid/app/config"
 
 const (
 	baseUrl      = config.KitVvzBaseUrl

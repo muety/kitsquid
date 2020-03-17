@@ -1,4 +1,4 @@
-module github.com/n1try/kithub2
+module github.com/n1try/kitsquid
 
 go 1.13
 

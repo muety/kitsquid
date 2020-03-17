@@ -2,10 +2,10 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kithub2/app/common"
-	"github.com/n1try/kithub2/app/config"
-	"github.com/n1try/kithub2/app/users"
-	"github.com/n1try/kithub2/app/util"
+	"github.com/n1try/kitsquid/app/common"
+	"github.com/n1try/kitsquid/app/config"
+	"github.com/n1try/kitsquid/app/users"
+	"github.com/n1try/kitsquid/app/util"
 	"html/template"
 	"math"
 	"net/url"
