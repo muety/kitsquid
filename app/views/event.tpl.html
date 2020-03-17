@@ -1,6 +1,6 @@
 {{ define "content" }}
     {{ if not .tplCtx.Errors }}
-        <div class="mb-4 text-xs text-gray-600">
+        <div class="mb-4 text-xs text-gray-500">
             <span>&nbsp;ᐅ&nbsp;</span>
             <a href="/" class="underline">Vorlesungen</a>
             <span>&nbsp;ᐅ&nbsp;</span>
@@ -8,7 +8,7 @@
         </div>
         <div class="flex flex-wrap items-start md:flex-no-wrap">
             <div class="w-full md:w-2/3 lg:w-3/4 mb-8 mr-0 md:mr-2 flex flex-col">
-                <div class="w-full rounded relative shadow-md bg-white mb-2">
+                <div class="w-full rounded relative shadow-md bg-gray-700 mb-2">
                     <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
                         {{ if .tplCtx.User }}
                             <div class="absolute top-0 text-2xl text-yellow-500 cursor-pointer"
@@ -23,24 +23,24 @@
                         <div class="flex items-center sm:items-start mb-4">
                             <h1 class="text-xl md:text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
                             <div class="relative inline-block m-2 ml-4 flex">
-                                <div class="py-1 px-2 bg-gray-400 rounded text-xs md:text-base text-gray-700 font-semibold flex-grow-0 flex items-center"
+                                <div class="py-1 px-2 border border-gray-300 bg-gray-700 rounded text-xs md:text-base text-gray-300 font-semibold flex-grow-0 flex items-center"
                                      title="{{ .event.Type }}">
                                     <span class="cursor-default">{{ strIndex 0 .event.Type }}</span>
                                 </div>
                                 {{ if .event.InWinter }}
-                                    <div class="ml-1 px-2 bg-blue-200 rounded text-xs md:text-base text-blue-800 font-semibold flex items-center flex-grow-0"
+                                    <div class="ml-1 px-2 border border-blue-300 bg-blue-800 rounded text-xs md:text-base text-blue-300 font-semibold flex items-center flex-grow-0"
                                          title="Wintersemester">
                                         <span class="cursor-default"><i class="icon-snowflake-o"></i></span>
                                     </div>
                                 {{ end }}
                                 {{ if .event.InSummer }}
-                                    <div class="ml-1 px-2 bg-orange-200 rounded text-xs md:text-base text-orange-600 font-semibold flex items-center flex-grow-0"
+                                    <div class="ml-1 px-2 border border-orange-300 bg-orange-800 rounded text-xs md:text-base text-orange-300 font-semibold flex items-center flex-grow-0"
                                          title="Sommersemester">
                                         <span class="cursor-default"><i class="icon-sun"></i></span>
                                     </div>
                                 {{ end }}
                                 {{ if .tplCtx.User }}
-                                    <div class="ml-1 px-2 bg-yellow-300 rounded text-xs md:text-base text-yellow-700 font-semibold flex items-center flex-grow-0"
+                                    <div class="ml-1 px-2 border border-yellow-500 rounded text-xs md:text-base text-yellow-500 font-semibold flex items-center flex-grow-0"
                                          title="Gesamtbewertung">
                                         <span class="cursor-default"><i class="icon-star"></i> <span id="event-rating">{{ index .averageRatings "overall" }}</span></span>
                                     </div>
@@ -64,7 +64,7 @@
                         {{ end }}
                         <div class="flex flex-wrap mb-3">
                             {{ range slice .event.Categories 1 }}
-                                <div class="rounded bg-gray-400 py-1 px-2 mr-2 mb-1 truncate text-xs md:text-sm"
+                                <div class="rounded bg-gray-600 text-gray-800 py-1 px-2 mr-2 mb-1 truncate text-xs md:text-sm"
                                      title="{{ . }}">{{ . }}</div>
                             {{ end }}
                         </div>
@@ -110,14 +110,14 @@
                     </div>
                 </div>
 
-                <div class="w-full rounded relative shadow-md bg-white mt-2">
+                <div class="w-full rounded relative shadow-md bg-gray-700 mt-2">
                     <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-6 mb-4">
                         <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Kommentare</h2>
 
                         {{ if .tplCtx.User }}
                             <form action="/comments" method="post" id="form-comments">
                                 <textarea id="input-comment-text" name="text"
-                                          class="w-full focus:shadow-md rounded border p-4"
+                                          class="w-full focus:shadow-md rounded border border-gray-600 p-4 bg-gray-800"
                                           placeholder="Schreibe einen Kommentar zu dieser Veranstaltung. Was hat dir (nicht) gefallen? Welche Tipps kannst du deinen Kommilitonen geben?" required></textarea>
                                 <input type="hidden" name="event_id" value="{{ .event.Id }}">
                                 <button id="btn-comments-submit"
@@ -130,10 +130,10 @@
                         {{ if and .tplCtx.User .comments }}
                             <div class="mt-16 flex flex-col">
                                 {{ range .comments }}
-                                    <div class="w-full relative rounded-lg p-4 bg-gray-200 text-sm my-2">
+                                    <div class="w-full relative border border-gray-600 rounded-lg p-4 bg-gray-800 text-sm my-2">
                                         <div class="w-full flex items-center mb-1">
                                             <p class="text-kit font-semibold mr-1">{{ index (strSplit .UserId "@") 0 }}</p>
-                                            <p class="text-2xs ml-1 flex-grow">{{ .CreatedAt | date }}</p>
+                                            <p class="text-2xs ml-1 flex-grow text-gray-500">{{ .CreatedAt | date }}</p>
                                             {{ if eq .UserId $.tplCtx.User.Id }}
                                                 <form action="/comments/delete" method="post" class="m-0">
                                                     <input type="hidden" name="id" value="{{ .Id }}">
@@ -143,7 +143,7 @@
                                                     </p>
                                                 </form>
                                             {{ end }}
-                                            <p class="text-kit font-semibold">#{{ .Index }}</p>
+                                            <p class="text-kit font-semibold" title="{{ .Id }}">#{{ .Index }}</p>
                                         </div>
                                         <p>{{ .Text | noescape }}</p>
                                     </div>
@@ -160,10 +160,10 @@
 
             <div class="flex flex-col w-full md:w-1/3 lg:w-1/4 flex-shrink-0 mb-8 ml-0 md:ml-2">
                     {{ if .event.Dates }}
-                        <div class="rounded relative overflow-hidden shadow-md bg-white mb-4">
+                        <div class="rounded relative overflow-hidden shadow-md bg-gray-700 mb-4">
                             <div class="px-4 py-2 md:px-6 md:py-4">
                                 <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Termine</h2>
-                                <div class="text-sm">
+                                <div class="text-xs">
                                     <ul class="">
                                         {{ range .event.Dates }}
                                             <li class="mb-2">
@@ -178,7 +178,7 @@
                         </div>
                     {{ end }}
 
-                    <div class="rounded relative overflow-hidden shadow-md bg-white">
+                    <div class="rounded relative overflow-hidden shadow-md bg-gray-700">
                             <div class="px-4 py-2 md:px-6 md:py-4">
                                 <div>
                                     <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Bewertungen</h2>
@@ -188,7 +188,7 @@
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Insgesamt</span>
                                             <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-overall">{{ index .averageRatings "overall" }}</span>)</span>
-                                            <i class="icon-info-circled cursor-pointer" title="Wie bewertest du diese Veranstaltung insgesamt?"></i>
+                                            <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie bewertest du diese Veranstaltung insgesamt?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">schlecht</span>
@@ -201,7 +201,7 @@
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Anspruch</span>
                                             <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-demand">{{ index .averageRatings "demand" }}</span>)</span>
-                                            <i class="icon-info-circled cursor-pointer" title="Wie bewertest du den inhaltlichen Anspruch dieser Veranstaltung?"></i>
+                                            <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie bewertest du den inhaltlichen Anspruch dieser Veranstaltung?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">unange-messen</span>
@@ -214,7 +214,7 @@
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Zeitaufwand</span>
                                             <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-effort">{{ index .averageRatings "effort" }}</span>)</span>
-                                            <i class="icon-info-circled cursor-pointer" title="Wie bewertest du den zeitlichen Aufwand, der für diese Veranstaltung notwendig ist?"></i>
+                                            <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie bewertest du den zeitlichen Aufwand, der für diese Veranstaltung notwendig ist?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">unange-messen</span>
@@ -227,7 +227,7 @@
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Praxisrelevanz</span>
                                             <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-relevance">{{ index .averageRatings "relevance" }}</span>)</span>
-                                            <i class="icon-info-circled cursor-pointer" title="Für wie praxisrelevant und sinnvoll für dein weiteres Studium und deine Karriere hälst du diese Veranstaltung inhaltlich?"></i>
+                                            <i class="icon-info-circled cursor-pointer text-gray-500" title="Für wie praxisrelevant und sinnvoll für dein weiteres Studium und deine Karriere hälst du diese Veranstaltung inhaltlich?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">unnötig</span>
@@ -240,7 +240,7 @@
                                         <div class="label text-sm mb-1">
                                             <span class="font-semibold">Dozent</span>
                                             <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-lecturer">{{ index .averageRatings "lecturer" }}</span>)</span>
-                                            <i class="icon-info-circled cursor-pointer" title="Wie sympathisch und kompetent schätzt du den Dozent (Prof., Übungsleiter, Tutor, ...) dieser Veranstaltung ein?"></i>
+                                            <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie sympathisch und kompetent schätzt du den Dozent (Prof., Übungsleiter, Tutor, ...) dieser Veranstaltung ein?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-2xs w-full text-left">doof</span>

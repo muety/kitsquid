@@ -1,16 +1,16 @@
 {{ define "content" }}
     <div class="container mx-auto w-full max-w-2xl mt-8">
-        <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post" action="/signup" id="form-signup">
+        <form class="bg-gray-700 shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post" action="/signup" id="form-signup">
             <h1 class="text-2xl inline-block border-b-4 border-kit mb-8">Registrieren</h1>
             <div class="mb-8 p-1 flex justify-center">
                 <img src="/assets/images/unknown.png" class="rounded-full w-24 border-2 border-gray-500" id="img-avatar">
             </div>
             <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-prefix">Deine KIT E-Mail
+                <label class="block text-gray-300 text-sm font-bold mb-2" for="input-signup-prefix">Deine KIT E-Mail
                     Adresse</label>
                 <div class="flex items-center">
                     <div class="flex-1">
-                        <input class="bg-white shadow-md appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        <input class="bg-gray-900 shadow-md appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
                                id="input-signup-prefix" type="text"
                                placeholder="{{ (index .whitelist 0).MailPrefixDisplay }}"
                                pattern="{{ (index .whitelist 0).MailPrefixPattern }}" required>
@@ -19,13 +19,13 @@
                         <span><strong>@</strong></span>
                     </div>
                     <div class="relative flex-1">
-                        <select class="bg-white cursor-pointer shadow-md appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        <select class="bg-gray-900 cursor-pointer shadow-md appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
                                 id="input-signup-suffix">
                             {{ range .whitelist }}
                                 <option>{{ .MailSuffixDisplay }}</option>
                             {{ end }}
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-300">
                             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                             </svg>
@@ -34,14 +34,14 @@
                 </div>
             </div>
             <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-password">Dein Passwort</label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                <label class="block text-gray-300 text-sm font-bold mb-2" for="input-signup-password">Dein Passwort</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-900 text-gray-300 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                        id="input-signup-password" type="password" placeholder="******************"
                        pattern="^[.*\S]{8,}$" name="password" required>
                 <p class="text-gray-500 text-xs italic">Das Passwort muss mindestens 8 Zeichen lang sein.</p>
             </div>
             <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Dein Geschlecht</label>
+                <label class="block text-gray-300 text-sm font-bold mb-2">Dein Geschlecht</label>
                 <fieldset id="fs-signup-gender">
                     <div class="flex justify-around">
                         <label class="mx-3" for="gender-male">
@@ -60,15 +60,15 @@
                 </fieldset>
             </div>
             <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="input-signup-major">Dein Studiengang</label>
+                <label class="block text-gray-300 text-sm font-bold mb-2" for="input-signup-major">Dein Studiengang</label>
                 <div class="relative">
-                    <select class="bg-white cursor-pointer shadow-md appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    <select class="bg-gray-900 cursor-pointer shadow-md appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
                             name="major" id="input-signup-major" required>
                         {{ range .university.Majors }}
                             <option>{{ . }}</option>
                         {{ end }}
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-300">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                             <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                         </svg>
@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="mb-8">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Du studierst im ...</label>
+                <label class="block text-gray-300 text-sm font-bold mb-2">Du studierst im ...</label>
                 <fieldset id="fs-signup-degree">
                     <div class="flex justify-around">
                         {{ range $i, $d := .university.Degrees }}

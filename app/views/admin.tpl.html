@@ -2,13 +2,13 @@
     <h1 class="text-2xl inline-block border-b-4 border-kit">Admin</h1>
     <div>
         <div class="w-full flex mt-8">
-            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-2 px-4 rounded-full mr-2">
+            <button class="border-2 border-kit hover:border-kit-dark font-semibold text-gray-300 py-1 px-4 rounded-full mr-2">
                 Reindex
             </button>
-            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-2 px-4 rounded-full ml-2 mr-2" onclick="flushAll()">
+            <button class="border-2 border-kit hover:border-kit-dark font-semibold text-gray-300 py-1 px-4 rounded-full ml-2 mr-2" onclick="flushAll()">
                 Flush
             </button>
-            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-2 px-4 rounded-full ml-2 mr-2">
+            <button class="border-2 border-kit hover:border-kit-dark font-semibold text-gray-300 py-1 px-4 rounded-full ml-2 mr-2">
                 Scrape
             </button>
         </div>
@@ -21,7 +21,7 @@
                             <label for="select-admin-entity" class="w-1/4">Entity:</label>
                             <div class="relative w-full">
                                 <select id="select-admin-entity" name="entity"
-                                        class="block w-full bg-white cursor-pointer appearance-none border border-gray-400 rounded py-2 px-2 text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        class="block w-full bg-gray-900 cursor-pointer appearance-none border border-gray-600 rounded py-2 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline">
                                     {{ range .entities }}
                                         <option value="{{ .Name }}">{{ .Name }}</option>
                                     {{ end }}
@@ -38,37 +38,37 @@
                         <div class="flex items-center justify-between mb-2">
                             <label for="input-admin-browser-key" class="w-1/4">Key:</label>
                             <input type="text" id="input-admin-browser-key" placeholder="Key"
-                                   class="bg-white appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                   class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-2 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
 
                         <div class="flex items-center justify-between mb-2">
                             <label for="textarea-admin-browser-value" class="w-1/4">Value:</label>
                             <textarea id="textarea-admin-browser-value" placeholder="{}"
-                                      class="bg-white appearance-none border border-gray-400 placeholder-gray-700 rounded w-full py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm"
+                                      class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-2 leading-tight focus:outline-none focus:shadow-outline text-sm"
                                       style="min-height: 200px"></textarea>
                         </div>
 
                         <div class="flex items-center flex-wrap justify-end">
-                            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-1 px-4 rounded-full ml-4" onclick="browse('get')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('get')">
                                 Get
                             </button>
-                            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-1 px-4 rounded-full ml-4" onclick="browse('list')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('list')">
                                 List
                             </button>
-                            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-1 px-4 rounded-full ml-4" onclick="browse('put')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('put')">
                                 Put
                             </button>
-                            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-1 px-4 rounded-full ml-4" onclick="browse('delete')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('delete')">
                                 Delete
                             </button>
-                            <button class="bg-kit hover:bg-kit-dark font-semibold text-white py-1 px-4 rounded-full ml-4" onclick="browse('flush')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('flush')">
                                 Flush
                             </button>
                         </div>
                 </div>
             </div>
             <div class="w-full min-h-full lg:w-1/3 pl-1">
-                <textarea id="textarea-admin-browser-result" class="w-full h-full py-2 px-4 border border-gray-400 rounded text-xs" placeholder="Data View" readonly></textarea>
+                <textarea id="textarea-admin-browser-result" class="bg-gray-900 w-full h-full py-2 px-4 border border-gray-600 placeholder-gray-600 rounded text-xs" placeholder="Data View" readonly></textarea>
             </div>
         </div>
     </div>

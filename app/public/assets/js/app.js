@@ -257,7 +257,7 @@ function displaySearchResults(data) {
 }
 
 function renderSearchResultItem(data) {
-    let eventTpl = `<li class="cursor-pointer hover:bg-gray-100 my-1 py-1 px-2 rounded">
+    let eventTpl = `<li class="cursor-pointer hover:bg-gray-700 my-1 py-1 px-2 rounded">
                         <a class="flex items-center justify-start" href="/event/${data.id}">
                             <div class="inline-block py-1 px-2 bg-gray-400 rounded text-2xs text-gray-700 font-semibold text-center" title="${data.type}">
                                 <span class="cursor-default">${data.type[0]}</span>

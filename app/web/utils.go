@@ -17,6 +17,7 @@ import (
 func GetFuncMap() template.FuncMap {
 	return template.FuncMap{
 		"add":         add,
+		"in":          in,
 		"strIndex":    strIndex,
 		"strRemove":   strRemove,
 		"strSplit":    strings.Split,
@@ -122,4 +123,13 @@ func formatDate(t time.Time) string {
 
 func noescape(s string) template.HTML {
 	return template.HTML(s)
+}
+
+func in(needle interface{}, haystack ...interface{}) bool {
+	for _, e := range haystack {
+		if e == needle {
+			return true
+		}
+	}
+	return false
 }

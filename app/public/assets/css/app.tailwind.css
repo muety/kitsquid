@@ -12,8 +12,6 @@
 
 .sidebar-item-active {
     @apply bg-kit;
-    @apply text-white;
-    @apply shadow-md;
 }
 
 .sidebar-item-active:hover {
@@ -75,7 +73,7 @@
 }
 
 .rating > .star {
-    @apply text-gray-300;
+    @apply text-gray-800;
     @apply inline-block;
     @apply relative;
 }

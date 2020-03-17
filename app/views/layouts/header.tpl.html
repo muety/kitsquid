@@ -17,11 +17,11 @@
                 <div class="flex flex-grow w-1/2">
                     <div class="w-full relative">
                         <div class="relative">
-                            <input id="input-search" class="border border-transparent border-gray-400 placeholder-gray-700 rounded-lg shadow-md bg-white py-1 pr-2 pl-10 block w-full"
+                            <input id="input-search" class="border border-transparent border-gray-600 placeholder-gray-600 rounded-lg shadow-md bg-gray-900 py-1 pr-2 pl-10 block w-full"
                                    placeholder="Veranstaltung suchen ...">
-                            <i class="icon-search pointer-events-none absolute inset-y-0 left-0 pl-4 pt-2"></i>
+                            <i class="icon-search pointer-events-none absolute inset-y-0 left-0 pl-4 pt-2 text-gray-600"></i>
                         </div>
-                        <div id="search-results" class="absolute hidden w-full bg-white border border-gray-400 rounded-lg shadow-sm py-1 px-4 mt-1 z-10">
+                        <div id="search-results" class="absolute hidden w-full bg-gray-900 border border-gray-600 rounded-lg shadow-sm py-1 px-4 mt-1 z-10">
                             <ul id="search-results-list" class="text-sm">
                             </ul>
                         </div>
@@ -37,7 +37,7 @@
                             </a>
                         </div>
                         <form id="form-logout" action="/logout" method="post" class="m-0 hidden"></form>
-                        <button class="hidden absolute bg-kit hover:bg-kit-dark text-white py-2 px-8 border rounded-full text-sm" id="btn-logout" onclick="logout()">
+                        <button class="hidden absolute border-2 border-kit hover:border-kit-dark bg-gray-800 font-semibold py-2 px-8 rounded-full text-sm" id="btn-logout" onclick="logout()">
                             Ausloggen
                         </button>
 
