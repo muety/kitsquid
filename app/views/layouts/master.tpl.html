@@ -2,8 +2,8 @@
 <head>
     {{ include "layouts/head" }}
 </head>
-<body class="bg-gray-800 text-gray-100 pb-8">
-    <div>
+<body class="table bg-gray-800 text-gray-100 w-full h-full min-h-full p-8">
+    <div class="h-full min-h-full w-full table pb-8">
         {{ include "layouts/header" }}
         <div class="w-full xl:w-3/4 mx-auto overflow-x-hidden md:overflow-auto">
             <div class="md:flex">
@@ -20,6 +20,15 @@
             <div class="hidden bg-gray-900 fixed bottom-0 left-0 m-6 p-4 rounded text-white text-sm shadow-xl" id="snackbar"></div>
         </div>
     </div>
+    <footer class="text-xs text-gray-500 w-full text-center pb-4" style="margin-top: -2px">
+        <a href="mailto:ferdinand@muetsch.io?subject=Frage%20zu%20KitSquid" title="Kontakt"><i class="icon-mail-alt"></i></a>
+        <span> | </span>
+        <a href="https://github.com/n1try/kitsquid/issues" target="_blank" title="Fehler melden"><i class="icon-bug"></i></a>
+        <span> | </span>
+        <a href="https://github.com/n1try/kitsquid" target="_blank" title="Source Code"><i class="icon-github-circled"></i></a>
+        <span> | </span>
+        <a href="/imprint">Datenschutz &#8226; Haftung &#8226; Impressum</a>
+    </footer>
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/app.js"></script>
 </body>

@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'kithub';
-  src: url('../font/kithub.eot?7753257');
-  src: url('../font/kithub.eot?7753257#iefix') format('embedded-opentype'),
-       url('../font/kithub.woff2?7753257') format('woff2'),
-       url('../font/kithub.woff?7753257') format('woff'),
-       url('../font/kithub.ttf?7753257') format('truetype'),
-       url('../font/kithub.svg?7753257#kithub') format('svg');
+  src: url('../font/kithub.eot?71493962');
+  src: url('../font/kithub.eot?71493962#iefix') format('embedded-opentype'),
+       url('../font/kithub.woff2?71493962') format('woff2'),
+       url('../font/kithub.woff?71493962') format('woff'),
+       url('../font/kithub.ttf?71493962') format('truetype'),
+       url('../font/kithub.svg?71493962#kithub') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'kithub';
-    src: url('../font/kithub.svg?7753257#kithub') format('svg');
+    src: url('../font/kithub.svg?71493962#kithub') format('svg');
   }
 }
 */
@@ -75,9 +75,12 @@
 .icon-cog:before { content: '\e811'; } /* '' */
 .icon-link-ext:before { content: '\f08e'; } /* '' */
 .icon-bookmark-empty:before { content: '\f097'; } /* '' */
+.icon-github-circled:before { content: '\f09b'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
+.icon-mail-alt:before { content: '\f0e0'; } /* '' */
 .icon-building:before { content: '\f0f7'; } /* '' */
 .icon-star-half-alt:before { content: '\f123'; } /* '' */
+.icon-bug:before { content: '\f188'; } /* '' */
 .icon-graduation-cap:before { content: '\f19d'; } /* '' */
 .icon-building-filled:before { content: '\f1ad'; } /* '' */
 .icon-calendar-check-o:before { content: '\f274'; } /* '' */
