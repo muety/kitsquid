@@ -1,3 +1,5 @@
+// TODO: Clean up this messy file
+
 const KEY_MAIN_RATING = 'overall'
 
 $(() => {
@@ -234,11 +236,16 @@ function toggleBookmarkEvent(id) {
         })
 }
 
+let snackBarTimeout
 function showSnackbar(text) {
+    if (snackBarTimeout) {
+        clearTimeout(snackBarTimeout)
+    }
+
     let sb = $('#snackbar')
     sb.text(text)
     sb.removeClass('hidden')
-    setTimeout(() => {
+    snackBarTimeout = setTimeout(() => {
         sb.addClass('hidden')
     }, 2000)
 }
