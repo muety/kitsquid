@@ -5,6 +5,7 @@ import (
 	"github.com/n1try/kitsquid/app/admin"
 	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/common/errors"
+	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/users"
@@ -36,6 +37,13 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	comments.RegisterRoutes(router, group)
 	reviews.RegisterRoutes(router, group)
 	admin.RegisterRoutes(router, group)
+
+	group.GET("/imprint", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "imprint", gin.H{"tplCtx": c.MustGet(config.TemplateContextKey)})
+	})
+	group.GET("/data-privacy", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "data_privacy", gin.H{"tplCtx": c.MustGet(config.TemplateContextKey)})
+	})
 
 	return group
 }
