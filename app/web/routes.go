@@ -38,6 +38,9 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	reviews.RegisterRoutes(router, group)
 	admin.RegisterRoutes(router, group)
 
+	group.GET("/about", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "about", gin.H{"tplCtx": c.MustGet(config.TemplateContextKey)})
+	})
 	group.GET("/imprint", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "imprint", gin.H{"tplCtx": c.MustGet(config.TemplateContextKey)})
 	})

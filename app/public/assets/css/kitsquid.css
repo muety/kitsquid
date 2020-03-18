@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'kitsquid';
-  src: url('../font/kitsquid.eot?80598925');
-  src: url('../font/kitsquid.eot?80598925#iefix') format('embedded-opentype'),
-       url('../font/kitsquid.woff2?80598925') format('woff2'),
-       url('../font/kitsquid.woff?80598925') format('woff'),
-       url('../font/kitsquid.ttf?80598925') format('truetype'),
-       url('../font/kitsquid.svg?80598925#kitsquid') format('svg');
+  src: url('../font/kitsquid.eot?8431036');
+  src: url('../font/kitsquid.eot?8431036#iefix') format('embedded-opentype'),
+       url('../font/kitsquid.woff2?8431036') format('woff2'),
+       url('../font/kitsquid.woff?8431036') format('woff'),
+       url('../font/kitsquid.ttf?8431036') format('truetype'),
+       url('../font/kitsquid.svg?8431036#kitsquid') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'kitsquid';
-    src: url('../font/kitsquid.svg?80598925#kitsquid') format('svg');
+    src: url('../font/kitsquid.svg?8431036#kitsquid') format('svg');
   }
 }
 */
@@ -78,11 +78,13 @@
 .icon-github-circled:before { content: '\f09b'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
 .icon-mail-alt:before { content: '\f0e0'; } /* '' */
+.icon-lightbulb:before { content: '\f0eb'; } /* '' */
 .icon-building:before { content: '\f0f7'; } /* '' */
 .icon-star-half-alt:before { content: '\f123'; } /* '' */
 .icon-bug:before { content: '\f188'; } /* '' */
 .icon-graduation-cap:before { content: '\f19d'; } /* '' */
 .icon-building-filled:before { content: '\f1ad'; } /* '' */
+.icon-hourglass-1:before { content: '\f251'; } /* '' */
 .icon-calendar-check-o:before { content: '\f274'; } /* '' */
 .icon-user-circle-o:before { content: '\f2be'; } /* '' */
 .icon-snowflake-o:before { content: '\f2dc'; } /* '' */

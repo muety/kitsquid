@@ -1,5 +1,12 @@
 <div id="sidebar" class="relative mt-32 z-90 w-full md:w-1/4 lg:w-1/6 hidden md:block px-6 md:px-0 md:pl-4 xl:pl-0">
     <ul class="text-sm">
+        <li class="py-2 pr-3 lg:pr-0 md:py-1 mb-4">
+            <a href="/about">
+                <button class="w-5/6 hover:bg-gray-900 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/about" }} sidebar-item-active {{ end }}">
+                    <i class="icon-info-circled md:hidden lg:inline-block"></i><span class="ml-3">Das Projekt</span>
+                </button>
+            </a>
+        </li>
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
             <a href="/">
                 <button class="w-5/6 hover:bg-gray-900 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if or (eq .tplCtx.Path "/") (strPrefix .tplCtx.Path "/event") }} sidebar-item-active {{ end }}">
@@ -16,6 +23,20 @@
             </a>
         </li>
         {{ end }}
+        <li class="py-2 pr-3 lg:pr-0 md:py-1 mt-4">
+            <a onclick="showSnackbar('Feature ist noch nicht verfügbar.')">
+                <button class="w-5/6 hover:bg-gray-900 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate">
+                    <i class="icon-calendar-check-o md:hidden lg:inline-block"></i><span class="ml-3">Stundenplan</span><span class="text-2xs ml-1 text-kit font-semibold">WIP</span>
+                </button>
+            </a>
+        </li>
+        <li class="py-2 pr-3 lg:pr-0 md:py-1 mb-4">
+            <a onclick="showSnackbar('Feature ist noch nicht verfügbar.')">
+                <button class="w-5/6 hover:bg-gray-900 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate">
+                    <i class="icon-lightbulb md:hidden lg:inline-block"></i><span class="ml-3">Empfehlungen</span><span class="text-2xs ml-1 text-kit font-semibold">WIP</span>
+                </button>
+            </a>
+        </li>
         {{ if .tplCtx.User }}
         <li class="py-2 pr-3 lg:pr-0 md:py-1">
             <a href="/account">
@@ -27,7 +48,7 @@
         {{ end }}
         {{ if .tplCtx.User }}
         {{ if .tplCtx.User.IsAdmin }}
-        <li class="py-2 pr-3 lg:pr-0 md:py-1">
+        <li class="py-2 pr-3 lg:pr-0 md:py-1 mt-4">
             <a href="/admin">
                 <button class="w-5/6 hover:bg-gray-900 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/admin" }} sidebar-item-active {{ end }}">
                     <i class="icon-cog-alt md:hidden lg:inline-block"></i><span class="ml-3">Admin</span>
