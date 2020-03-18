@@ -7,11 +7,12 @@ type registeredEntity struct {
 }
 
 type crudResolvers struct {
-	List   func() (interface{}, error)
-	Get    func(string) (interface{}, error)
-	Put    func(string, string) error
-	Delete func(string) error
-	Flush  func()
+	List    func() (interface{}, error)
+	Get     func(string) (interface{}, error)
+	Put     func(string, string) error
+	Delete  func(string) error
+	Flush   func()
+	Reindex func()
 }
 
 type adminQuery struct {

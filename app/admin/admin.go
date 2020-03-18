@@ -38,8 +38,9 @@ func registerEntities() {
 				}
 				return events.Insert(&event, true)
 			},
-			Delete: events.Delete,
-			Flush:  events.FlushCaches,
+			Delete:  events.Delete,
+			Flush:   events.FlushCaches,
+			Reindex: events.Reindex,
 		},
 	}
 
@@ -56,8 +57,9 @@ func registerEntities() {
 				}
 				return users.Insert(&user, true)
 			},
-			Delete: users.Delete,
-			Flush:  users.FlushCaches,
+			Delete:  users.Delete,
+			Flush:   users.FlushCaches,
+			Reindex: users.Reindex,
 		},
 	}
 
@@ -75,7 +77,6 @@ func registerEntities() {
 				return users.InsertSession(&session, true)
 			},
 			Delete: func(key string) error { return users.DeleteSession(&users.UserSession{Token: key}) },
-			Flush:  users.FlushCaches,
 		},
 	}
 
@@ -92,8 +93,9 @@ func registerEntities() {
 				}
 				return reviews.Insert(&review, true)
 			},
-			Delete: reviews.Delete,
-			Flush:  reviews.FlushCaches,
+			Delete:  reviews.Delete,
+			Flush:   reviews.FlushCaches,
+			Reindex: reviews.Reindex,
 		},
 	}
 
@@ -110,8 +112,9 @@ func registerEntities() {
 				}
 				return comments.Insert(&comment, true)
 			},
-			Delete: comments.Delete,
-			Flush:  comments.FlushCaches,
+			Delete:  comments.Delete,
+			Flush:   comments.FlushCaches,
+			Reindex: comments.Reindex,
 		},
 	}
 
@@ -141,7 +144,6 @@ func registerEntities() {
 				}
 				return events.DeleteBookmark(&events.Bookmark{Id: uint64(intKey)})
 			},
-			Flush: events.FlushCaches,
 		},
 	}
 

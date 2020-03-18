@@ -7,6 +7,7 @@ import (
 	"github.com/n1try/kitsquid/app/util"
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
+	"go.etcd.io/bbolt"
 	"reflect"
 	"regexp"
 	"time"
@@ -183,10 +184,17 @@ func InsertMulti(events []*Event, upsert bool) error {
 }
 
 func Delete(key string) error {
-	defer eventsCache.Flush()
-	defer miscCache.Flush()
+	defer FlushCaches()
 
-	return db.Delete(key, &Event{})
+	return db.Bolt().Update(func(tx *bbolt.Tx) error {
+		if err := db.TxDelete(tx, key, &Event{}); err != nil {
+			return err
+		}
+		if err := db.TxDeleteMatching(tx, &Bookmark{}, bolthold.Where("EntityId").Eq(key)); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 // Inplace

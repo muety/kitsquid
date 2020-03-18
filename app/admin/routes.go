@@ -15,6 +15,7 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/admin/query", CheckAdmin(), apiAdminQuery(router))
 	group.POST("/admin/flush", CheckAdmin(), apiAdminFlush(router))
+	group.POST("/admin/reindex", CheckAdmin(), apiAdminReindex(router))
 }
 
 func getIndex(r *gin.Engine) func(c *gin.Context) {
@@ -61,6 +62,8 @@ func apiAdminQuery(r *gin.Engine) func(c *gin.Context) {
 		case "flush":
 			f = handleFlush
 			break
+		case "reindex":
+			f = handleReindex
 		default:
 			f = func(_q *adminQuery, _e *registeredEntity, context *gin.Context) {
 				c.AbortWithError(http.StatusBadRequest, errors.BadRequest{})
@@ -76,7 +79,23 @@ func apiAdminFlush(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		go func() {
 			for _, e := range entities {
-				go e.Resolvers.Flush()
+				if e.Resolvers.Flush != nil {
+					go e.Resolvers.Flush()
+				}
+			}
+		}()
+
+		c.Status(http.StatusAccepted)
+	}
+}
+
+func apiAdminReindex(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		go func() {
+			for _, e := range entities {
+				if e.Resolvers.Reindex != nil {
+					go e.Resolvers.Reindex()
+				}
 			}
 		}()
 
@@ -142,6 +161,15 @@ func handleDelete(q *adminQuery, re *registeredEntity, c *gin.Context) {
 }
 
 func handleFlush(q *adminQuery, re *registeredEntity, c *gin.Context) {
-	go re.Resolvers.Flush()
+	if re.Resolvers.Flush != nil {
+		go re.Resolvers.Flush()
+	}
+	c.Status(http.StatusAccepted)
+}
+
+func handleReindex(q *adminQuery, re *registeredEntity, c *gin.Context) {
+	if re.Resolvers.Reindex != nil {
+		go re.Resolvers.Reindex()
+	}
 	c.Status(http.StatusAccepted)
 }

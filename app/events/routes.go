@@ -76,12 +76,12 @@ func getBookmarks(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		events := make([]*Event, len(bookmarks))
-		for i, b := range bookmarks {
+		events := make([]*Event, 0)
+		for _, b := range bookmarks {
 			if e, err := Get(b.EntityId); err != nil {
 				log.Errorf("failed to get bookmarked event %s – %v\n", b.EntityId, err)
 			} else {
-				events[i] = e
+				events = append(events, e)
 			}
 		}
 
