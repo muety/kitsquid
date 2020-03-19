@@ -21,7 +21,7 @@ const (
 	SessionKey         = "kitsquid_session"
 	UserKey            = "user"
 	TemplateContextKey = "tplCtx"
-	KitVvzBaseUrl      = "https://campus.kit.edu/live-stud/campus/all"
+	KitVvzBaseUrl      = "https://campus.kit.edu/sp/campus/all"
 	FacultyIdx         = 0
 )
 

@@ -55,11 +55,8 @@ func _debugScrape() {
 
 func _debugScrapeDetails() {
 	scraper := scraping.NewEventDetailsScraper()
-	ls, err := events.GetAll()
-	if err != nil {
-		panic(err)
-	}
-	job := scraping.FetchDetailsJob{Events: ls}
+	el, err := events.Find(&events.EventQuery{})
+	job := scraping.FetchDetailsJob{Events: el}
 	result, err := scraper.Run(job)
 	if err != nil {
 		panic(err)

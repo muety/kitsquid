@@ -179,7 +179,8 @@ func InsertMulti(events []*Event, upsert bool, overwrite bool) error {
 		}
 
 		if err := f(tx, e.Id, e); err != nil {
-			return err
+			log.Errorf("failed to insert event %s", e.Id)
+			tx.Rollback()
 		}
 	}
 

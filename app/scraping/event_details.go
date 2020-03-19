@@ -2,14 +2,27 @@ package scraping
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
 	"github.com/n1try/kitsquid/app/events"
 	"golang.org/x/sync/semaphore"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
+	"time"
 )
+
+var (
+	client *http.Client
+)
+
+type iliasResponse struct {
+	Gguid string `json:"gguid" binding:"required"`
+	Url   string `json:"url" binding:"required"`
+}
 
 type FetchDetailsJob struct {
 	Events []*events.Event
@@ -25,6 +38,9 @@ func (l EventDetailsScraper) Schedule(job ScrapeJob, cronExp string) {
 }
 
 func (l EventDetailsScraper) Run(job ScrapeJob) (interface{}, error) {
+	client = &http.Client{
+		Timeout: 10 * time.Second,
+	}
 	return job.process()
 }
 
@@ -147,10 +163,34 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 
 			newEvent := *existingEvent
 			newEvent.Description = desc
+			if existingEvent.Description != "" && newEvent.Description == "" {
+				log.Warningf("WARNING! event %s had description before, but was removed", existingEvent.Gguid)
+			}
 
 			newEvent.Links = []*events.Link{{Name: "VVZ", Url: link}}
 			if extLink != "" {
 				newEvent.Links = append(newEvent.Links, &events.Link{Name: "Link", Url: extLink})
+			}
+
+			// Fetch ILIAS link
+			u, _ = url.Parse(fmt.Sprintf(eventIliasUrl, newEvent.Gguid))
+			log.V(2).Infof("[FetchDetailsJob] processing %s\n", u.String())
+			req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+			if resp, err := client.Do(req); err != nil {
+				log.Errorf("failed to fetch ILIAS event details for event %s\n", newEvent.Gguid)
+			} else {
+				defer resp.Body.Close()
+
+				var iliasData iliasResponse
+				dec := json.NewDecoder(resp.Body)
+				if err := dec.Decode(&iliasData); err != nil {
+					log.Errorf("failed to parse ILIAS response for event %s\n", newEvent.Gguid)
+				}
+
+				if _, err := url.Parse(iliasData.Url); err == nil &&
+					(strings.HasPrefix(iliasData.Url, "http://") || strings.HasPrefix(iliasData.Url, "https://")) {
+					newEvent.Links = append(newEvent.Links, &events.Link{Name: "ILIAS", Url: iliasData.Url})
+				}
 			}
 
 			mtx.Lock()
