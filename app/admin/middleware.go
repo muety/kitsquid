@@ -13,7 +13,7 @@ func CheckAdmin() gin.HandlerFunc {
 		defer c.Next()
 
 		user, _ := c.Get(config.UserKey)
-		if user == nil || !user.(*users.User).IsAdmin() {
+		if user == nil || !user.(*users.User).Admin {
 			c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{})
 			return
 		}

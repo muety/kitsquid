@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/n1try/kitsquid/app/config"
 	"time"
 )
 
@@ -9,6 +8,7 @@ type User struct {
 	Id        string    `form:"user" binding:"required" boltholdIndex:"Id"`
 	Password  string    `form:"password" binding:"required"`
 	Active    bool      `form:"" boltholdIndex:"Active"`
+	Admin     bool      `form:""`
 	Gender    string    `form:"gender" binding:"required"`
 	Major     string    `form:"major" binding:"required"`
 	Degree    string    `form:"degree" binding:"required"`
@@ -53,15 +53,6 @@ func (s *User) IsValid(validator UserValidator) bool {
 
 func (s *User) HasValidCredentials(validator UserCredentialsValidator) bool {
 	return validator(s)
-}
-
-func (s *User) IsAdmin() bool {
-	for _, a := range config.Get().Auth.Admins {
-		if a == s.Id {
-			return true
-		}
-	}
-	return false
 }
 
 func (s *UserSession) IsValid(validator UserSessionValidator) bool {

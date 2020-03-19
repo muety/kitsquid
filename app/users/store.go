@@ -53,6 +53,31 @@ func FlushCaches() {
 }
 
 func setup() {
+	if cfg.Auth.Admin.User != "" {
+		if _, err := Get(cfg.Auth.Admin.User); err != nil {
+			log.Infof("creating admin user %s", cfg.Auth.Admin.User)
+			admin := &User{
+				Id:        cfg.Auth.Admin.User,
+				Password:  cfg.Auth.Admin.Password,
+				Active:    true,
+				Admin:     true,
+				Gender:    cfg.Auth.Admin.Gender,
+				Major:     cfg.Auth.Admin.Major,
+				Degree:    cfg.Auth.Admin.Degree,
+				CreatedAt: time.Now(),
+			}
+
+			if err := HashPassword(admin); err != nil {
+				log.Errorf("failed to hash admin password – %v\n", err)
+				return
+			}
+
+			if err := Insert(admin, false); err != nil {
+				log.Errorf("failed to create admin user – %v\n", err)
+				return
+			}
+		}
+	}
 }
 
 func Get(id string) (*User, error) {

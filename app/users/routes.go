@@ -144,6 +144,10 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		// Make double-sure
+		user.Admin = false
+		user.Active = false
+
 		if err := Insert(&user, false); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
 			if err == bolthold.ErrKeyExists {
@@ -191,6 +195,7 @@ func postAccount(r *gin.Engine) func(c *gin.Context) {
 
 		u, _ := c.Get(config.UserKey)
 		user := u.(*User)
+		user.Admin = false
 
 		if err := c.ShouldBind(&change); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -257,6 +262,7 @@ func getActivate(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		user.Active = true
+		user.Admin = false
 		if err := Insert(user, true); err != nil {
 			c.Error(err)
 			makeError()

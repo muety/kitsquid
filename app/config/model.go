@@ -38,7 +38,13 @@ type Config struct {
 		Session struct {
 			Timeout string `default:"1d" env:"KITSQUID_AUTH_SESSION_TIMEOUT"`
 		}
-		Admins    []string `env:"KITSQUID_AUTH_ADMIN_USERS"`
+		Admin struct {
+			User     string `env:"KITSQUID_ADMIN_USER"`
+			Password string `env:"KITSQUID_ADMIN_PASSWORD"`
+			Gender   string `env:"KITSQUID_ADMIN_GENDER"`
+			Major    string `env:"KITSQUID_ADMIN_MAJOR"`
+			Degree   string `env:"KITSQUID_ADMIN_DEGREE"`
+		}
 		Whitelist []common.UserWhitelistItem
 	}
 	Misc struct {

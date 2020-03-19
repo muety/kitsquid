@@ -47,7 +47,7 @@
         </li>
         {{ end }}
         {{ if .tplCtx.User }}
-        {{ if .tplCtx.User.IsAdmin }}
+        {{ if .tplCtx.User.Admin }}
         <li class="py-2 pr-3 lg:pr-0 md:py-1 mt-4">
             <a href="/admin">
                 <button class="w-5/6 hover:bg-gray-900 py-2 md:py-1 px-4 md:px-2 lg:px-4 rounded-full text-left truncate {{ if eq .tplCtx.Path "/admin" }} sidebar-item-active {{ end }}">
