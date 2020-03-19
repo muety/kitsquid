@@ -8,7 +8,23 @@
             <button class="border-2 border-kit hover:border-kit-dark font-semibold text-gray-300 py-1 px-4 rounded-full ml-2 mr-2" onclick="flushAll()">
                 Flush
             </button>
-            <button class="border-2 border-kit hover:border-kit-dark font-semibold text-gray-300 py-1 px-4 rounded-full ml-2 mr-2">
+        </div>
+
+        <h2 class="text-lg inline-block border-b-2 border-kit mt-8 mb-4">Scraper</h2>
+        <div class="flex flex-wrap justify-between w-full items-end">
+            <div class="mr-2 flex-grow">
+                <label for="input-admin-scrape-tguid" class="text-sm">Tguid: <i class="icon-info-circled cursor-pointer" title="Open Firefox DevTools, go to VVZ, inspect tguid parameter in Network tab when loading faculty list"></i> </label>
+                <input id="input-admin-scrape-tguid" name="tguid" type="text" class="block w-full bg-gray-900 appearance-none border border-gray-600 rounded py-2 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" placeholder="E.g. 0x4CB7204338AE4F67A58AFCE6C29D1488" required>
+            </div>
+            <div class="mr-2">
+                <label for="input-admin-scrape-from" class="text-sm">From: <i class="icon-info-circled cursor-pointer" title="Faculty index (e.g. 0 = 'KIT-Fakultät für Architektur')"></i></label>
+                <input id="input-admin-scrape-from" name="from" type="number" class="block w-full bg-gray-900 appearance-none border border-gray-600 rounded py-2 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" placeholder="0" required>
+            </div>
+            <div class="mr-2">
+                <label for="input-admin-scrape-to" class="text-sm">To: <i class="icon-info-circled cursor-pointer" title="Faculty index (e.g. 0 = 'KIT-Fakultät für Architektur')"></i></label>
+                <input id="input-admin-scrape-to" name="to" type="number" class="block w-full bg-gray-900 appearance-none border border-gray-600 rounded py-2 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline" placeholder="23" required>
+            </div>
+            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full h-10 mt-2" onclick="scrape()">
                 Scrape
             </button>
         </div>

@@ -6,12 +6,6 @@ import (
 
 type SemesterKey string
 
-const (
-	SemesterWs1920 SemesterKey = "WS19/20"
-	SemesterWs1718 SemesterKey = "WS17/18"
-)
-
-var SemesterKeys = []SemesterKey{SemesterWs1920, SemesterWs1718}
 var Genders = []string{"male", "female", "human"}
 
 type UserWhitelistItem struct {

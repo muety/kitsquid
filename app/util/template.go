@@ -2,7 +2,6 @@ package util
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kitsquid/app/common"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 )
@@ -34,5 +33,5 @@ type TplCtx struct {
 	}
 	Alerts       []string
 	Errors       []string
-	SemesterKeys []common.SemesterKey
+	SemesterKeys []string
 }

@@ -2,9 +2,13 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	log "github.com/golang/glog"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
+	"github.com/n1try/kitsquid/app/events"
+	"github.com/n1try/kitsquid/app/scraping"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -16,6 +20,7 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/admin/query", CheckAdmin(), apiAdminQuery(router))
 	group.POST("/admin/flush", CheckAdmin(), apiAdminFlush(router))
 	group.POST("/admin/reindex", CheckAdmin(), apiAdminReindex(router))
+	group.POST("/admin/scrape", CheckAdmin(), apiAdminScrape(router))
 }
 
 func getIndex(r *gin.Engine) func(c *gin.Context) {
@@ -98,6 +103,73 @@ func apiAdminReindex(r *gin.Engine) func(c *gin.Context) {
 				}
 			}
 		}()
+
+		c.Status(http.StatusAccepted)
+	}
+}
+
+func apiAdminScrape(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var from int
+		var to int
+		var currentError error
+
+		tguid := c.Request.URL.Query().Get("tguid")
+		fromStr := c.Request.URL.Query().Get("from")
+		toStr := c.Request.URL.Query().Get("to")
+
+		if i, err := strconv.Atoi(fromStr); err == nil {
+			from = i
+		} else {
+			currentError = err
+		}
+		if i, err := strconv.Atoi(toStr); err == nil {
+			to = i
+		} else {
+			currentError = err
+		}
+
+		if tguid == "" || currentError != nil {
+			c.AbortWithError(http.StatusBadRequest, errors.BadRequest{})
+			return
+		}
+
+		go func(tguid string, from, to int) {
+			log.Infoln("scraping start")
+
+			mainScraper := scraping.NewEventScraper()
+			mainJob := scraping.FetchEventsJob{
+				Tguid: tguid,
+				From:  from,
+				To:    to,
+			}
+			mainResult, err := mainScraper.Run(mainJob)
+			if err != nil {
+				log.Errorf("event scraping failed – %v\n", err)
+				return
+			}
+
+			if err := events.InsertMulti(mainResult.([]*events.Event), true, false); err != nil {
+				log.Errorf("failed to store scraped events – %v\n", err)
+				return
+			}
+
+			detailsScraper := scraping.NewEventDetailsScraper()
+			detailsJob := scraping.FetchDetailsJob{Events: mainResult.([]*events.Event)}
+			detailsResult, err := detailsScraper.Run(detailsJob)
+			if err != nil {
+				log.Errorf("event details scraping failed – %v\n", err)
+				return
+			}
+
+			for _, l := range detailsResult.([]*events.Event) {
+				if err := events.Insert(l, true, false); err != nil {
+					log.Errorf("failed to update event %s – %v\n", l.Id, err)
+				}
+			}
+
+			log.Infoln("scraping end")
+		}(tguid, from, to)
 
 		c.Status(http.StatusAccepted)
 	}

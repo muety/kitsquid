@@ -68,6 +68,33 @@ function flushAll() {
         })
 }
 
+function scrape() {
+    let tguid = $('#input-admin-scrape-tguid').val()
+    let from = parseInt($('#input-admin-scrape-from').val())
+    let to = parseInt($('#input-admin-scrape-to').val())
+
+    if (!tguid || isNaN(from) || isNaN(to)) {
+        showSnackbar('Invalid scrape request')
+        return
+    }
+
+    fetch(`/api/admin/scrape?tguid=${tguid}&from=${from}&to=${to}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    showSnackbar(`Fehler: ${data.error}`)
+                })
+            } else if (response.status >= 200 && response.status <= 299) {
+                showSnackbar('Gestartet')
+            }
+        })
+        .catch(() => {
+            showSnackbar('Fehler')
+        })
+}
+
 function hasJsonBody(response) {
     return response.headers.get('content-type') &&
         response.headers.get('content-type').startsWith('application/json') &&

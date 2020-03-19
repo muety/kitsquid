@@ -9,7 +9,7 @@ tls:
   cert: etc/cert.pem
 
 db:
-  path: kitsquid.db
+  path: kitsquid.gob.db
   encoding: gob # json or gob
 
 mail:
@@ -36,7 +36,7 @@ auth:
   admin:
     user: user@example.com
     password: secretpassword
-    gender: Weiblich
+    gender: female
     major: Informatik
     degree: Master
   whitelist:

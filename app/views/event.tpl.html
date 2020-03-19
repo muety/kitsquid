@@ -47,7 +47,7 @@
                                 {{ end }}
                             </div>
                         </div>
-                        {{ if not (eq .semesterQuery (index .tplCtx.SemesterKeys (add (len .tplCtx.SemesterKeys) -1))) }}
+                        {{ if not (eq .semesterQuery (index .tplCtx.SemesterKeys 0)) }}
                             <div class="my-8" id="alert-different-semester">
                                 <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded relative"
                                      role="alert">

@@ -4,11 +4,11 @@ import (
 	"context"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/common"
 	model "github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/util"
 	"golang.org/x/sync/semaphore"
 	"golang.org/x/text/language"
+	"math"
 	"net/url"
 	"regexp"
 	"strings"
@@ -16,7 +16,9 @@ import (
 )
 
 type FetchEventsJob struct {
-	Semester common.SemesterKey
+	Tguid string
+	From  int
+	To    int
 }
 
 type listEventFacultiesJob struct {
@@ -32,6 +34,11 @@ type listEventsJob struct {
 	Tguid    string
 	Gguid    string
 	Semester string
+}
+
+type listEventFacultiesResult struct {
+	Semester  string
+	Faculties []*eventFaculty
 }
 
 type eventFaculty struct {
@@ -58,6 +65,7 @@ func (l EventScraper) Run(job ScrapeJob) (interface{}, error) {
 }
 
 func (l FetchEventsJob) process() (interface{}, error) {
+	var semester string
 	var events = make([]*model.Event, 0)
 	var categories = make([]*eventCategory, 0)
 	var faculties = make([]*eventFaculty, 0)
@@ -66,20 +74,21 @@ func (l FetchEventsJob) process() (interface{}, error) {
 		return events, err
 	}
 
-	tguid, err := common.ResolveSemesterId(l.Semester)
-	if err != nil {
-		return makeError(err)
-	}
-
-	job1 := listEventFacultiesJob{Tguid: tguid}
+	job1 := listEventFacultiesJob{Tguid: l.Tguid}
 	result1, err := job1.process()
 	if err != nil {
 		return makeError(err)
 	}
-	faculties = result1.([]*eventFaculty)
+	semester = result1.(listEventFacultiesResult).Semester
+	faculties = result1.(listEventFacultiesResult).Faculties
 
-	for _, faculty := range faculties {
-		job2 := listEventCategoriesJob{Tguid: tguid, Gguid: faculty.Gguid}
+	from := int(math.Max(float64(l.From), 0))
+	to := int(math.Min(float64(l.To), float64(len(faculties)-1)))
+
+	log.V(2).Infof("starting to scrape events for tguid %s from %d to %d", l.Tguid, from, to)
+
+	for _, faculty := range faculties[from:to] {
+		job2 := listEventCategoriesJob{Tguid: l.Tguid, Gguid: faculty.Gguid}
 		result2, err := job2.process()
 		if err != nil {
 			log.Errorf("failed to fetch categories – %v\n", err)
@@ -129,7 +138,7 @@ func (l FetchEventsJob) process() (interface{}, error) {
 			addEvents(result.([]*model.Event))
 			mtx.Unlock()
 			log.Flush()
-		}(tguid, cat.Gguid, string(l.Semester))
+		}(l.Tguid, cat.Gguid, semester)
 	}
 
 	if err := sem.Acquire(ctx, int64(maxWorkers)); err != nil {
@@ -148,8 +157,10 @@ func (l FetchEventsJob) process() (interface{}, error) {
 
 func (l listEventFacultiesJob) process() (interface{}, error) {
 	faculties := make([]*eventFaculty, 0)
+	semester := ""
 
 	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
+	reTitle := regexp.MustCompile(`.+ \((.+)\)`)
 
 	u, _ := url.Parse(facultiesUrl)
 	q := u.Query()
@@ -162,6 +173,20 @@ func (l listEventFacultiesJob) process() (interface{}, error) {
 	if err != nil {
 		log.Errorf("failed to load %s\n", u.String())
 		return nil, err
+	}
+
+	// Parse heading (e.g. "Vorlesungsverzeichnis (WS 19/20)")
+	h1, err := htmlquery.Query(doc, "//h1[@class='pagetitle']")
+	if err != nil {
+		log.Errorf("failed to query title in faculties document for tguid %s\n", l.Tguid)
+		return nil, err
+	}
+
+	matches := reTitle.FindStringSubmatch(htmlquery.InnerText(h1))
+	if len(matches) == 2 {
+		semester = strings.ReplaceAll(matches[1], " ", "")
+	} else {
+		log.Errorf("failed to parse title for tguid for %s\n", l.Tguid)
 	}
 
 	as, err := htmlquery.QueryAll(doc, "//table[@id='tableVVZ']/tbody[@class='tablecontent']//a")
@@ -184,7 +209,10 @@ func (l listEventFacultiesJob) process() (interface{}, error) {
 		}
 	}
 
-	return faculties, nil
+	return listEventFacultiesResult{
+		Semester:  semester,
+		Faculties: faculties,
+	}, nil
 }
 
 func (l listEventCategoriesJob) process() (interface{}, error) {

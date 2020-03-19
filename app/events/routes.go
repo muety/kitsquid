@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kitsquid/app/comments"
-	"github.com/n1try/kitsquid/app/common"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/reviews"
@@ -118,9 +117,10 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		semester := common.SemesterKeys[len(common.SemesterKeys)-1]
-		if s := c.Request.URL.Query().Get("semester"); s != "" {
-			semester = common.SemesterKey(s)
+		semesters, _ := GetSemesters()
+		semester := semesters[0]
+		if s := c.Request.URL.Query().Get("semester"); s != "" && util.ContainsString(s, semesters) {
+			semester = s
 		}
 
 		var bookmarked bool

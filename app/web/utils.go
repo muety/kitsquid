@@ -2,8 +2,8 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kitsquid/app/common"
 	"github.com/n1try/kitsquid/app/config"
+	"github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/n1try/kitsquid/app/util"
 	"html/template"
@@ -52,6 +52,8 @@ func GetTplCtx(c *gin.Context) util.TplCtx {
 		user = u.(*users.User)
 	}
 
+	semesters, _ := events.GetSemesters()
+
 	return util.TplCtx{
 		Url:  c.Request.URL.String(),
 		Path: c.FullPath(),
@@ -65,7 +67,7 @@ func GetTplCtx(c *gin.Context) util.TplCtx {
 		},
 		Alerts:       alerts,
 		Errors:       errors,
-		SemesterKeys: common.SemesterKeys,
+		SemesterKeys: semesters,
 	}
 }
 
