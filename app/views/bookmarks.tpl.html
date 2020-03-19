@@ -1,51 +1,52 @@
 {{ define "content" }}
-    {{ if .events }}
-        <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Favoriten</h1>
-        <span class="ml-1 text-gray-500">({{ len .events }})</span>
-        <div class="flex flex-wrap">
-            {{ range .events }}
-                <div class="w-full sm:w-1/2 xl:w-1/3 p-1">
-                    <a href="event/{{ .Id }}">
-                        <div class="h-full rounded relative overflow-hidden shadow-md hover:shadow-lg bg-gray-700 event-card" style="min-height: 95px;">
-                            <div class="h-full rounded-bl rounded-tl w-05 absolute faculty-indicator" style="background-color: {{ randomColor (index .Categories $.tplCtx.Constants.FacultyIndex) }}" title="{{ index .Categories 0 }}"></div>
-                            <div class="pl-4 pr-10 py-2 text-gray-300 text-sm">
-                                <div>
-                                    <span class="font-semibold">{{ .Name }}</span>
-                                </div>
-                                <div>
-                            <span class="text-xs">
-                                <i class="icon-person"></i>
-                                {{ range $i, $e := .Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
-                            </span>
-                                </div>
-                                <div class="flex flex-wrap mt-2">
-                                    {{ range slice .Categories 1 }}
-                                        <div class="rounded bg-gray-600 text-gray-800 p-1 m-px truncate max-w-4xs text-2xs" title="{{ . }}">{{ . }}</div>
-                                    {{ end }}
-                                </div>
+    <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Favoriten</h1>
+    <span class="ml-1 text-gray-500">({{ len .events }})</span>
+    <div class="flex flex-wrap">
+        {{ range .events }}
+            <div class="w-full sm:w-1/2 xl:w-1/3 p-1">
+                <a href="event/{{ .Id }}">
+                    <div class="h-full rounded relative overflow-hidden shadow-md hover:shadow-lg bg-gray-700 event-card" style="min-height: 95px;">
+                        <div class="h-full rounded-bl rounded-tl w-05 absolute faculty-indicator" style="background-color: {{ randomColor (index .Categories $.tplCtx.Constants.FacultyIndex) }}" title="{{ index .Categories 0 }}"></div>
+                        <div class="pl-4 pr-10 py-2 text-gray-300 text-sm">
+                            <div>
+                                <span class="font-semibold">{{ .Name }}</span>
                             </div>
-                            <div class="absolute top-0 right-0 flex flex-col m-2">
-                                <div class="p-1 border border-gray-300 bg-gray-700 rounded text-2xs text-gray-300 font-semibold text-center" title="{{ .Type }}">
-                                    <span class="cursor-default">{{ strIndex 0 .Type }}</span>
-                                </div>
-                                {{ if .InWinter }}
-                                    <div class="mt-1 p-1 border border-blue-300 bg-blue-800 rounded text-xs text-blue-300 font-semibold flex items-center" title="Wintersemester">
-                                        <span class="cursor-default"><i class="icon-snowflake-o"></i></span>
-                                    </div>
+                            <div>
+                        <span class="text-xs">
+                            <i class="icon-person"></i>
+                            {{ range $i, $e := .Lecturers }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}
+                        </span>
+                            </div>
+                            <div class="flex flex-wrap mt-2">
+                                {{ range slice .Categories 1 }}
+                                    <div class="rounded bg-gray-600 text-gray-800 p-1 m-px truncate max-w-4xs text-2xs" title="{{ . }}">{{ . }}</div>
                                 {{ end }}
-                                {{ if .InSummer }}
-                                    <div class="mt-1 p-1 border border-orange-300 bg-orange-800 rounded text-xs text-orange-300 font-semibold flex items-center" title="Sommersemester">
-                                        <span class="cursor-default"><i class="icon-sun"></i></span>
-                                    </div>
-                                {{ end }}
-                                <div class="mt-1 p-1 border border-yellow-500 rounded text-2xs text-yellow-500 font-semibold flex items-center" title="Gesamtbewertung">
-                                    <span class="cursor-default text-center w-full">{{ index $.eventRatings .Id }}</span>
-                                </div>
                             </div>
                         </div>
-                    </a>
-                </div>
-            {{ end }}
-        </div>
+                        <div class="absolute top-0 right-0 flex flex-col m-2">
+                            <div class="p-1 border border-gray-300 bg-gray-700 rounded text-2xs text-gray-300 font-semibold text-center" title="{{ .Type }}">
+                                <span class="cursor-default">{{ strIndex 0 .Type }}</span>
+                            </div>
+                            {{ if .InWinter }}
+                                <div class="mt-1 p-1 border border-blue-300 bg-blue-800 rounded text-xs text-blue-300 font-semibold flex items-center" title="Wintersemester">
+                                    <span class="cursor-default"><i class="icon-snowflake-o"></i></span>
+                                </div>
+                            {{ end }}
+                            {{ if .InSummer }}
+                                <div class="mt-1 p-1 border border-orange-300 bg-orange-800 rounded text-xs text-orange-300 font-semibold flex items-center" title="Sommersemester">
+                                    <span class="cursor-default"><i class="icon-sun"></i></span>
+                                </div>
+                            {{ end }}
+                            <div class="mt-1 p-1 border border-yellow-500 rounded text-2xs text-yellow-500 font-semibold flex items-center" title="Gesamtbewertung">
+                                <span class="cursor-default text-center w-full">{{ index $.eventRatings .Id }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {{ end }}
+    </div>
+    {{ if not .events }}
+    <div>Du hast noch keine Veranstaltungen zu deinen Favoriten hinzugefügt.</div>
     {{ end }}
 {{ end }}
