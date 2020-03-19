@@ -51,7 +51,7 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 	mtx := &sync.Mutex{}
 	sem := semaphore.NewWeighted(int64(maxWorkers))
 
-	for i, l := range f.Events {
+	for i, e := range f.Events {
 		if err := sem.Acquire(ctx, 1); err != nil {
 			log.Errorf("failed to acquire semaphore while fetching event details – %v\n", err)
 			continue
@@ -197,7 +197,7 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			updatedEvents[index] = &newEvent
 			mtx.Unlock()
 			log.Flush()
-		}(i, l.Gguid, l)
+		}(i, e.Gguid, e)
 	}
 
 	if err := sem.Acquire(ctx, int64(maxWorkers)); err != nil {
