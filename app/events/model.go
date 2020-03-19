@@ -3,6 +3,7 @@ package events
 import (
 	"fmt"
 	"github.com/n1try/kitsquid/app/config"
+	"strconv"
 	"strings"
 )
 
@@ -49,6 +50,41 @@ func (l Event) String() string {
 
 func (l Lecturer) String() string {
 	return l.Name
+}
+
+type Semesters []string
+
+func (s Semesters) Len() int {
+	return len(s)
+}
+func (s Semesters) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s Semesters) Less(i, j int) bool {
+	token1, year1 := s.split(s[i])
+	token2, year2 := s.split(s[j])
+
+	if year1 == year2 {
+		if token1 == "WS" && token2 == "SS" {
+			return true
+		}
+	}
+
+	return year1 < year2
+}
+
+func (s Semesters) split(str string) (token string, year int) {
+	if len(str) != 4 && len(str) != 7 {
+		return token, year
+	}
+
+	if y, err := strconv.Atoi(str[len(str)-2 : len(str)]); err == nil {
+		year = y
+	} else {
+		return token, year
+	}
+
+	return str[2:], year
 }
 
 type EventDate struct {

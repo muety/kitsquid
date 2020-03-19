@@ -10,6 +10,7 @@ import (
 	"go.etcd.io/bbolt"
 	"reflect"
 	"regexp"
+	"sort"
 	"time"
 )
 
@@ -139,13 +140,15 @@ func Find(query *EventQuery) ([]*Event, error) {
 	return foundEvents, err
 }
 
-func Insert(event *Event, upsert bool) error {
+func Insert(event *Event, upsert bool, overwrite bool) error {
 	f := db.Insert
 
 	if upsert {
 		if existing, err := Get(event.Id); err == nil {
 			f = db.Upsert
-			updateEvent(event, existing)
+			if !overwrite {
+				updateEvent(event, existing)
+			}
 		}
 	}
 
@@ -154,7 +157,7 @@ func Insert(event *Event, upsert bool) error {
 	return f(event.Id, event)
 }
 
-func InsertMulti(events []*Event, upsert bool) error {
+func InsertMulti(events []*Event, upsert bool, overwrite bool) error {
 	f := db.TxInsert
 	if upsert {
 		f = db.TxUpsert
@@ -169,7 +172,9 @@ func InsertMulti(events []*Event, upsert bool) error {
 	for _, e := range events {
 		if upsert {
 			if existing, err := Get(e.Id); err == nil {
-				updateEvent(e, existing)
+				if !overwrite {
+					updateEvent(e, existing)
+				}
 			}
 		}
 
@@ -333,6 +338,58 @@ func GetLecturers() ([]*Lecturer, error) {
 
 	miscCache.SetDefault(cacheKey, lecturers)
 	return lecturers, nil
+}
+
+func GetSemesters() (Semesters, error) {
+	cacheKey := "get:semesters"
+	if fl, ok := miscCache.Get(cacheKey); ok {
+		return fl.(Semesters), nil
+	}
+
+	semesterMap := make(map[string]bool)
+	events, err := GetAll()
+	if err != nil {
+		return Semesters{}, err
+	}
+
+	for _, l := range events {
+		for _, s := range l.Semesters {
+			if _, ok := semesterMap[s]; !ok {
+				semesterMap[s] = true
+			}
+		}
+	}
+
+	semesters := Semesters{}
+	for k := range semesterMap {
+		semesters = append(semesters, k)
+	}
+	sort.Sort(sort.Reverse(semesters))
+
+	miscCache.SetDefault(cacheKey, semesters)
+	return semesters, nil
+}
+
+func GetCurrentSemester() (curr string, err error) {
+	cacheKey := "get:semester:current"
+	if s, ok := miscCache.Get(cacheKey); ok {
+		return s.(string), nil
+	}
+
+	allSemesters, err := GetSemesters()
+	if err == nil && len(allSemesters) > 0 {
+		curr = allSemesters[0]
+		miscCache.SetDefault(cacheKey, curr)
+	}
+
+	return curr, err
+}
+
+func MustGetCurrentSemester() string {
+	if s, err := GetCurrentSemester(); err == nil {
+		return s
+	}
+	return ""
 }
 
 func GetBookmark(key uint64) (*Bookmark, error) {

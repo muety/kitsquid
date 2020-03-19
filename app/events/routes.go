@@ -30,6 +30,10 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 func getEvents(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		eventQuery := buildEventQuery(c.Request.URL.Query())
+		if eventQuery.SemesterEq == "" {
+			eventQuery.SemesterEq = MustGetCurrentSemester()
+		}
+
 		events, err := Find(eventQuery)
 		if err != nil {
 			c.Error(err)
@@ -40,6 +44,7 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 		categories, _ := GetCategories()
 		types, _ := GetTypes()
 		lecturers, _ := GetLecturers()
+		semesters, _ := GetSemesters()
 
 		eventRatings := make(map[string]float32)
 		for _, e := range events {
@@ -57,6 +62,7 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 			"eventRatings": eventRatings,
 			"categories":   categories,
 			"lecturers":    lecturers,
+			"semesters":    semesters,
 			"limit":        eventQuery.Limit,
 			"offset":       eventQuery.Skip,
 			"tplCtx":       c.MustGet(config.TemplateContextKey),

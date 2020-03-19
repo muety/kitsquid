@@ -36,7 +36,7 @@ func registerEntities() {
 				if err := json.Unmarshal([]byte(value), &event); err != nil {
 					return err
 				}
-				return events.Insert(&event, true)
+				return events.Insert(&event, true, true)
 			},
 			Delete:  events.Delete,
 			Flush:   events.FlushCaches,

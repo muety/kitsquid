@@ -77,10 +77,12 @@ $(() => {
 
     // Filtering
     if (formFilter) {
-        for (let filter of ['type', 'category', 'lecturer_id']) {
+        for (let filter of ['type', 'category', 'lecturer_id', 'semester']) {
             let param = decodeURIComponent($.urlParam(filter) || '').split('+').join(' ')
             let optionExists = param && !!(formFilter.find(`#select-event-${filter} option[value="${param}"]`))
-            formFilter.find(`#select-event-${filter}`).val(optionExists ? param : '')
+            let first = formFilter.find(`#select-event-${filter} option`).first()
+            //formFilter.find(`#select-event-${filter}`).val(optionExists ? param : '')
+            formFilter.find(`#select-event-${filter}`).val(optionExists ? param : first.val())
         }
     }
 

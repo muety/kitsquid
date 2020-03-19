@@ -48,7 +48,7 @@ func _debugScrape() {
 	}
 	log.Flush()
 
-	if err := events.InsertMulti(result.([]*events.Event), true); err != nil {
+	if err := events.InsertMulti(result.([]*events.Event), true, false); err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
 }
@@ -67,7 +67,7 @@ func _debugScrapeDetails() {
 	log.Flush()
 
 	for _, l := range result.([]*events.Event) {
-		if err := events.Insert(l, true); err != nil {
+		if err := events.Insert(l, true, false); err != nil {
 			log.Errorf("failed to update lecture %s – %v\n", l.Id, err)
 		}
 	}
