@@ -22,7 +22,10 @@ func Init() {
 	cfg = config.Get()
 	router = gin.Default()
 
-	router.Use(gin.Recovery())
+	router.Use(
+		gin.Recovery(),
+		RemoteIp(),
+	)
 
 	ginviewConfig := goview.DefaultConfig
 	ginviewConfig.Root = "app/views"

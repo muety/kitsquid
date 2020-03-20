@@ -109,9 +109,10 @@ func getSignup(r *gin.Engine) func(c *gin.Context) {
 
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, "signup", gin.H{
-			"whitelist":  cfg.Auth.Whitelist,
-			"university": cfg.University,
-			"tplCtx":     c.MustGet(config.TemplateContextKey),
+			"whitelist":    cfg.Auth.Whitelist,
+			"university":   cfg.University,
+			"grecaptchaId": cfg.Recaptcha.ClientId,
+			"tplCtx":       c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
@@ -122,10 +123,24 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 
 	return func(c *gin.Context) {
 		var user User
+		var recaptcha recaptchaClientRequest
 
 		h := &gin.H{
-			"whitelist":  cfg.Auth.Whitelist,
-			"university": cfg.University,
+			"whitelist":    cfg.Auth.Whitelist,
+			"university":   cfg.University,
+			"grecaptchaId": cfg.Recaptcha.ClientId,
+		}
+
+		if err := c.ShouldBind(&recaptcha); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
+			return
+		}
+
+		if !ValidateRecaptcha(recaptcha.GRecaptchaToken, c.GetString(config.RemoteIpKey)) {
+			log.Errorf("recaptcha validation failed while trying to sign up user %s\n", user.Id)
+			util.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
+			return
 		}
 
 		if err := c.ShouldBind(&user); err != nil {

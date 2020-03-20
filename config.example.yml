@@ -45,6 +45,10 @@ auth:
       suffix-pattern: \@student.kit.edu$
       suffix-display: student.kit.edu
 
+recaptcha:
+  client_id: ""
+  client_secret: ""
+
 university:
   degrees:
     - Bachelor

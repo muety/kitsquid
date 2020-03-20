@@ -21,6 +21,7 @@ const (
 	SessionKey            = "kitsquid_session"
 	UserKey               = "user"
 	TemplateContextKey    = "tplCtx"
+	RemoteIpKey           = "remoteIp"
 	KitVvzBaseUrl         = "https://campus.kit.edu/sp/campus/all"
 	FacultyIdx            = 0
 	MaxEventSearchResults = 25

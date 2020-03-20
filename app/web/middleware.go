@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/n1try/kitsquid/app/config"
+	"strings"
 )
 
 func ErrorHandle() gin.HandlerFunc {
@@ -57,6 +58,24 @@ func TemplateContext() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tplCtx := GetTplCtx(c)
 		c.Set(config.TemplateContextKey, &tplCtx)
+		c.Next()
+	}
+}
+
+func RemoteIp() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		remoteIp := c.Request.RemoteAddr
+		if ip := c.GetHeader("X-Real-Ip"); ip != "" {
+			remoteIp = ip
+		} else if ip := c.GetHeader("X-Forwarded-For"); ip != "" {
+			remoteIp = ip
+		}
+
+		if strings.Contains(remoteIp, ":") {
+			remoteIp = strings.Split(remoteIp, ":")[0]
+		}
+
+		c.Set(config.RemoteIpKey, remoteIp)
 		c.Next()
 	}
 }

@@ -16,8 +16,8 @@ type Config struct {
 	Url  string `env:"KITSQUID_URL"`
 	Tls  struct {
 		Enable   bool   `default:"false" env:"KITSQUID_TLS"`
-		KeyPath  string `default:"etc/key.pem" env:"KITSQUID_TLS_KEY"`
-		CertPath string `default:"etc/cert.pem" env:"KITSQUID_TLS_CERT"`
+		KeyPath  string `default:"etc/key.pem" yaml:"key" env:"KITSQUID_TLS_KEY"`
+		CertPath string `default:"etc/cert.pem" yaml:"cert" env:"KITSQUID_TLS_CERT"`
 	}
 	Db struct {
 		Path     string `default:"kitsquid.db" env:"KITSQUID_DB_FILE"`
@@ -47,8 +47,12 @@ type Config struct {
 		}
 		Whitelist []common.UserWhitelistItem
 	}
+	Recaptcha struct {
+		ClientId     string `yaml:"client_id" env:"KITSQUAD_RECAPTCHA_ID"`
+		ClientSecret string `yaml:"client_secret" env:"KITSQUAD_RECAPTCHA_SECRET"`
+	}
 	Misc struct {
-		Pagesize int
+		Pagesize int `default:"50"`
 	}
 	University struct {
 		Majors               []string

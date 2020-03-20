@@ -39,6 +39,14 @@ type passwordChange struct {
 	NewPassword string `form:"new" binding:"required"`
 }
 
+type recaptchaClientRequest struct {
+	GRecaptchaToken string `form:"grecaptcha-token" binding:"required"`
+}
+
+type recaptchaApiResponse struct {
+	Success bool `json:"success" binding:"required"`
+}
+
 type UserValidator func(s *User) bool
 
 type UserResolver func(id string) (*User, error)

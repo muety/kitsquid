@@ -95,6 +95,7 @@
                 </button>
             </div>
             <input type="hidden" value="" id="input-signup-user" name="user">
+            <input type="hidden" id="input-signup-grecaptcha-token" name="grecaptcha-token">
         </form>
     </div>
 
@@ -103,5 +104,14 @@
         {{ range .whitelist }}
         window.signupConfig['{{ .MailSuffixDisplay }}'] = ['{{ .MailPrefixDisplay }}', '{{ .MailPrefixPattern }}']
         {{- end }}
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js?render={{ .grecaptchaId }}"></script>
+    <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ .grecaptchaId }}', {action: 'homepage'}).then(function(token) {
+                $('#input-signup-grecaptcha-token').val(token)
+            });
+        });
     </script>
 {{ end }}
