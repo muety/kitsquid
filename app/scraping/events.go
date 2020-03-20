@@ -2,6 +2,7 @@ package scraping
 
 import (
 	"context"
+	"fmt"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
 	model "github.com/n1try/kitsquid/app/events"
@@ -161,6 +162,7 @@ func (l listEventFacultiesJob) process() (interface{}, error) {
 
 	reGguid := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 	reTitle := regexp.MustCompile(`.+ \((.+)\)`)
+	reSemester := regexp.MustCompile(`(SS|WS) (\d{2}\/?\d{2})`)
 
 	u, _ := url.Parse(facultiesUrl)
 	q := u.Query()
@@ -184,7 +186,15 @@ func (l listEventFacultiesJob) process() (interface{}, error) {
 
 	matches := reTitle.FindStringSubmatch(htmlquery.InnerText(h1))
 	if len(matches) == 2 {
-		semester = strings.ReplaceAll(matches[1], " ", "")
+		matches2 := reSemester.FindStringSubmatch(matches[1])
+		if len(matches2) == 3 {
+			if matches2[1] == "SS" {
+				matches2[2] = matches2[2][2:]
+			}
+			semester = fmt.Sprintf("%s %s", matches2[1], matches2[2])
+		} else {
+			log.Errorf("failed to parse title for tguid for %s\n", l.Tguid)
+		}
 	} else {
 		log.Errorf("failed to parse title for tguid for %s\n", l.Tguid)
 	}

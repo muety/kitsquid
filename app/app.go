@@ -6,6 +6,7 @@ import (
 	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
+	"github.com/n1try/kitsquid/app/migrations"
 	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/n1try/kitsquid/app/web"
@@ -27,5 +28,6 @@ func init() {
 }
 
 func Run() {
+	migrations.RunAll()
 	web.Start()
 }
