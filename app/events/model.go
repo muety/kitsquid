@@ -65,7 +65,7 @@ func (s Semesters) Less(i, j int) bool {
 	token2, year2 := s.split(s[j])
 
 	if year1 == year2 {
-		if token1 == "WS" && token2 == "SS" {
+		if token1 == "SS" && token2 == "WS" {
 			return true
 		}
 	}
