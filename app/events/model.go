@@ -65,7 +65,7 @@ func (s Semesters) Less(i, j int) bool {
 	token2, year2 := s.split(s[j])
 
 	if year1 == year2 {
-		if token1 == "SS" && token2 == "WS" {
+		if token1 == "WS" && token2 == "SS" {
 			return true
 		}
 	}
@@ -74,7 +74,7 @@ func (s Semesters) Less(i, j int) bool {
 }
 
 func (s Semesters) split(str string) (token string, year int) {
-	if len(str) != 4 && len(str) != 7 {
+	if len(str) != 5 && len(str) != 8 {
 		return token, year
 	}
 
@@ -84,7 +84,7 @@ func (s Semesters) split(str string) (token string, year int) {
 		return token, year
 	}
 
-	return str[2:], year
+	return str[:2], year
 }
 
 type EventDate struct {
