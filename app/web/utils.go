@@ -16,17 +16,18 @@ import (
 
 func GetFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"add":         add,
-		"in":          in,
-		"strIndex":    strIndex,
-		"strRemove":   strRemove,
-		"strSplit":    strings.Split,
-		"strPrefix":   strings.HasPrefix,
-		"htmlSafe":    htmlSafe,
-		"randomColor": util.RandomColor,
-		"paginate":    paginate,
-		"date":        formatDate,
-		"noescape":    noescape,
+		"add":           add,
+		"in":            in,
+		"strIndex":      strIndex,
+		"strRemove":     strRemove,
+		"strSplit":      strings.Split,
+		"strPrefix":     strings.HasPrefix,
+		"strCapitalize": strings.Title,
+		"htmlSafe":      htmlSafe,
+		"randomColor":   util.RandomColor,
+		"paginate":      paginate,
+		"date":          formatDate,
+		"noescape":      noescape,
 	}
 }
 

@@ -98,6 +98,21 @@ func GetAll() ([]*Review, error) {
 	return Find(&ReviewQuery{})
 }
 
+func Count() int {
+	cacheKey := "count"
+	if c, ok := reviewsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAll()
+	if err != nil {
+		return -1
+	}
+
+	reviewsCache.SetDefault(cacheKey, len(all))
+	return len(all)
+}
+
 func GetAverages(eventId string) (map[string]float32, error) {
 	cacheKey := fmt.Sprintf("avg:%s", eventId)
 	if avg, ok := reviewsCache.Get(cacheKey); ok {

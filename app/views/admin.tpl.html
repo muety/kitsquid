@@ -1,7 +1,18 @@
 {{ define "content" }}
     <h1 class="text-2xl inline-block border-b-4 border-kit">Admin</h1>
     <div>
-        <div class="w-full flex mt-8">
+        <h2 class="text-lg inline-block border-b-2 border-kit mt-8 mb-4">Stats</h2>
+        <div class="flex flex-wrap justify-start w-full items-center">
+            {{ range $k, $v := .counters }}
+            <div class="flex flex-col items-center bg-gray-700 p-2 rounded mr-4" style="min-width: 70px;">
+                <div class="text-kit text-4xl text-center">{{ $v }}</div>
+                <div class="text-2xs text-center" style="margin-top: -10px">{{ $k | strCapitalize }}</div>
+            </div>
+            {{ end }}
+        </div>
+
+        <h2 class="text-lg inline-block border-b-2 border-kit mt-8 mb-4">Quick Actions</h2>
+        <div class="w-full flex">
             <button class="border-2 border-kit hover:border-kit-dark font-semibold text-gray-300 py-1 px-4 rounded-full mr-2">
                 Reindex
             </button>

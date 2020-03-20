@@ -149,6 +149,21 @@ func GetAll() ([]*User, error) {
 	return all, nil
 }
 
+func Count() int {
+	cacheKey := "count"
+	if c, ok := usersCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAll()
+	if err != nil {
+		return -1
+	}
+
+	usersCache.SetDefault(cacheKey, len(all))
+	return len(all)
+}
+
 func Insert(user *User, upsert bool) error {
 	usersCache.Flush()
 

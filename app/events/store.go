@@ -140,6 +140,21 @@ func Find(query *EventQuery) ([]*Event, error) {
 	return foundEvents, err
 }
 
+func Count() int {
+	cacheKey := "count"
+	if c, ok := eventsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAll()
+	if err != nil {
+		return -1
+	}
+
+	eventsCache.SetDefault(cacheKey, len(all))
+	return len(all)
+}
+
 func Insert(event *Event, upsert bool, overwrite bool) error {
 	f := db.Insert
 
@@ -213,41 +228,22 @@ func updateEvent(newEvent, existingEvent *Event) {
 }
 
 func GetFaculties() ([]string, error) {
-	cacheKey := "get:faculties"
-	if fl, ok := miscCache.Get(cacheKey); ok {
-		return fl.([]string), nil
-	}
-
-	facultyMap := make(map[string]bool)
-	events, err := GetAll()
-	if err != nil {
-		return []string{}, err
-	}
-
-	for _, l := range events {
-		if len(l.Categories) > config.FacultyIdx {
-			if _, ok := facultyMap[l.Categories[config.FacultyIdx]]; !ok {
-				facultyMap[l.Categories[config.FacultyIdx]] = true
-			}
-		}
-	}
-
-	var i int
-	faculties := make([]string, len(facultyMap))
-	for k := range facultyMap {
-		faculties[i] = k
-		i++
-	}
-
-	miscCache.SetDefault(cacheKey, faculties)
-	return faculties, nil
+	return GetCategoriesAtIndex(config.FacultyIdx)
 }
 
 func CountFaculties() int {
-	if fl, err := GetFaculties(); err == nil {
-		return len(fl)
+	cacheKey := "count:faculties"
+	if c, ok := miscCache.Get(cacheKey); ok {
+		return c.(int)
 	}
-	return 0
+
+	all, err := GetFaculties()
+	if err != nil {
+		return -1
+	}
+
+	miscCache.SetDefault(cacheKey, len(all))
+	return len(all)
 }
 
 func GetCategories() ([]string, error) {
@@ -260,7 +256,7 @@ func GetCategories() ([]string, error) {
 
 	for i := 0; ; i++ {
 		batch, err := GetCategoriesAtIndex(i)
-		if err != nil || len(categories) == 0 {
+		if err != nil || len(batch) == 0 {
 			break
 		}
 		categories = append(categories, batch...)
@@ -299,6 +295,21 @@ func GetCategoriesAtIndex(index int) ([]string, error) {
 
 	miscCache.SetDefault(cacheKey, categories)
 	return categories, nil
+}
+
+func CountCategories() int {
+	cacheKey := "count:categories"
+	if c, ok := miscCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetCategories()
+	if err != nil {
+		return -1
+	}
+
+	miscCache.SetDefault(cacheKey, len(all))
+	return len(all)
 }
 
 func GetTypes() ([]string, error) {
@@ -473,6 +484,21 @@ func FindBookmarks(userId string) ([]*Bookmark, error) {
 
 	bookmarksCache.SetDefault(cacheKey, bookmarks)
 	return bookmarks, nil
+}
+
+func CountBookmarks() int {
+	cacheKey := "count"
+	if c, ok := bookmarksCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAllBookmarks()
+	if err != nil {
+		return -1
+	}
+
+	bookmarksCache.SetDefault(cacheKey, len(all))
+	return len(all)
 }
 
 func InsertBookmark(bookmark *Bookmark) error {

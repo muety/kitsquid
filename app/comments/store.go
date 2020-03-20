@@ -123,6 +123,21 @@ func GetAll() ([]*Comment, error) {
 	return all, nil
 }
 
+func Count() int {
+	cacheKey := "count"
+	if c, ok := commentsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAll()
+	if err != nil {
+		return -1
+	}
+
+	commentsCache.SetDefault(cacheKey, len(all))
+	return len(all)
+}
+
 func Insert(comment *Comment, upsert bool) error {
 	commentsCache.Flush()
 

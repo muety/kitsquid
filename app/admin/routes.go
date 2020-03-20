@@ -3,10 +3,13 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
+	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
+	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/scraping"
+	"github.com/n1try/kitsquid/app/users"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,8 +28,20 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 
 func getIndex(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
+
+		counters := map[string]int{
+			"events":     events.Count(),
+			"categories": events.CountCategories(),
+			"faculties":  events.CountFaculties(),
+			"bookmarks":  events.CountBookmarks(),
+			"comments":   comments.Count(),
+			"reviews":    reviews.Count(),
+			"users":      users.Count(),
+		}
+
 		c.HTML(http.StatusOK, "admin", gin.H{
 			"entities": entities,
+			"counters": counters,
 			"tplCtx":   c.MustGet(config.TemplateContextKey),
 		})
 	}
