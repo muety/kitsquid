@@ -2,8 +2,10 @@ package web
 
 import (
 	"context"
+	"fmt"
 	"github.com/foolin/goview"
 	"github.com/foolin/goview/supports/ginview"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kitsquid/app/config"
@@ -22,8 +24,15 @@ func Init() {
 	cfg = config.Get()
 	router = gin.Default()
 
+	corsCfg := cors.DefaultConfig()
+	corsCfg.AllowOrigins = []string{cfg.Url}
+	if cfg.IsDev() {
+		corsCfg.AllowOrigins = append(corsCfg.AllowOrigins, fmt.Sprintf("http://localhost:%d", cfg.Port))
+	}
+
 	router.Use(
 		gin.Recovery(),
+		cors.New(corsCfg),
 		RemoteIp(),
 	)
 
