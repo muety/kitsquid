@@ -18,11 +18,12 @@ var Messages = map[string]string{
 }
 
 const (
-	SessionKey         = "kitsquid_session"
-	UserKey            = "user"
-	TemplateContextKey = "tplCtx"
-	KitVvzBaseUrl      = "https://campus.kit.edu/sp/campus/all"
-	FacultyIdx         = 0
+	SessionKey            = "kitsquid_session"
+	UserKey               = "user"
+	TemplateContextKey    = "tplCtx"
+	KitVvzBaseUrl         = "https://campus.kit.edu/sp/campus/all"
+	FacultyIdx            = 0
+	MaxEventSearchResults = 25
 )
 
 var (

@@ -271,9 +271,9 @@ function renderSearchResultItem(data) {
                             <div class="inline-block py-1 px-2 bg-gray-400 rounded text-2xs text-gray-700 font-semibold text-center" title="${data.type}">
                                 <span class="cursor-default">${data.type[0]}</span>
                             </div>
-                            <div class="ml-3">[${data.id}] ${data.name}</div>
-                            <div class="ml-3">
-                                <span class="text-xs whitespace-no-wrap">
+                            <div class="ml-3 w-3/4 truncate">[${data.id}] ${data.name}</div>
+                            <div class="ml-3 w-1/4 truncate">
+                                <span class="text-2xs whitespace-no-wrap truncate">
                                     <i class="icon-person"></i>
                                     <span>${data.lecturers.join(', ')}</span>
                                 </span>

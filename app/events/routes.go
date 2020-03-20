@@ -175,7 +175,7 @@ func apiSearchEvents(r *gin.Engine) func(c *gin.Context) {
 		// TODO: Add ability to search by ID
 		eventQuery := &EventQuery{
 			NameLike: values.Get("q"),
-			Limit:    10,
+			Limit:    config.MaxEventSearchResults,
 		}
 
 		events, err := Find(eventQuery)
