@@ -2,6 +2,17 @@
 
 const KEY_MAIN_RATING = 'overall'
 
+function isIE() {
+    var nav = navigator.userAgent.toLowerCase()
+    return nav.indexOf('msie') !== -1 || nav.indexOf('trident') !== -1
+}
+
+window.onload = function () {
+    if (isIE()) {
+        document.getElementById('browser-notice').classList.remove('hidden')
+    }
+}
+
 $(() => {
     const inputSignupPrefix = $('#input-signup-prefix'),
         inputSignupSuffix = $('#input-signup-suffix'),
@@ -239,6 +250,7 @@ function toggleBookmarkEvent(id) {
 }
 
 let snackBarTimeout
+
 function showSnackbar(text) {
     if (snackBarTimeout) {
         clearTimeout(snackBarTimeout)
