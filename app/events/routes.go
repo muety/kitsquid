@@ -40,7 +40,7 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		categories, _ := GetCategories()
+		categories, _ := GetCategoriesAtIndex(config.FacultyIdx) // Top-level categories only
 		types, _ := GetTypes()
 		lecturers, _ := GetLecturers()
 		semesters, _ := GetSemesters()

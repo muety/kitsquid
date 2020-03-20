@@ -256,6 +256,26 @@ func GetCategories() ([]string, error) {
 		return fl.([]string), nil
 	}
 
+	categories := make([]string, 0)
+
+	for i := 0; ; i++ {
+		batch, err := GetCategoriesAtIndex(i)
+		if err != nil || len(categories) == 0 {
+			break
+		}
+		categories = append(categories, batch...)
+	}
+
+	miscCache.SetDefault(cacheKey, categories)
+	return categories, nil
+}
+
+func GetCategoriesAtIndex(index int) ([]string, error) {
+	cacheKey := fmt.Sprintf("get:categories:index:%d", index)
+	if fl, ok := miscCache.Get(cacheKey); ok {
+		return fl.([]string), nil
+	}
+
 	categoryMap := make(map[string]bool)
 	events, err := GetAll()
 	if err != nil {
@@ -263,9 +283,9 @@ func GetCategories() ([]string, error) {
 	}
 
 	for _, l := range events {
-		for _, c := range l.Categories {
-			if _, ok := categoryMap[c]; !ok {
-				categoryMap[c] = true
+		if len(l.Categories) > index {
+			if _, ok := categoryMap[l.Categories[index]]; !ok {
+				categoryMap[l.Categories[index]] = true
 			}
 		}
 	}
