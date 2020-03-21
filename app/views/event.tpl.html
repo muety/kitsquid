@@ -117,7 +117,7 @@
                         {{ if .tplCtx.User }}
                             <form action="/comments" method="post" id="form-comments">
                                 <textarea id="input-comment-text" name="text"
-                                          class="w-full focus:shadow-md rounded border border-gray-600 p-4 bg-gray-800"
+                                          class="w-full focus:shadow-md rounded border border-gray-600 p-4 bg-gray-800 text-sm"
                                           placeholder="Schreibe einen Kommentar zu dieser Veranstaltung. Was hat dir (nicht) gefallen? Welche Tipps kannst du deinen Kommilitonen geben?" required></textarea>
                                 <input type="hidden" name="event_id" value="{{ .event.Id }}">
                                 <button id="btn-comments-submit"
@@ -130,23 +130,32 @@
                         {{ if and .tplCtx.User .comments }}
                             <div class="mt-16 flex flex-col">
                                 {{ range .comments }}
+                                    {{ if index $.userMap .UserId }}
                                     <div class="w-full relative border border-gray-600 rounded-lg p-4 bg-gray-800 text-sm my-2">
-                                        <div class="w-full flex items-center mb-1">
-                                            <p class="text-kit font-semibold mr-1">{{ index (strSplit .UserId "@") 0 }}</p>
-                                            <p class="text-2xs ml-1 flex-grow text-gray-500">{{ .CreatedAt | date }}</p>
-                                            {{ if eq .UserId $.tplCtx.User.Id }}
-                                                <form action="/comments/delete" method="post" class="m-0">
-                                                    <input type="hidden" name="id" value="{{ .Id }}">
-                                                    <p>
-                                                        <button type="submit"><i class="icon-trash-empty mr-1"></i>
-                                                        </button>
-                                                    </p>
-                                                </form>
-                                            {{ end }}
-                                            <p class="text-kit font-semibold" title="{{ .Id }}">#{{ .Index }}</p>
+                                        <div class="flex items-center">
+                                            <div class="mr-1" title="{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }} ({{ (index $.userMap .UserId).Degree }} {{ (index $.userMap .UserId).Major }})">
+                                                <img src="https://avatars.dicebear.com/v2/{{ (index $.userMap .UserId).Gender }}/{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }}.svg" class="w-8 rounded-full border-2 border-gray-500 mr-3">
+                                            </div>
+                                            <div class="w-full ml-1">
+                                                <div class="w-full flex items-center mb-1">
+                                                    <p class="text-kit font-semibold mr-1" title="{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }} ({{ (index $.userMap .UserId).Degree }} {{ (index $.userMap .UserId).Major }})">{{ index (strSplit .UserId "@") 0 }}</p>
+                                                    <p class="text-2xs ml-1 flex-grow text-gray-500">{{ .CreatedAt | date }}</p>
+                                                    {{ if eq .UserId $.tplCtx.User.Id }}
+                                                        <form action="/comments/delete" method="post" class="m-0">
+                                                            <input type="hidden" name="id" value="{{ .Id }}">
+                                                            <p>
+                                                                <button type="submit"><i class="icon-trash-empty mr-1"></i>
+                                                                </button>
+                                                            </p>
+                                                        </form>
+                                                    {{ end }}
+                                                    <p class="text-kit font-semibold" title="{{ .Id }}">#{{ .Index }}</p>
+                                                </div>
+                                                <p>{{ .Text | noescape }}</p>
+                                            </div>
                                         </div>
-                                        <p>{{ .Text | noescape }}</p>
                                     </div>
+                                    {{ end }}
                                 {{ end }}
                             </div>
                         {{ else if and .tplCtx.User (not .comments) }}

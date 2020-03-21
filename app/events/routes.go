@@ -136,14 +136,21 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 
 		var comms []*comments.Comment
 		var userReview *reviews.Review
+		var userMap map[string]*users.User
 		var averageRatings map[string]float32
 
 		if user != nil {
 			comms, err = comments.Find(&comments.CommentQuery{
 				EventIdEq: event.Id,
-				UserIdEq:  user.Id,
 				ActiveEq:  true,
 			})
+
+			userMap = make(map[string]*users.User)
+			for _, c := range comms {
+				if u, err := users.Get(c.UserId); err == nil {
+					userMap[u.Id] = u
+				}
+			}
 
 			userReview, err = reviews.Get(fmt.Sprintf("%s:%s", user.Id, event.Id))
 
@@ -160,6 +167,7 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			"event":          event,
 			"bookmarked":     bookmarked,
 			"comments":       comms,
+			"userMap":        userMap,
 			"userReview":     userReview,
 			"averageRatings": averageRatings,
 			"semesterQuery":  semester,
