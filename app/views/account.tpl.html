@@ -1,30 +1,91 @@
 {{ define "content" }}
     <div class="px-4">
-    <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Account</h1>
-    <div>
-        <h2 class="text-lg inline-block text-kit mb-2">Passwort ändern</h2>
-        <form id="form-password-change" action="/account" method="post">
+        <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Account</h1>
+        <form id="form-account-change" action="/account" method="post">
             <div class="w-full lg:w-2/3">
+                <h2 class="text-lg inline-block text-kit mb-2">Persönliche Angaben</h2>
+                <div class="mb-8">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Dein Geschlecht</label>
+                    <fieldset id="fs-account-gender">
+                        <div class="flex justify-around">
+                            <label class="mx-3" for="gender-male">
+                                <input class="form-radio" type="radio" name="gender" value="male" id="gender-male"
+                                       {{ if eq .tplCtx.User.Gender "male" }}checked{{ end }}>
+                                <span class="ml-2">Männlich</span>
+                            </label>
+                            <label class="mx-3" for="gender-female">
+                                <input class="form-radio" type="radio" name="gender" value="female" id="gender-female"
+                                       {{ if eq .tplCtx.User.Gender "female" }}checked{{ end }}>
+                                <span class="ml-2">Weiblich</span>
+                            </label>
+                            <label class="mx-3" for="gender-human">
+                                <input class="form-radio" type="radio" name="gender" value="human" id="gender-human"
+                                       {{ if eq .tplCtx.User.Gender "human" }}checked{{ end }}>
+                                <span class="ml-2">Divers</span>
+                            </label>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="mb-8">
+                    <label class="block text-gray-300 text-sm font-bold mb-2" for="input-account-major">Dein
+                        Studiengang</label>
+                    <div class="relative">
+                        <select class="bg-gray-900 cursor-pointer shadow-md appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-1 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
+                                name="major" id="input-account-major" required>
+                            {{ range .university.Majors }}
+                                <option {{ if eq . $.tplCtx.User.Major }}selected{{ end }}>{{ . }}</option>
+                            {{ end }}
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-300">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Du studierst im ...</label>
+                    <fieldset id="fs-account-degree">
+                        <div class="flex justify-around">
+                            {{ range $i, $d := .university.Degrees }}
+                                <label class="mx-3" for="degree-{{ $d }}">
+                                    <input class="form-radio" type="radio" name="degree" value="{{ $d }}"
+                                           id="degree-{{ $d }}" {{ if eq $.tplCtx.User.Degree $d }}checked{{ end }}>
+                                    <span class="ml-2">{{ $d }}</span>
+                                </label>
+                            {{ end }}
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-2/3 mt-12">
+                <h2 class="text-lg inline-block text-kit mb-2">Passwort ändern</h2>
                 <div class="flex w-full">
                     <div class="w-1/2 pr-2">
                         <label class="block text-gray-300 text-sm font-bold mb-2" for="input-password-old">Altes
                             Passwort</label>
-                        <input type="password" id="input-password-old" placeholder="********" name="old" pattern="^[.*\S]{8,}$" class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-1 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <input type="password" id="input-password-old" placeholder="********" name="old"
+                               pattern="^[.*\S]{8,}$"
+                               class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-1 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
+                               required>
                     </div>
                     <div class="w-1/2 pl-2">
                         <label class="block text-gray-300 text-sm font-bold mb-2" for="input-password-new">Neues
                             Passwort</label>
-                        <input type="password" id="input-password-new" placeholder="********" name="new" pattern="^[.*\S]{8,}$" class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-1 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <input type="password" id="input-password-new" placeholder="********" name="new"
+                               pattern="^[.*\S]{8,}$"
+                               class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-1 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
+                               required>
                     </div>
                 </div>
-                <div class="w-full flex justify-end mt-8">
-                    <button class="bg-kit hover:bg-kit-dark text-white font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
-                            type="submit">
-                        Speichern
-                    </button>
-                </div>
+            </div>
+            <div class="w-full lg:w-2/3 flex justify-end mt-12">
+                <button class="bg-kit hover:bg-kit-dark text-white font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
+                        type="submit">
+                    Speichern
+                </button>
             </div>
         </form>
-    </div>
     </div>
 {{ end }}

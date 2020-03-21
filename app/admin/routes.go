@@ -37,6 +37,7 @@ func getIndex(r *gin.Engine) func(c *gin.Context) {
 			"comments":   comments.Count(),
 			"reviews":    reviews.Count(),
 			"users":      users.Count(),
+			"admins":     users.CountAdmins(),
 		}
 
 		c.HTML(http.StatusOK, "admin", gin.H{

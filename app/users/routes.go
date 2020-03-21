@@ -119,7 +119,7 @@ func getSignup(r *gin.Engine) func(c *gin.Context) {
 
 func postSignup(r *gin.Engine) func(c *gin.Context) {
 	cfg := config.Get()
-	validator := NewUserValidator(cfg)
+	validator := NewUserValidator(cfg, true)
 
 	return func(c *gin.Context) {
 		var user User
@@ -159,9 +159,9 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		// Make double-sure
-		user.Admin = false
-		user.Active = false
+		if u, err := Get(user.Id); err != nil || !u.Admin {
+			user.Admin = false
+		}
 
 		if err := Insert(&user, false); err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -196,17 +196,19 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 func getAccount(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, "account", gin.H{
-			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"university": cfg.University,
+			"tplCtx":     c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
 
 func postAccount(r *gin.Engine) func(c *gin.Context) {
 	cfg := config.Get()
-	validator := NewUserCredentialsValidator(cfg)
+	userValidator := NewUserValidator(cfg, false)
+	pwValidator := NewUserCredentialsValidator(cfg, true)
 
 	return func(c *gin.Context) {
-		var change passwordChange
+		var change accountChange
 
 		u, _ := c.Get(config.UserKey)
 		user := u.(*User)
@@ -218,19 +220,36 @@ func postAccount(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		if !CheckPasswordHash(user, change.OldPassword) {
-			util.MakeError(c, "account", http.StatusUnauthorized, errors.Unauthorized{}, nil)
-			return
+		if change.OldPassword != "" && change.NewPassword != "" {
+			if !CheckPasswordHash(user, change.OldPassword) {
+				util.MakeError(c, "account", http.StatusUnauthorized, errors.Unauthorized{}, nil)
+				return
+			}
+
+			if !user.HasValidCredentials(pwValidator) {
+				util.MakeError(c, "account", http.StatusBadRequest, errors.BadRequest{}, nil)
+				return
+			}
+
+			user.Password = change.NewPassword
+			if err := HashPassword(user); err != nil {
+				util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
+				return
+			}
 		}
 
-		if !user.HasValidCredentials(validator) {
+		if change.Gender != "" {
+			user.Gender = change.Gender
+		}
+		if change.Major != "" {
+			user.Major = change.Major
+		}
+		if change.Degree != "" {
+			user.Degree = change.Degree
+		}
+
+		if !user.IsValid(userValidator) {
 			util.MakeError(c, "account", http.StatusBadRequest, errors.BadRequest{}, nil)
-			return
-		}
-
-		user.Password = change.NewPassword
-		if err := HashPassword(user); err != nil {
-			util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
 			return
 		}
 
@@ -242,7 +261,7 @@ func postAccount(r *gin.Engine) func(c *gin.Context) {
 
 		c.HTML(http.StatusOK, "redirect", gin.H{
 			"tplCtx": c.MustGet(config.TemplateContextKey),
-			"url":    "/account?alert=password_change_success",
+			"url":    "/account?alert=account_change_success",
 		})
 	}
 }

@@ -34,9 +34,12 @@ type Login struct {
 	Password string `form:"password" binding:"required"`
 }
 
-type passwordChange struct {
-	OldPassword string `form:"old" binding:"required"`
-	NewPassword string `form:"new" binding:"required"`
+type accountChange struct {
+	OldPassword string `form:"old"`
+	NewPassword string `form:"new"`
+	Gender      string `form:"gender"`
+	Major       string `form:"major"`
+	Degree      string `form:"degree"`
 }
 
 type recaptchaClientRequest struct {

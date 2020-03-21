@@ -54,7 +54,7 @@ func FlushCaches() {
 
 func setup() {
 	if cfg.Auth.Admin.User != "" {
-		if _, err := Get(cfg.Auth.Admin.User); err != nil {
+		if u, err := Get(cfg.Auth.Admin.User); err != nil || !u.Admin {
 			log.Infof("creating admin user %s", cfg.Auth.Admin.User)
 			admin := &User{
 				Id:        cfg.Auth.Admin.User,
@@ -72,7 +72,7 @@ func setup() {
 				return
 			}
 
-			if err := Insert(admin, false); err != nil {
+			if err := Insert(admin, true); err != nil {
 				log.Errorf("failed to create admin user – %v\n", err)
 				return
 			}
@@ -157,6 +157,21 @@ func Count() int {
 
 	all, err := GetAll()
 	if err != nil {
+		return -1
+	}
+
+	usersCache.SetDefault(cacheKey, len(all))
+	return len(all)
+}
+
+func CountAdmins() int {
+	cacheKey := "count:admins"
+	if c, ok := usersCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	var all []*User
+	if err := db.Find(&all, bolthold.Where("Admin").Eq(true)); err != nil {
 		return -1
 	}
 

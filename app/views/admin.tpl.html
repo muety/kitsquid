@@ -1,10 +1,10 @@
 {{ define "content" }}
     <h1 class="text-2xl inline-block border-b-4 border-kit">Admin</h1>
     <div>
-        <h2 class="text-lg inline-block border-b-2 border-kit mt-8 mb-4">Stats</h2>
+        <h2 class="text-lg inline-block border-b-2 border-kit mt-8">Stats</h2>
         <div class="flex flex-wrap justify-start w-full items-center">
             {{ range $k, $v := .counters }}
-            <div class="flex flex-col items-center bg-gray-700 p-2 rounded mr-4" style="min-width: 70px;">
+            <div class="flex flex-col items-center bg-gray-700 p-2 rounded mr-4 mt-4" style="min-width: 70px;">
                 <div class="text-kit text-4xl text-center">{{ $v }}</div>
                 <div class="text-2xs text-center" style="margin-top: -10px">{{ $k | strCapitalize }}</div>
             </div>
@@ -68,7 +68,7 @@
                                    class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-2 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
 
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between">
                             <label for="textarea-admin-browser-value" class="w-1/4">Value:</label>
                             <textarea id="textarea-admin-browser-value" placeholder="{}"
                                       class="bg-gray-900 appearance-none border border-gray-600 placeholder-gray-600 rounded w-full py-2 px-2 leading-tight focus:outline-none focus:shadow-outline text-sm"
@@ -76,22 +76,22 @@
                         </div>
 
                         <div class="flex items-center flex-wrap justify-end">
-                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('get')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('get')">
                                 Get
                             </button>
-                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('list')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('list')">
                                 List
                             </button>
-                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('put')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('put')">
                                 Put
                             </button>
-                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('delete')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('delete')">
                                 Delete
                             </button>
-                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('flush')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('flush')">
                                 Flush
                             </button>
-                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4" onclick="browse('reindex')">
+                            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('reindex')">
                                 Reindex
                             </button>
                         </div>

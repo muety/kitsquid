@@ -29,7 +29,7 @@ func getHttpClient() *http.Client {
 	return client
 }
 
-func NewUserValidator(cfg *config.Config) UserValidator {
+func NewUserValidator(cfg *config.Config, checkPw bool) UserValidator {
 	return func(u *User) bool {
 		if !util.ContainsString(u.Degree, cfg.University.Degrees) ||
 			!util.ContainsString(u.Major, cfg.University.Majors) ||
@@ -37,18 +37,18 @@ func NewUserValidator(cfg *config.Config) UserValidator {
 			return false
 		}
 
-		return NewUserCredentialsValidator(cfg)(u)
+		return NewUserCredentialsValidator(cfg, checkPw)(u)
 	}
 }
 
-func NewUserCredentialsValidator(cfg *config.Config) UserCredentialsValidator {
+func NewUserCredentialsValidator(cfg *config.Config, checkPw bool) UserCredentialsValidator {
 	return func(u *User) bool {
 		whitelist := cfg.Auth.Whitelist
 
 		for _, w := range whitelist {
 			if w.MailDomainRegex().Match([]byte(u.Id)) &&
 				w.MailLocalPartRegex().Match([]byte(u.Id)) &&
-				w.PasswordRegex().Match([]byte(u.Password)) {
+				(!checkPw || w.PasswordRegex().Match([]byte(u.Password))) {
 				return true
 			}
 		}
