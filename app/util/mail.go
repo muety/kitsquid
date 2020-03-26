@@ -4,12 +4,17 @@ import (
 	"bytes"
 	log "github.com/golang/glog"
 	"github.com/n1try/kitsquid/app/config"
+	"net/mail"
 	"net/smtp"
 	"text/template"
 )
 
 func SendMail(recipient string, content *bytes.Buffer) error {
 	cfg := config.Get()
+
+	if _, err := mail.ParseAddress(recipient); err != nil {
+		return err
+	}
 
 	return smtp.SendMail(
 		cfg.SmtpHost(),
