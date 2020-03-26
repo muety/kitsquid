@@ -75,7 +75,7 @@
                                       style="min-height: 200px"></textarea>
                         </div>
 
-                        <div class="flex items-center flex-wrap justify-end">
+                        <div class="flex items-center flex-wrap justify-end mb-2">
                             <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full ml-4 mt-2" onclick="browse('get')">
                                 Get
                             </button>
@@ -101,6 +101,16 @@
                 <textarea id="textarea-admin-browser-result" class="bg-gray-900 w-full h-full py-2 px-4 border border-gray-600 placeholder-gray-600 rounded text-xs" placeholder="Data View" readonly></textarea>
             </div>
         </div>
+
+        <h2 class="text-lg inline-block border-b-2 border-kit mt-8 mb-4">Send Test E-Mail</h2>
+        <div class="flex flex-wrap w-full items-center">
+            <label for="input-admin-mail-recipient" class="mr-2">To: </label>
+            <input id="input-admin-mail-recipient" type="email" class="flex-grow lg:flex-grow-0 bg-gray-900 appearance-none border border-gray-600 rounded py-2 px-2 mr-2 text-sm leading-tight focus:outline-none focus:shadow-outline" placeholder="E.g. foo@bar.com" required>
+            <button class="border-2 border-kit hover:border-kit-dark text-gray-300 font-semibold px-4 rounded-full h-10" onclick="sendTestMail()">
+                Send
+            </button>
+        </div>
+
     </div>
 
     <script src="/assets/js/admin.js"></script>

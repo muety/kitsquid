@@ -95,6 +95,32 @@ function scrape() {
         })
 }
 
+function sendTestMail() {
+    const re = /\S+@\S+\.\S+/
+    let recipient = $('#input-admin-mail-recipient').val()
+
+    if (!re.test(recipient)) {
+        showSnackbar('Invalid mail address')
+        return
+    }
+
+    fetch(`/api/admin/test_mail?to=${recipient}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    showSnackbar(`Fehler: ${data.error}`)
+                })
+            } else if (response.status >= 200 && response.status <= 299) {
+                showSnackbar('Gesendet')
+            }
+        })
+        .catch(() => {
+            showSnackbar('Fehler')
+        })
+}
+
 function hasJsonBody(response) {
     return response.headers.get('content-type') &&
         response.headers.get('content-type').startsWith('application/json') &&

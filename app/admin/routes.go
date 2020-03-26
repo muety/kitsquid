@@ -10,6 +10,7 @@ import (
 	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/scraping"
 	"github.com/n1try/kitsquid/app/users"
+	"github.com/n1try/kitsquid/app/util"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,6 +25,7 @@ func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/admin/flush", CheckAdmin(), apiAdminFlush(router))
 	group.POST("/admin/reindex", CheckAdmin(), apiAdminReindex(router))
 	group.POST("/admin/scrape", CheckAdmin(), apiAdminScrape(router))
+	group.POST("/admin/test_mail", CheckAdmin(), apiAdminTestMail(router))
 }
 
 func getIndex(r *gin.Engine) func(c *gin.Context) {
@@ -188,6 +190,24 @@ func apiAdminScrape(r *gin.Engine) func(c *gin.Context) {
 		}(tguid, from, to)
 
 		c.Status(http.StatusAccepted)
+	}
+}
+
+func apiAdminTestMail(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		to := c.Request.URL.Query().Get("to")
+		if to == "" {
+			c.AbortWithError(http.StatusBadRequest, errors.BadRequest{})
+			return
+		}
+
+		if err := util.SendTestMail(to); err != nil {
+			c.Error(err)
+			c.AbortWithError(http.StatusInternalServerError, errors.Internal{})
+			return
+		}
+
+		c.Status(http.StatusOK)
 	}
 }
 
