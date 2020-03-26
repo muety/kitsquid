@@ -1,5 +1,6 @@
 Content-Type: text/plain; charset=UTF-8
 To: {{ .recipient }}
+From: {{ .sender }}
 Subject: Test Mail
 
 This is a test mail send from KITSquid. Hope it arrived ...

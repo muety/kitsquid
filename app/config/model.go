@@ -24,7 +24,7 @@ type Config struct {
 		Encoding string `default:"gob" env:"KITSQUID_DB_ENCODING"`
 	}
 	Mail struct {
-		From string `default:"noreply@kitsquid.eu" env:"KITSQUID_MAIL_SENDER"`
+		From string `default:"no-reply@kitsquid.de" env:"KITSQUID_MAIL_SENDER"`
 		Smtp struct {
 			Host     string `env:"SMTP_HOST"`
 			Port     int    `default:"25" env:"SMTP_PORT"`

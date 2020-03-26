@@ -20,6 +20,8 @@ func SendMail(recipient string, content *bytes.Buffer) error {
 }
 
 func SendTestMail(recipient string) error {
+	cfg := config.Get()
+
 	tpl, err := template.ParseFiles("app/views/mail/test.tpl.txt")
 	if err != nil {
 		return err
@@ -28,6 +30,7 @@ func SendTestMail(recipient string) error {
 	var buf bytes.Buffer
 	if err := tpl.Execute(&buf, map[string]string{
 		"recipient": recipient,
+		"sender":    cfg.Mail.From,
 	}); err != nil {
 		return err
 	}

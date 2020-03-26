@@ -1,5 +1,6 @@
 Content-Type: text/plain; charset=UTF-8
 To: {{ .recipient }}
+From: {{ .sender }}
 Subject: Aktiviere deinen KitSquid Account
 
 🐙 Hallo und Willkommen bei KitSquid!
