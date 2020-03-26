@@ -14,6 +14,7 @@ db:
 
 mail:
   from: mail@example.com
+  # Only works with STARTTLS, not with complete SSL/TLS
   smtp:
     host: mail.example.com
     port: 25
