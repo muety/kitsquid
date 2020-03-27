@@ -49,12 +49,10 @@ func ExtractUser() gin.HandlerFunc {
 
 func CheckUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		defer c.Next()
-
-		user, _ := c.Get(config.UserKey)
-		if user == nil {
-			c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{})
+		if user, _ := c.Get(config.UserKey); user != nil {
+			c.Next()
 			return
 		}
+		c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{})
 	}
 }
