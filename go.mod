@@ -7,15 +7,10 @@ require (
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/foolin/goview v0.2.0
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.5.0
-	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/gin-gonic/gin v1.6.2
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/jinzhu/configor v1.1.1
-	github.com/json-iterator/go v1.1.9 // indirect
-	github.com/leodido/go-urn v1.2.0 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/satori/go.uuid v1.2.0
 	github.com/timshannon/bolthold v0.0.0-20200224174833-bf6268f136e7
@@ -25,6 +20,4 @@ require (
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
 	golang.org/x/text v0.3.2
-	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
