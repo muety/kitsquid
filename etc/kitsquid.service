@@ -1,0 +1,16 @@
+[Unit]
+Description=KitSquid
+
+[Service]
+Type=simple
+WorkingDirectory=$GOPATH/src/github.com/n1try/kitsquid
+ExecStart=$GOPATH/src/github.com/n1try/kitsquid/kitsquid
+User=kitsquid
+Group=kitsquid
+Restart=on-failure
+RestartSec=90
+StartLimitInterval=400
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target
