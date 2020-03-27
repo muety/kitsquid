@@ -25,6 +25,11 @@ var (
 
 func Init() {
 	cfg = config.Get()
+
+	if !cfg.IsDev() {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router = gin.Default()
 
 	// Configure CORS middleware
