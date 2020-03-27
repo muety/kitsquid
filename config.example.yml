@@ -3,6 +3,9 @@ addr: 127.0.0.1
 env: development
 url: "http://kitsquid.example.com"
 
+# Limit requests to a maximum of 60 per minute
+rate: 60-M
+
 tls:
   enable: false
   key: etc/key.pem

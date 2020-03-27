@@ -9,6 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
 	"github.com/n1try/kitsquid/app/config"
+	"github.com/n1try/limiter/v3"
+	mgin "github.com/n1try/limiter/v3/drivers/middleware/gin"
+	rls "github.com/n1try/limiter/v3/drivers/store/memory"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,15 +27,26 @@ func Init() {
 	cfg = config.Get()
 	router = gin.Default()
 
+	// Configure CORS middleware
 	corsCfg := cors.DefaultConfig()
 	corsCfg.AllowOrigins = []string{cfg.Url}
 	if cfg.IsDev() {
 		corsCfg.AllowOrigins = append(corsCfg.AllowOrigins, fmt.Sprintf("http://localhost:%d", cfg.Port))
 	}
+	corsMiddleware := cors.New(corsCfg)
+
+	// Configure rate limiting middleware
+	rate, _ := limiter.NewRateFromFormatted(cfg.Rate)
+	rateLimitMiddleware := mgin.NewMiddleware(
+		limiter.New(rls.NewStore(),
+			rate,
+			limiter.WithTrustForwardHeader(true)),
+	)
 
 	router.Use(
 		gin.Recovery(),
-		cors.New(corsCfg),
+		corsMiddleware,
+		rateLimitMiddleware,
 		RemoteIp(),
 	)
 
