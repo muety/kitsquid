@@ -138,6 +138,7 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 		var userReview *reviews.Review
 		var userMap map[string]*users.User
 		var averageRatings map[string]float32
+		var countRatings int
 
 		if user != nil {
 			comms, err = comments.Find(&comments.CommentQuery{
@@ -153,8 +154,10 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			}
 
 			userReview, err = reviews.Get(fmt.Sprintf("%s:%s", user.Id, event.Id))
-
 			averageRatings, err = reviews.GetAverages(event.Id)
+			countRatings = reviews.FindCount(&reviews.ReviewQuery{
+				EventIdEq: event.Id,
+			})
 
 			if err != nil {
 				c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -170,6 +173,7 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			"userMap":        userMap,
 			"userReview":     userReview,
 			"averageRatings": averageRatings,
+			"countRatings":   countRatings,
 			"semesterQuery":  semester,
 			"tplCtx":         c.MustGet(config.TemplateContextKey),
 		})

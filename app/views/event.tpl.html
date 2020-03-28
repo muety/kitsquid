@@ -12,7 +12,7 @@
                     <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
                         {{ if .tplCtx.User }}
                             <div class="absolute top-0 text-2xl text-yellow-500 cursor-pointer"
-                                 style="margin-top: -4px; margin-left: -5px"
+                                 style="margin-top: -10px; margin-left: -5px"
                                  onclick="toggleBookmarkEvent({{ .event.Id }})">
                                 <i class="{{ if .bookmarked }}hidden{{ end }} icon-bookmark-empty"
                                    id="indicator-bookmark-{{ .event.Id }}-empty"></i>
@@ -191,6 +191,7 @@
                             <div class="px-4 py-2 md:px-6 md:py-4">
                                 <div>
                                     <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Bewertungen</h2>
+                                    <span class="text-xs">({{ .countRatings }})</span>
                                 </div>
                                 {{ if .tplCtx.User }}
                                     <div class="mb-6">

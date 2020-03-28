@@ -94,6 +94,18 @@ func Find(query *ReviewQuery) ([]*Review, error) {
 	return foundReviews, err
 }
 
+func FindCount(query *ReviewQuery) int {
+	cacheKey := fmt.Sprintf("count:%v", query)
+	if c, ok := reviewsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+	if all, err := Find(query); err == nil {
+		reviewsCache.SetDefault(cacheKey, len(all))
+		return len(all)
+	}
+	return -1
+}
+
 func GetAll() ([]*Review, error) {
 	return Find(&ReviewQuery{})
 }
