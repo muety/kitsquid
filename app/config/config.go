@@ -24,6 +24,7 @@ const (
 	RemoteIpKey           = "remoteIp"
 	KitVvzBaseUrl         = "https://campus.kit.edu/sp/campus/all"
 	FacultyIdx            = 0
+	OverallRatingKey      = "overall"
 	MaxEventSearchResults = 25
 )
 

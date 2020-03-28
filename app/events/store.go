@@ -31,7 +31,9 @@ func InitStore(store *bolthold.Store) {
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
 
 	setup()
-	Reindex()
+	if !cfg.QuickStart {
+		Reindex()
+	}
 }
 
 func Reindex() {

@@ -10,12 +10,13 @@ import (
 )
 
 type Config struct {
-	Env  string `default:"development" env:"KITSQUID_ENV"`
-	Port int    `default:"8080" env:"KITSQUID_PORT"`
-	Addr string `default:"" env:"KITSQUID_ADDR"`
-	Url  string `env:"KITSQUID_URL"`
-	Rate string `default:"60-M" env:"KITSQUID_RATE_LIMIT"`
-	Tls  struct {
+	Env        string `default:"development" env:"KITSQUID_ENV"`
+	QuickStart bool   `default:"false" env:"KITSQUID_QUICK_START"`
+	Port       int    `default:"8080" env:"KITSQUID_PORT"`
+	Addr       string `default:"" env:"KITSQUID_ADDR"`
+	Url        string `env:"KITSQUID_URL"`
+	Rate       string `default:"60-M" env:"KITSQUID_RATE_LIMIT"`
+	Tls        struct {
 		Enable   bool   `default:"false" env:"KITSQUID_TLS"`
 		KeyPath  string `default:"etc/key.pem" yaml:"key" env:"KITSQUID_TLS_KEY"`
 		CertPath string `default:"etc/cert.pem" yaml:"cert" env:"KITSQUID_TLS_CERT"`

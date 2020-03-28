@@ -26,7 +26,9 @@ func InitStore(store *bolthold.Store) {
 	sessionsCache = cache.New(cfg.CacheDuration("sessions", 30*time.Minute), cfg.CacheDuration("sessions", 30*time.Minute)*2)
 
 	setup()
-	Reindex()
+	if !cfg.QuickStart {
+		Reindex()
+	}
 }
 
 func Reindex() {

@@ -23,7 +23,9 @@ func InitStore(store *bolthold.Store) {
 	commentsCache = cache.New(cfg.CacheDuration("comments", 30*time.Minute), cfg.CacheDuration("comments", 30*time.Minute)*2)
 
 	setup()
-	Reindex()
+	if !cfg.QuickStart {
+		Reindex()
+	}
 }
 
 func Reindex() {

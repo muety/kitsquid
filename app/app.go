@@ -28,6 +28,8 @@ func init() {
 }
 
 func Run() {
-	migrations.RunAll()
+	if !config.Get().QuickStart {
+		migrations.RunAll()
+	}
 	web.Start()
 }
