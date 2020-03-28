@@ -39,12 +39,10 @@
                                         <span class="cursor-default"><i class="icon-sun"></i></span>
                                     </div>
                                 {{ end }}
-                                {{ if .tplCtx.User }}
-                                    <div class="ml-1 px-2 border border-yellow-500 rounded text-xs md:text-base text-yellow-500 font-semibold flex items-center flex-grow-0 flex-no-wrap"
-                                         title="Gesamtbewertung">
-                                        <i class="icon-star"></i> <span id="event-rating">{{ .event.Rating }}</span>
-                                    </div>
-                                {{ end }}
+                                <div class="ml-1 px-2 border border-yellow-500 rounded text-xs md:text-base text-yellow-500 font-semibold flex items-center flex-grow-0 flex-no-wrap"
+                                     title="Gesamtbewertung">
+                                    <i class="icon-star"></i> <span id="event-rating">{{ .event.Rating }}</span>
+                                </div>
                             </div>
                         </div>
                         {{ if not (eq .semesterQuery (index .tplCtx.SemesterKeys 0)) }}
