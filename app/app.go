@@ -3,7 +3,6 @@ package app
 import (
 	"flag"
 	"github.com/n1try/kitsquid/app/admin"
-	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/migrations"
@@ -21,7 +20,6 @@ func init() {
 	web.Init()
 	events.Init(config.Db())
 	users.Init(config.Db())
-	comments.Init(config.Db())
 	admin.Init(config.Db())
 }
 

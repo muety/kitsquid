@@ -2,7 +2,6 @@ package admin
 
 import (
 	"encoding/json"
-	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/timshannon/bolthold"
@@ -100,20 +99,20 @@ func registerEntities() {
 
 	registry["comment"] = &registeredEntity{
 		Name:     "Comment",
-		Instance: &comments.Comment{},
+		Instance: &events.Comment{},
 		Resolvers: crudResolvers{
-			List: func() (i interface{}, err error) { return comments.GetAll() },
-			Get:  func(key string) (i interface{}, err error) { return comments.Get(key) },
+			List: func() (i interface{}, err error) { return events.GetAllComments() },
+			Get:  func(key string) (i interface{}, err error) { return events.GetComment(key) },
 			Put: func(key, value string) error {
-				var comment comments.Comment
+				var comment events.Comment
 				if err := json.Unmarshal([]byte(value), &comment); err != nil {
 					return err
 				}
-				return comments.Insert(&comment, true)
+				return events.InsertComment(&comment, true)
 			},
-			Delete:  comments.Delete,
-			Flush:   comments.FlushCaches,
-			Reindex: comments.Reindex,
+			Delete:  events.DeleteComment,
+			Flush:   events.FlushCaches,
+			Reindex: events.Reindex,
 		},
 	}
 

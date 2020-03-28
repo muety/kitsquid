@@ -3,7 +3,6 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
@@ -35,7 +34,7 @@ func getIndex(r *gin.Engine) func(c *gin.Context) {
 			"categories": events.CountCategories(),
 			"faculties":  events.CountFaculties(),
 			"bookmarks":  events.CountBookmarks(),
-			"comments":   comments.Count(),
+			"comments":   events.CountComments(),
 			"reviews":    events.CountReviews(),
 			"users":      users.Count(),
 			"admins":     users.CountAdmins(),

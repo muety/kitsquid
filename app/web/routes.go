@@ -3,7 +3,6 @@ package web
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/n1try/kitsquid/app/admin"
-	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
@@ -34,7 +33,6 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 
 	events.RegisterRoutes(router, group)
 	users.RegisterRoutes(router, group)
-	comments.RegisterRoutes(router, group)
 	admin.RegisterRoutes(router, group)
 
 	group.GET("/about", func(c *gin.Context) {
@@ -57,7 +55,6 @@ func RegisterApiRoutes(router *gin.Engine) *gin.RouterGroup {
 
 	events.RegisterApiRoutes(router, group)
 	users.RegisterApiRoutes(router, group)
-	comments.RegisterApiRoutes(router, group)
 	admin.RegisterApiRoutes(router, group)
 
 	return group

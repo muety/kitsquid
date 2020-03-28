@@ -5,6 +5,7 @@ import (
 	"github.com/n1try/kitsquid/app/config"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Event struct {
@@ -153,4 +154,26 @@ type Review struct {
 type ReviewQuery struct {
 	EventIdEq string
 	UserIdEq  string
+}
+
+type Comment struct {
+	Id        string    `form:"" boltholdIndex:"Id"`
+	Index     uint8     `form:"" boltholdIndex:"Index"`
+	EventId   string    `form:"event_id" boltholdIndex:"EventId"`
+	UserId    string    `form:"" boltholdIndex:"UserId"`
+	Active    bool      `form:"" boltholdIndex:"Active"`
+	Text      string    `form:"text" binding:"required"`
+	CreatedAt time.Time `form:""`
+}
+
+type CommentQuery struct {
+	EventIdEq string
+	UserIdEq  string
+	ActiveEq  bool
+	Skip      int
+	Limit     int
+}
+
+type commentDelete struct {
+	Id string `form:"id" binding:"required"`
 }

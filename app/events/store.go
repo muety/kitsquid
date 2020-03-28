@@ -20,9 +20,10 @@ var (
 	db             *bolthold.Store
 	cfg            *config.Config
 	eventsCache    *cache.Cache
-	reviewsCache   *cache.Cache
 	bookmarksCache *cache.Cache
 	miscCache      *cache.Cache
+	reviewsCache   *cache.Cache
+	commentsCache  *cache.Cache
 )
 
 func InitStore(store *bolthold.Store) {
@@ -33,6 +34,7 @@ func InitStore(store *bolthold.Store) {
 	miscCache = cache.New(cfg.CacheDuration("misc", 30*time.Minute), cfg.CacheDuration("misc", 30*time.Minute)*2)
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
 	reviewsCache = cache.New(cfg.CacheDuration("reviews", 30*time.Minute), cfg.CacheDuration("reviews", 30*time.Minute)*2)
+	commentsCache = cache.New(cfg.CacheDuration("comments", 30*time.Minute), cfg.CacheDuration("comments", 30*time.Minute)*2)
 
 	setup()
 	if !cfg.QuickStart {
@@ -62,6 +64,8 @@ func FlushCaches() {
 	eventsCache.Flush()
 	miscCache.Flush()
 	bookmarksCache.Flush()
+	reviewsCache.Flush()
+	commentsCache.Flush()
 }
 
 func setup() {}
@@ -582,6 +586,131 @@ func CountReviews() int {
 
 	reviewsCache.SetDefault(cacheKey, len(all))
 	return len(all)
+}
+
+func GetComment(id string) (*Comment, error) {
+	cacheKey := fmt.Sprintf("get:%s", id)
+	if c, ok := commentsCache.Get(cacheKey); ok {
+		return c.(*Comment), nil
+	}
+
+	var comment Comment
+
+	if err := db.Get(id, &comment); err != nil {
+		return &comment, err
+	}
+
+	commentsCache.SetDefault(cacheKey, &comment)
+	return &comment, nil
+}
+
+func FindComments(query *CommentQuery) ([]*Comment, error) {
+	cacheKey := fmt.Sprintf("find:%v", query)
+	if cc, ok := commentsCache.Get(cacheKey); ok {
+		return cc.([]*Comment), nil
+	}
+
+	var foundComments []*Comment
+
+	q := bolthold.
+		Where("Id").Not().Eq("").Index("Id").
+		And("Active").Eq(query.ActiveEq).Index("Active")
+
+	if query != nil {
+		if query.EventIdEq != "" {
+			q.And("EventId").Eq(query.EventIdEq).Index("EventId")
+		}
+		if query.UserIdEq != "" {
+			q.And("UserId").Eq(query.UserIdEq).Index("UserId")
+		}
+		if query.Skip > 0 {
+			q.Skip(query.Skip)
+		}
+		if query.Limit > 0 {
+			q.Limit(query.Limit)
+		}
+	}
+
+	err := db.Find(&foundComments, q.SortBy("CreatedAt"))
+	if err == nil {
+		commentsCache.SetDefault(cacheKey, foundComments)
+	}
+	return foundComments, err
+}
+
+func GetAllComments() ([]*Comment, error) {
+	inactive, err := FindComments(&CommentQuery{
+		ActiveEq: false,
+	})
+	if err != nil {
+		return []*Comment{}, err
+	}
+	active, err := FindComments(&CommentQuery{
+		ActiveEq: true,
+	})
+
+	all := make([]*Comment, len(active)+len(inactive))
+	for i, c := range inactive {
+		all[i] = c
+	}
+
+	for i, c := range active {
+		all[i+len(inactive)] = c
+	}
+
+	return all, nil
+}
+
+func CountComments() int {
+	cacheKey := "count"
+	if c, ok := commentsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAllComments()
+	if err != nil {
+		return -1
+	}
+
+	commentsCache.SetDefault(cacheKey, len(all))
+	return len(all)
+}
+
+func InsertComment(comment *Comment, upsert bool) error {
+	commentsCache.Flush()
+
+	f := db.Insert
+	if upsert {
+		f = db.Upsert
+	}
+
+	return f(comment.Id, comment)
+}
+
+func DeleteComment(id string) error {
+	commentsCache.Flush()
+	return db.Delete(id, &Comment{})
+}
+
+func GetMaxCommentIndexByEvent(eventId string) (count uint8, err error) {
+	cacheKey := fmt.Sprintf("max:index:%s", eventId)
+	if e, ok := commentsCache.Get(cacheKey); ok {
+		return e.(uint8), err
+	}
+
+	q := bolthold.
+		Where("EventId").Eq(eventId).Index("EventId")
+
+	var result Comment
+
+	aggResult, err := db.FindAggregate(&result, q)
+	if err == nil && len(aggResult) == 1 && aggResult[0].Count() > 0 {
+		aggResult[0].Max("Index", &result)
+		count = result.Index
+		commentsCache.SetDefault(cacheKey, count)
+	}
+
+	return count, err
 }
 
 func GetBookmark(key uint64) (*Bookmark, error) {

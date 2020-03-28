@@ -4,26 +4,104 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/n1try/kitsquid/app/util"
+	uuid "github.com/satori/go.uuid"
+	"html/template"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/", getEvents(router))
 	group.GET("/bookmarks", CheckUser(), getBookmarks(router))
 	group.GET("/event/:id", getEvent(router))
+	group.POST("/event/:id/comments", CheckUser(), postComment(router))
+	group.POST("/event/:id/comments/delete", CheckUser(), deleteComment(router))
 }
 
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/event/search", apiSearchEvents(router))
 	group.PUT("/event/:id/bookmark", CheckUser(), apiPutBookmark(router))
 	group.PUT("/event/:id/reviews", CheckUser(), apiPutReview(router))
+}
+
+func getEvent(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		event, err := Get(c.Param("id"))
+		if err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusNotFound, errors.NotFound{}, nil)
+			return
+		}
+
+		semesters, _ := GetSemesters()
+		semester := semesters[0]
+		if s := c.Request.URL.Query().Get("semester"); s != "" && util.ContainsString(s, semesters) {
+			semester = s
+		}
+
+		var bookmarked bool
+
+		var user *users.User
+		u, _ := c.Get(config.UserKey)
+		if u != nil {
+			user = u.(*users.User)
+			if _, err := FindBookmark(user.Id, event.Id); err == nil {
+				bookmarked = true
+			}
+		}
+
+		var comms []*Comment
+		var userReview *Review
+		var userMap map[string]*users.User
+		var averageRatings map[string]float32
+		var countRatings int
+
+		countRatings = FindCountReviews(&ReviewQuery{
+			EventIdEq: event.Id,
+		})
+
+		if user != nil {
+			comms, err = FindComments(&CommentQuery{
+				EventIdEq: event.Id,
+				ActiveEq:  true,
+			})
+
+			userMap = make(map[string]*users.User)
+			for _, c := range comms {
+				if u, err := users.Get(c.UserId); err == nil {
+					userMap[u.Id] = u
+				}
+			}
+
+			userReview, err = GetReview(fmt.Sprintf("%s:%s", user.Id, event.Id))
+			averageRatings, err = GetReviewAverages(event.Id)
+
+			if err != nil {
+				c.Error(err).SetType(gin.ErrorTypePrivate)
+				util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
+				return
+			}
+		}
+
+		c.HTML(http.StatusOK, "event", gin.H{
+			"event":          event,
+			"bookmarked":     bookmarked,
+			"comments":       comms,
+			"userMap":        userMap,
+			"userReview":     userReview,
+			"averageRatings": averageRatings,
+			"countRatings":   countRatings,
+			"semesterQuery":  semester,
+			"tplCtx":         c.MustGet(config.TemplateContextKey),
+		})
+	}
 }
 
 func getEvents(r *gin.Engine) func(c *gin.Context) {
@@ -86,8 +164,19 @@ func getBookmarks(r *gin.Engine) func(c *gin.Context) {
 	}
 }
 
-func getEvent(r *gin.Engine) func(c *gin.Context) {
+func postComment(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		var comment Comment
+
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
+
+		if err := c.ShouldBind(&comment); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusBadRequest, errors.BadRequest{}, nil)
+			return
+		}
+
 		event, err := Get(c.Param("id"))
 		if err != nil {
 			c.Error(err).SetType(gin.ErrorTypePrivate)
@@ -95,66 +184,72 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		semesters, _ := GetSemesters()
-		semester := semesters[0]
-		if s := c.Request.URL.Query().Get("semester"); s != "" && util.ContainsString(s, semesters) {
-			semester = s
+		text := template.HTMLEscapeString(comment.Text)
+		text = strings.ReplaceAll(text, "\r\n", "<br>")
+		text = strings.ReplaceAll(text, "\n", "<br>")
+
+		comment.Id = uuid.NewV4().String()
+		comment.Text = text
+		comment.Active = true // TODO: Admin functionality to activate comments
+		comment.CreatedAt = time.Now()
+		comment.UserId = user.Id
+		comment.EventId = event.Id
+		if maxIdx, err := GetMaxCommentIndexByEvent(comment.EventId); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
+		} else {
+			comment.Index = maxIdx + 1
 		}
 
-		var bookmarked bool
-
-		var user *users.User
-		u, _ := c.Get(config.UserKey)
-		if u != nil {
-			user = u.(*users.User)
-			if _, err := FindBookmark(user.Id, event.Id); err == nil {
-				bookmarked = true
-			}
+		if err := InsertComment(&comment, false); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
 		}
 
-		var comms []*comments.Comment
-		var userReview *Review
-		var userMap map[string]*users.User
-		var averageRatings map[string]float32
-		var countRatings int
-
-		countRatings = FindCountReviews(&ReviewQuery{
-			EventIdEq: event.Id,
+		// TODO: Prevent posting comments to non-existing events
+		c.HTML(http.StatusOK, "redirect", gin.H{
+			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"url":    fmt.Sprintf("/event/%s", comment.EventId),
 		})
+	}
+}
 
-		if user != nil {
-			comms, err = comments.Find(&comments.CommentQuery{
-				EventIdEq: event.Id,
-				ActiveEq:  true,
-			})
+func deleteComment(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var comment commentDelete
 
-			userMap = make(map[string]*users.User)
-			for _, c := range comms {
-				if u, err := users.Get(c.UserId); err == nil {
-					userMap[u.Id] = u
-				}
-			}
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
 
-			userReview, err = GetReview(fmt.Sprintf("%s:%s", user.Id, event.Id))
-			averageRatings, err = GetReviewAverages(event.Id)
-
-			if err != nil {
-				c.Error(err).SetType(gin.ErrorTypePrivate)
-				util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
-				return
-			}
+		if err := c.ShouldBind(&comment); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusBadRequest, errors.BadRequest{}, nil)
+			return
 		}
 
-		c.HTML(http.StatusOK, "event", gin.H{
-			"event":          event,
-			"bookmarked":     bookmarked,
-			"comments":       comms,
-			"userMap":        userMap,
-			"userReview":     userReview,
-			"averageRatings": averageRatings,
-			"countRatings":   countRatings,
-			"semesterQuery":  semester,
-			"tplCtx":         c.MustGet(config.TemplateContextKey),
+		existing, err := GetComment(comment.Id)
+		if err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusNotFound, errors.NotFound{}, nil)
+			return
+		}
+
+		if existing.UserId != user.Id {
+			util.MakeError(c, "event", http.StatusUnauthorized, errors.Unauthorized{}, nil)
+			return
+		}
+
+		if err := DeleteComment(comment.Id); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "event", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
+		}
+
+		c.HTML(http.StatusOK, "redirect", gin.H{
+			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"url":    fmt.Sprintf("/event/%s", existing.EventId),
 		})
 	}
 }
