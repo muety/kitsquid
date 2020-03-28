@@ -276,6 +276,8 @@ func (l listEventsJob) process() (interface{}, error) {
 	reStripPagetitle := regexp.MustCompile(`.+: +(.+) +\(.+\)`)
 	reStripBreadcrumbTitle := regexp.MustCompile(`[\d\.]*\d? ?(.+)`)
 
+	nameReplacer := strings.NewReplacer("\"", "", "„", "", "“", "")
+
 	u, _ := url.Parse(mainUrl)
 	q := url.Values{}
 	q.Add("tguid", l.Tguid)
@@ -379,7 +381,8 @@ func (l listEventsJob) process() (interface{}, error) {
 				log.Errorf("failed to get event title for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
-			currentEvent.Name = htmlquery.InnerText(a)
+			currentEvent.Name = strings.TrimSpace(htmlquery.InnerText(a))
+			currentEvent.Name = nameReplacer.Replace(currentEvent.Name)
 
 			// Gguid
 			if href := htmlquery.SelectAttr(a, "href"); href != "" {
@@ -412,7 +415,8 @@ func (l listEventsJob) process() (interface{}, error) {
 			}
 			for _, a := range as {
 				lecturer := &model.Lecturer{}
-				lecturer.Name = htmlquery.InnerText(a)
+				lecturer.Name = strings.TrimSpace(htmlquery.InnerText(a))
+				lecturer.Name = nameReplacer.Replace(lecturer.Name)
 
 				if href := htmlquery.SelectAttr(a, "href"); href != "" {
 					matches := reLecturerId.FindStringSubmatch(href)
