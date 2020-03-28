@@ -7,7 +7,6 @@ import (
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/migrations"
-	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/n1try/kitsquid/app/web"
 )
@@ -23,7 +22,6 @@ func init() {
 	events.Init(config.Db())
 	users.Init(config.Db())
 	comments.Init(config.Db())
-	reviews.Init(config.Db())
 	admin.Init(config.Db())
 }
 

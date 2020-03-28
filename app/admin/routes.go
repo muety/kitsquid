@@ -7,7 +7,6 @@ import (
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/events"
-	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/scraping"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/n1try/kitsquid/app/util"
@@ -37,7 +36,7 @@ func getIndex(r *gin.Engine) func(c *gin.Context) {
 			"faculties":  events.CountFaculties(),
 			"bookmarks":  events.CountBookmarks(),
 			"comments":   comments.Count(),
-			"reviews":    reviews.Count(),
+			"reviews":    events.CountReviews(),
 			"users":      users.Count(),
 			"admins":     users.CountAdmins(),
 		}

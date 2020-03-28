@@ -26,6 +26,7 @@ var (
 func init() {
 	registeredMigrations = []Migration{
 		migration1{},
+		migration2{},
 	}
 }
 

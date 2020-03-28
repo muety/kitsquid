@@ -8,6 +8,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
 	"go.etcd.io/bbolt"
+	"math"
 	"reflect"
 	"regexp"
 	"sort"
@@ -18,6 +19,7 @@ var (
 	db             *bolthold.Store
 	cfg            *config.Config
 	eventsCache    *cache.Cache
+	reviewsCache   *cache.Cache
 	bookmarksCache *cache.Cache
 	miscCache      *cache.Cache
 )
@@ -29,6 +31,7 @@ func InitStore(store *bolthold.Store) {
 	eventsCache = cache.New(cfg.CacheDuration("events", 30*time.Minute), cfg.CacheDuration("events", 30*time.Minute)*2)
 	miscCache = cache.New(cfg.CacheDuration("misc", 30*time.Minute), cfg.CacheDuration("misc", 30*time.Minute)*2)
 	bookmarksCache = cache.New(cfg.CacheDuration("bookmarks", 30*time.Minute), cfg.CacheDuration("bookmarks", 30*time.Minute)*2)
+	reviewsCache = cache.New(cfg.CacheDuration("reviews", 30*time.Minute), cfg.CacheDuration("reviews", 30*time.Minute)*2)
 
 	setup()
 	if !cfg.QuickStart {
@@ -133,9 +136,12 @@ func Find(query *EventQuery) ([]*Event, error) {
 		if query.Limit > 0 {
 			q.Limit(query.Limit)
 		}
+		if len(query.SortFields) > 0 {
+			q.SortBy(query.SortFields...)
+		}
 	}
 
-	err := db.Find(&foundEvents, q.SortBy("Name"))
+	err := db.Find(&foundEvents, q)
 	if err == nil {
 		eventsCache.SetDefault(cacheKey, foundEvents)
 	}
@@ -222,6 +228,11 @@ func Delete(key string) error {
 
 // Inplace
 func updateEvent(newEvent, existingEvent *Event) {
+	// Keep rating
+	newEvent.Rating = existingEvent.Rating
+	newEvent.InverseRating = existingEvent.InverseRating
+
+	// Keep semesters
 	for _, c := range existingEvent.Semesters {
 		if !util.ContainsString(c, newEvent.Semesters) {
 			newEvent.Semesters = append(newEvent.Semesters, c)
@@ -424,6 +435,146 @@ func MustGetCurrentSemester() string {
 		return s
 	}
 	return ""
+}
+
+func GetReview(id string) (*Review, error) {
+	cacheKey := fmt.Sprintf("get:%s", id)
+	if c, ok := reviewsCache.Get(cacheKey); ok {
+		return c.(*Review), nil
+	}
+
+	var review Review
+
+	if err := db.Get(id, &review); err != nil {
+		return &review, err
+	}
+
+	reviewsCache.SetDefault(cacheKey, &review)
+	return &review, nil
+}
+
+func FindReviews(query *ReviewQuery) ([]*Review, error) {
+	cacheKey := fmt.Sprintf("find:%v", query)
+	if rr, ok := reviewsCache.Get(cacheKey); ok {
+		return rr.([]*Review), nil
+	}
+
+	var foundReviews []*Review
+
+	q := bolthold.
+		Where("Id").Not().Eq("").Index("Id")
+
+	if query != nil {
+		if query.EventIdEq != "" {
+			q.And("EventId").Eq(query.EventIdEq).Index("EventId")
+		}
+		if query.UserIdEq != "" {
+			q.And("UserId").Eq(query.UserIdEq).Index("UserId")
+		}
+	}
+
+	err := db.Find(&foundReviews, q)
+	if err == nil {
+		reviewsCache.SetDefault(cacheKey, foundReviews)
+	}
+	return foundReviews, err
+}
+
+func FindCountReviews(query *ReviewQuery) int {
+	cacheKey := fmt.Sprintf("count:%v", query)
+	if c, ok := reviewsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+	if all, err := FindReviews(query); err == nil {
+		reviewsCache.SetDefault(cacheKey, len(all))
+		return len(all)
+	}
+	return -1
+}
+
+func GetAllReviews() ([]*Review, error) {
+	return FindReviews(&ReviewQuery{})
+}
+
+func GetReviewAverages(eventId string) (map[string]float32, error) {
+	cacheKey := fmt.Sprintf("avg:%s", eventId)
+	if avg, ok := reviewsCache.Get(cacheKey); ok {
+		return avg.(map[string]float32), nil
+	}
+
+	result := make(map[string]float32)
+	count := make(map[string]float32)
+
+	reviews, err := FindReviews(&ReviewQuery{
+		EventIdEq: eventId,
+	})
+
+	if err != nil {
+		return result, err
+	}
+
+	for _, r := range reviews {
+		for k, v := range r.Ratings {
+			if _, ok := result[k]; !ok {
+				result[k] = 0
+			}
+			if _, ok := count[k]; !ok {
+				count[k] = 0
+			}
+			result[k] += float32(v)
+			count[k] += 1
+		}
+	}
+
+	for k, v := range result {
+		result[k] = float32(math.Round(float64(v/count[k])*10) / 10)
+	}
+
+	reviewsCache.SetDefault(cacheKey, result)
+	return result, nil
+}
+
+func InsertReview(review *Review, upsert bool) error {
+	review.Id = fmt.Sprintf("%s:%s", review.UserId, review.EventId)
+
+	f := db.Insert
+	if upsert {
+		if existing, err := GetReview(review.Id); err == nil {
+			f = db.Upsert
+			updateReview(review, existing)
+		}
+	}
+
+	reviewsCache.Flush()
+	return f(review.Id, review)
+}
+
+func DeleteReview(key string) error {
+	defer reviewsCache.Flush()
+	return db.Delete(key, &Review{})
+}
+
+func updateReview(newReview, existingReview *Review) {
+	for k, v := range existingReview.Ratings {
+		if _, ok := newReview.Ratings[k]; !ok {
+			newReview.Ratings[k] = v
+		}
+	}
+}
+
+func CountReviews() int {
+	cacheKey := "count"
+	if c, ok := reviewsCache.Get(cacheKey); ok {
+		return c.(int)
+	}
+
+	all, err := GetAllReviews()
+	if err != nil {
+		return -1
+	}
+
+	reviewsCache.SetDefault(cacheKey, len(all))
+	return len(all)
 }
 
 func GetBookmark(key uint64) (*Bookmark, error) {

@@ -8,16 +8,18 @@ import (
 )
 
 type Event struct {
-	Id          string `boltholdIndex:"Id"`
-	Gguid       string
-	Name        string `boltholdIndex:"Name"`
-	Type        string `boltholdIndex:"Type"`
-	Description string
-	Categories  []string `boltholdSliceIndex:"Categories"`
-	Links       []*Link
-	Dates       []*EventDate
-	Lecturers   []*Lecturer
-	Semesters   []string `boltholdSliceIndex:"Semesters"`
+	Id            string `boltholdIndex:"Id"`
+	Gguid         string
+	Name          string `boltholdIndex:"Name"`
+	Type          string `boltholdIndex:"Type"`
+	Description   string
+	Rating        float32  // for caching purposes only; actual rating is kept as reviews.Reviews
+	InverseRating float32  `boltholdIndex:"InverseRating"`
+	Categories    []string `boltholdSliceIndex:"Categories"`
+	Links         []*Link
+	Dates         []*EventDate
+	Lecturers     []*Lecturer
+	Semesters     []string `boltholdSliceIndex:"Semesters"`
 }
 
 func (l *Event) Link(baseUrl string) string {
@@ -110,6 +112,7 @@ type EventQuery struct {
 	CategoryIn   []string
 	Skip         int
 	Limit        int
+	SortFields   []string
 }
 
 type EventSearchResultItem struct {
@@ -137,4 +140,17 @@ type Bookmark struct {
 	Id       uint64 `boltholdKey:"Id"`
 	UserId   string `boltholdIndex:"UserId"`
 	EntityId string `boltholdIndex:"EntityId"`
+}
+
+// TODO: View models!
+type Review struct {
+	Id      string           `json:"" boltholdKey:"Id" boltholdIndex:"Id"`
+	EventId string           `json:"event_id" boltholdIndex:"EventId"`
+	UserId  string           `json:"" boltholdIndex:"UserId"`
+	Ratings map[string]uint8 `json:"ratings"`
+}
+
+type ReviewQuery struct {
+	EventIdEq string
+	UserIdEq  string
 }

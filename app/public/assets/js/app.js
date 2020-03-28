@@ -180,14 +180,13 @@ function performSearch(q) {
 }
 
 function postRating(key, value) {
-    fetch(`/api/reviews`, {
+    fetch(`/api/event/${eventId}/reviews`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'event_id': eventId,
             'ratings': {
                 [key]: value
             }

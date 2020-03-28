@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/events"
-	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/timshannon/bolthold"
 	"strconv"
@@ -82,20 +81,20 @@ func registerEntities() {
 
 	registry["review"] = &registeredEntity{
 		Name:     "Review",
-		Instance: &reviews.Review{},
+		Instance: &events.Review{},
 		Resolvers: crudResolvers{
-			List: func() (i interface{}, err error) { return reviews.GetAll() },
-			Get:  func(key string) (i interface{}, err error) { return reviews.Get(key) },
+			List: func() (i interface{}, err error) { return events.GetAllReviews() },
+			Get:  func(key string) (i interface{}, err error) { return events.GetReview(key) },
 			Put: func(key, value string) error {
-				var review reviews.Review
+				var review events.Review
 				if err := json.Unmarshal([]byte(value), &review); err != nil {
 					return err
 				}
-				return reviews.Insert(&review, true)
+				return events.InsertReview(&review, true)
 			},
-			Delete:  reviews.Delete,
-			Flush:   reviews.FlushCaches,
-			Reindex: reviews.Reindex,
+			Delete:  events.DeleteReview,
+			Flush:   events.FlushCaches,
+			Reindex: events.Reindex,
 		},
 	}
 

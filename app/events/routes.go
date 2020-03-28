@@ -7,7 +7,6 @@ import (
 	"github.com/n1try/kitsquid/app/comments"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
-	"github.com/n1try/kitsquid/app/reviews"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/n1try/kitsquid/app/util"
 	"net/http"
@@ -24,6 +23,7 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/event/search", apiSearchEvents(router))
 	group.PUT("/event/:id/bookmark", CheckUser(), apiPutBookmark(router))
+	group.PUT("/event/:id/reviews", CheckUser(), apiPutReview(router))
 }
 
 func getEvents(r *gin.Engine) func(c *gin.Context) {
@@ -45,26 +45,15 @@ func getEvents(r *gin.Engine) func(c *gin.Context) {
 		lecturers, _ := GetLecturers()
 		semesters, _ := GetSemesters()
 
-		eventRatings := make(map[string]float32)
-		for _, e := range events {
-			eventRatings[e.Id] = 0
-			if averages, err := reviews.GetAverages(e.Id); err == nil {
-				if avg, ok := averages[reviews.KeyMainRating]; ok {
-					eventRatings[e.Id] = avg
-				}
-			}
-		}
-
 		c.HTML(http.StatusOK, "index", gin.H{
-			"events":       events,
-			"types":        types,
-			"eventRatings": eventRatings,
-			"categories":   categories,
-			"lecturers":    lecturers,
-			"semesters":    semesters,
-			"limit":        eventQuery.Limit,
-			"offset":       eventQuery.Skip,
-			"tplCtx":       c.MustGet(config.TemplateContextKey),
+			"events":     events,
+			"types":      types,
+			"categories": categories,
+			"lecturers":  lecturers,
+			"semesters":  semesters,
+			"limit":      eventQuery.Limit,
+			"offset":     eventQuery.Skip,
+			"tplCtx":     c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
@@ -90,20 +79,9 @@ func getBookmarks(r *gin.Engine) func(c *gin.Context) {
 			}
 		}
 
-		eventRatings := make(map[string]float32)
-		for _, e := range events {
-			eventRatings[e.Id] = 0
-			if averages, err := reviews.GetAverages(e.Id); err == nil {
-				if avg, ok := averages[reviews.KeyMainRating]; ok {
-					eventRatings[e.Id] = avg
-				}
-			}
-		}
-
 		c.HTML(http.StatusOK, "bookmarks", gin.H{
-			"events":       events,
-			"eventRatings": eventRatings,
-			"tplCtx":       c.MustGet(config.TemplateContextKey),
+			"events": events,
+			"tplCtx": c.MustGet(config.TemplateContextKey),
 		})
 	}
 }
@@ -135,7 +113,7 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		var comms []*comments.Comment
-		var userReview *reviews.Review
+		var userReview *Review
 		var userMap map[string]*users.User
 		var averageRatings map[string]float32
 		var countRatings int
@@ -153,9 +131,9 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 				}
 			}
 
-			userReview, err = reviews.Get(fmt.Sprintf("%s:%s", user.Id, event.Id))
-			averageRatings, err = reviews.GetAverages(event.Id)
-			countRatings = reviews.FindCount(&reviews.ReviewQuery{
+			userReview, err = GetReview(fmt.Sprintf("%s:%s", user.Id, event.Id))
+			averageRatings, err = GetReviewAverages(event.Id)
+			countRatings = FindCountReviews(&ReviewQuery{
 				EventIdEq: event.Id,
 			})
 
@@ -241,6 +219,71 @@ func apiPutBookmark(r *gin.Engine) func(c *gin.Context) {
 	}
 }
 
+func apiPutReview(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var review Review
+
+		u, _ := c.Get(config.UserKey)
+		user := u.(*users.User)
+
+		event, err := Get(c.Param("id"))
+		if err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			c.AbortWithError(http.StatusNotFound, errors.NotFound{}).SetType(gin.ErrorTypePublic)
+			return
+		}
+
+		review.EventId = event.Id
+		review.UserId = user.Id
+
+		if err := c.ShouldBindJSON(&review); err != nil || !ratingValid(&review) {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			c.AbortWithError(http.StatusBadRequest, errors.BadRequest{}).SetType(gin.ErrorTypePublic)
+			return
+		}
+
+		if err := InsertReview(&review, true); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+			return
+		}
+
+		// TODO: Prevent posting reviews to non-existing events
+		// TODO: Prevent posting non-existing rating keys
+		updateUserReview, err1 := GetReview(fmt.Sprintf("%s:%s", review.UserId, review.EventId))
+		updateAverageRatings, err2 := GetReviewAverages(review.EventId)
+
+		if err1 != nil || err2 != nil {
+			if err1 != nil {
+				c.Error(err1).SetType(gin.ErrorTypePrivate)
+			}
+			if err2 != nil {
+				c.Error(err2).SetType(gin.ErrorTypePrivate)
+			}
+			c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+			return
+		}
+
+		if overall, ok := updateAverageRatings[config.OverallRatingKey]; ok {
+			event.Rating = overall
+			event.InverseRating = -overall
+
+			if err := Insert(event, true, false); err != nil {
+				c.Error(err).SetType(gin.ErrorTypePrivate)
+				c.AbortWithError(http.StatusInternalServerError, errors.Internal{}).SetType(gin.ErrorTypePublic)
+				return
+			}
+		}
+
+		updateInfo := map[string]interface{}{
+			"userRatings":    updateUserReview.Ratings,
+			"averageRatings": updateAverageRatings,
+		}
+
+		c.JSON(http.StatusOK, updateInfo)
+	}
+}
+
 func buildEventQuery(v url.Values) *EventQuery {
 	var (
 		limit  = config.Get().Misc.Pagesize
@@ -266,5 +309,21 @@ func buildEventQuery(v url.Values) *EventQuery {
 		CategoryIn:   v["category"],
 		Skip:         offset,
 		Limit:        limit,
+		SortFields:   []string{"InverseRating", "Name"},
 	}
+}
+
+func ratingValid(review *Review) bool {
+	if review.EventId == "" {
+		return false
+	}
+	if len(review.Ratings) < 1 {
+		return false
+	}
+	for k, v := range review.Ratings {
+		if k == "" || v < 1 || v > 5 {
+			return false
+		}
+	}
+	return true
 }
