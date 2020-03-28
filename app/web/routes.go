@@ -24,6 +24,7 @@ func RegisterFallbackRoutes(router *gin.Engine) {
 
 func RegisterStaticRoutes(router *gin.Engine) {
 	router.Static("/assets", "app/public/build")
+	router.StaticFile("favicon.ico", "app/public/build/favicon.ico")
 }
 
 func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {

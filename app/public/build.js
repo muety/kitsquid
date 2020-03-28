@@ -8,6 +8,7 @@ const ASSETS = {
     base: '',
     files: [
         ...fs.readdirSync(`${ASSET_DIR}/css`).filter(f => !f.includes('tailwind')).map(f => Object.assign({}, { src: `${ASSET_DIR}/css/${f}`, dst: `css/${f}` })),
+        ...fs.readdirSync(`${ASSET_DIR}/`).filter(f => f.endsWith('.ico')).map(f => Object.assign({}, { src: `${ASSET_DIR}/${f}`, dst: `${f}` })),
         ...fs.readdirSync(`${ASSET_DIR}/js`).map(f => Object.assign({}, { src: `${ASSET_DIR}/js/${f}`, dst: `js/${f}` })),
         ...fs.readdirSync(`${ASSET_DIR}/images`).map(f => Object.assign({}, { src: `${ASSET_DIR}/images/${f}`, dst: `images/${f}` })),
         ...fs.readdirSync(`${ASSET_DIR}/font`).map(f => Object.assign({}, { src: `${ASSET_DIR}/font/${f}`, dst: `font/${f}` }))
