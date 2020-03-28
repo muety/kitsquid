@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -350,6 +351,8 @@ func GetTypes() ([]string, error) {
 		i++
 	}
 
+	sort.Sort(sort.StringSlice(types))
+
 	miscCache.SetDefault(cacheKey, types)
 	return types, nil
 }
@@ -380,6 +383,10 @@ func GetLecturers() ([]*Lecturer, error) {
 		lecturers[i] = v
 		i++
 	}
+
+	sort.Slice(lecturers, func(i, j int) bool {
+		return strings.Compare(lecturers[i].Name, lecturers[j].Name) < 0
+	})
 
 	miscCache.SetDefault(cacheKey, lecturers)
 	return lecturers, nil
