@@ -159,6 +159,7 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		user.CreatedAt = time.Now()
 		if u, err := Get(user.Id); err != nil || !u.Admin {
 			user.Admin = false
 		}
