@@ -331,6 +331,7 @@ func apiPutReview(r *gin.Engine) func(c *gin.Context) {
 
 		review.EventId = event.Id
 		review.UserId = user.Id
+		review.CreatedAt = time.Now()
 
 		if err := c.ShouldBindJSON(&review); err != nil || !ratingValid(&review) {
 			c.Error(err).SetType(gin.ErrorTypePrivate)

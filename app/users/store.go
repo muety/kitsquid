@@ -121,7 +121,7 @@ func Find(query *UserQuery) ([]*User, error) {
 		}
 	}
 
-	err := db.Find(&foundUsers, q.SortBy("CreatedAt"))
+	err := db.Find(&foundUsers, q.SortBy("CreatedAt").Reverse())
 	if err == nil {
 		usersCache.SetDefault(cacheKey, foundUsers)
 	}

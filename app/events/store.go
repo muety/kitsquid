@@ -484,7 +484,7 @@ func FindReviews(query *ReviewQuery) ([]*Review, error) {
 		}
 	}
 
-	err := db.Find(&foundReviews, q)
+	err := db.Find(&foundReviews, q.SortBy("CreatedAt").Reverse())
 	if err == nil {
 		reviewsCache.SetDefault(cacheKey, foundReviews)
 	}

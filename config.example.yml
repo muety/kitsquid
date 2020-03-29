@@ -25,7 +25,7 @@ mail:
     password: "shhh"
 
 cache:
-  lectures: 30m
+  events: 30m
   misc: 60m
   users: 60m
   sessions: 10m
