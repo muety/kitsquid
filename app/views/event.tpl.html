@@ -100,7 +100,7 @@
                         {{ end }}
                         {{ if .event.Description }}
                             <div class="my-1 mt-8">
-                                <div class="show-li text-sm">
+                                <div class="show-li text-sm description">
                                     {{ htmlSafe .event.Description }}
                                 </div>
                             </div>
@@ -156,9 +156,9 @@
                                 {{ end }}
                             </div>
                         {{ else if and .tplCtx.User (not .comments) }}
-                            <p>Keine Kommentare</p>
+                            <p class="mt-2">Keine Kommentare</p>
                         {{ else }}
-                            <p><i class="icon-info-circled"></i> Bitte logge dich ein, um Kommentare lesen zu können.</p>
+                            <p class="mt-2"><i class="icon-info-circled"></i> Bitte logge dich ein, um Kommentare lesen zu können.</p>
                         {{ end }}
                     </div>
                 </div>

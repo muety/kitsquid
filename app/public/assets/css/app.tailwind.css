@@ -85,3 +85,7 @@
 .star.checked, .star.checked ~ .star {
     @apply text-yellow-500;
 }
+
+.description p {
+    @apply mt-4;
+}

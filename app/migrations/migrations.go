@@ -28,6 +28,7 @@ func init() {
 		migration1{},
 		migration2{},
 		migration3{},
+		migration4{},
 	}
 }
 

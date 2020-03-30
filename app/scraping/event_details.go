@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/n1try/kitsquid/app/events"
 	"golang.org/x/sync/semaphore"
 	"net/http"
@@ -50,6 +51,16 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 	ctx := context.TODO()
 	mtx := &sync.Mutex{}
 	sem := semaphore.NewWeighted(int64(maxWorkers))
+
+	// Don't forget to update migration4 when changing the policy
+	htmlPolicy := bluemonday.StrictPolicy()
+	htmlPolicy.AllowNoAttrs()
+	htmlPolicy.AllowImages()
+	htmlPolicy.AllowLists()
+	htmlPolicy.AllowTables()
+	htmlPolicy.AllowElements("b", "i", "strong", "p", "span", "br", "h1", "h2", "h3", "h4", "h5", "h6", "a", "section")
+	htmlPolicy.AllowAttrs("style").OnElements("p", "span")
+	htmlPolicy.AllowStyles("text-decoration").MatchingEnum("underline", "line-through").OnElements("p", "span")
 
 	for i, e := range f.Events {
 		if err := sem.Acquire(ctx, 1); err != nil {
@@ -136,9 +147,9 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			desc2 = sb.String()
 
 			if len(desc1) > len(desc2) {
-				desc = desc1
+				desc = htmlPolicy.Sanitize(desc1)
 			} else {
-				desc = desc2
+				desc = htmlPolicy.Sanitize(desc2)
 			}
 
 			// External Link
