@@ -131,7 +131,11 @@
                                     <div class="w-full relative border border-gray-600 rounded-lg p-4 bg-gray-800 text-sm my-2">
                                         <div class="flex items-center">
                                             <div class="mr-1" title="{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }} ({{ (index $.userMap .UserId).Degree }} {{ (index $.userMap .UserId).Major }})">
-                                                <img src="https://avatars.dicebear.com/v2/{{ (index $.userMap .UserId).Gender }}/{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }}.svg" class="w-8 rounded-full border-2 border-gray-500 mr-3">
+                                                {{ if eq (index $.userMap .UserId).Gender "–" }}
+                                                    <img src="/assets/images/unknown.png" class="w-8 rounded-full border-2 border-gray-500 mr-3">
+                                                {{ else }}
+                                                    <img src="https://avatars.dicebear.com/v2/{{ (index $.userMap .UserId).Gender }}/{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }}.svg" class="w-8 rounded-full border-2 border-gray-500 mr-3">
+                                                {{ end }}
                                             </div>
                                             <div class="w-full ml-1">
                                                 <div class="w-full flex items-center mb-1">

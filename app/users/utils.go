@@ -128,3 +128,16 @@ func ValidateRecaptcha(token, ip string) bool {
 
 	return apiResponse.Success
 }
+
+func DeletedUser() *User {
+	return &User{
+		Id:        config.DeletedUserName,
+		Password:  "",
+		Active:    true,
+		Admin:     false,
+		Gender:    "–",
+		Major:     "–",
+		Degree:    "–",
+		CreatedAt: time.Time{},
+	}
+}

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"github.com/leandro-lugaresi/hub"
 	"github.com/n1try/kitsquid/app/events"
 	"github.com/n1try/kitsquid/app/users"
 	"github.com/timshannon/bolthold"
@@ -13,8 +14,8 @@ var (
 	entities []*registeredEntity
 )
 
-func Init(store *bolthold.Store) {
-	InitStore(store)
+func Init(store *bolthold.Store, eventBus *hub.Hub) {
+	initStore(store)
 
 	registry = make(map[string]*registeredEntity)
 	entities = make([]*registeredEntity, 0)

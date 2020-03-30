@@ -74,6 +74,7 @@ func getEvent(r *gin.Engine) func(c *gin.Context) {
 			})
 
 			userMap = make(map[string]*users.User)
+			userMap[config.DeletedUserName] = users.DeletedUser()
 			for _, c := range comms {
 				if u, err := users.Get(c.UserId); err == nil {
 					userMap[u.Id] = u
@@ -236,7 +237,7 @@ func deleteComment(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		if existing.UserId != user.Id {
+		if existing.UserId != user.Id || existing.UserId == config.DeletedUserName {
 			util.MakeError(c, "event", http.StatusUnauthorized, errors.Unauthorized{}, nil)
 			return
 		}

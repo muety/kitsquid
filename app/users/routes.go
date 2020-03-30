@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
+	"github.com/leandro-lugaresi/hub"
 	"github.com/n1try/kitsquid/app/common/errors"
 	"github.com/n1try/kitsquid/app/config"
 	"github.com/n1try/kitsquid/app/util"
@@ -21,6 +22,7 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/signup", postSignup(router))
 	group.POST("/login", postLogin(router))
 	group.POST("/account", CheckUser(), postAccount(router))
+	group.POST("/account/delete", CheckUser(), postDeleteAccount(router))
 	group.POST("/logout", CheckUser(), postLogout(router))
 }
 
@@ -263,6 +265,36 @@ func postAccount(r *gin.Engine) func(c *gin.Context) {
 		c.HTML(http.StatusOK, "redirect", gin.H{
 			"tplCtx": c.MustGet(config.TemplateContextKey),
 			"url":    "/account?alert=account_change_success",
+		})
+	}
+}
+
+func postDeleteAccount(r *gin.Engine) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		u, _ := c.Get(config.UserKey)
+		user := u.(*User)
+
+		s, _ := c.Get(config.SessionKey)
+		session := s.(*UserSession)
+
+		if err := Delete(user.Id); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+			util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
+			return
+		}
+
+		if err := DeleteSession(session); err != nil {
+			c.Error(err).SetType(gin.ErrorTypePrivate)
+		}
+
+		config.EventBus().Publish(hub.Message{
+			Name:   config.EventAccountDelete,
+			Fields: hub.Fields{"id": user.Id},
+		})
+
+		c.HTML(http.StatusOK, "redirect", gin.H{
+			"tplCtx": c.MustGet(config.TemplateContextKey),
+			"url":    "/?alert=account_delete_success",
 		})
 	}
 }

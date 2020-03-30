@@ -1,9 +1,9 @@
 {{ define "content" }}
     <div class="px-4">
-        <h1 class="text-2xl inline-block border-b-4 border-kit mb-4">Account</h1>
+        <h1 class="text-2xl inline-block border-b-4 border-kit">Account</h1>
         <form id="form-account-change" action="/account" method="post">
-            <div class="w-full lg:w-2/3">
-                <h2 class="text-lg inline-block text-kit mb-2">Persönliche Angaben</h2>
+            <div class="w-full lg:w-2/3 rounded shadow-md bg-gray-700 p-8 mt-8">
+                <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Persönliche Angaben</h2>
                 <div class="mb-8">
                     <label class="block text-gray-300 text-sm font-bold mb-2">Dein Geschlecht</label>
                     <fieldset id="fs-account-gender">
@@ -59,8 +59,8 @@
                 </div>
             </div>
 
-            <div class="w-full lg:w-2/3 mt-12">
-                <h2 class="text-lg inline-block text-kit mb-2">Passwort ändern</h2>
+            <div class="w-full lg:w-2/3 rounded shadow-md bg-gray-700 p-8 mt-8">
+                <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Passwort ändern</h2>
                 <div class="flex w-full">
                     <div class="w-1/2 pr-2">
                         <label class="block text-gray-300 text-sm font-bold mb-2" for="input-password-old">Altes
@@ -80,12 +80,17 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full lg:w-2/3 flex justify-end mt-12">
-                <button class="bg-kit hover:bg-kit-dark text-white font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
-                        type="submit">
+
+            <div class="w-full lg:w-2/3 flex justify-end mt-8 py-1">
+                    <button id="btn-delete-account" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 mr-1 rounded focus:outline-none focus:shadow-outline text-sm" type="button">
+                        Account löschen
+                    </button>
+
+                <button class="bg-kit hover:bg-kit-dark text-white font-bold py-1 px-4 ml-1 rounded focus:outline-none focus:shadow-outline text-sm" type="submit">
                     Speichern
                 </button>
             </div>
         </form>
+        <form id="form-account-delete" action="/account/delete" method="post"></form>
     </div>
 {{ end }}

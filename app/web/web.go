@@ -89,6 +89,9 @@ func Start() {
 			log.Fatalf("failed to shut down the server gracefully – %v", err)
 		}
 
+		// Pre-shutdown tasks
+		config.EventBus().Close()
+
 		log.Infoln("exited gracefully")
 		close(exited)
 	}()

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	log "github.com/golang/glog"
 	"github.com/jinzhu/configor"
+	"github.com/leandro-lugaresi/hub"
 	"github.com/timshannon/bolthold"
 	"strings"
 )
@@ -15,6 +16,7 @@ var Messages = map[string]string{
 	"activate_failure":       "Dein Account konnte nicht aktiviert werden. Bitte wende dich an den Admin",
 	"activate_success":       "Dein Account ist aktiviert. Du kannst dich jetzt einloggen",
 	"account_change_success": "Deine Angaben wurden aktualisiert",
+	"account_delete_success": "Dein Account wurde gelöscht",
 }
 
 const (
@@ -25,12 +27,15 @@ const (
 	KitVvzBaseUrl         = "https://campus.kit.edu/sp/campus/all"
 	FacultyIdx            = 0
 	OverallRatingKey      = "overall"
+	DeletedUserName       = "(gelöschter Benutzer)"
 	MaxEventSearchResults = 25
+	EventAccountDelete    = "account.delete"
 )
 
 var (
-	config *Config
-	db     *bolthold.Store
+	config   *Config
+	db       *bolthold.Store
+	eventBus *hub.Hub
 )
 
 func Init() {
@@ -64,6 +69,9 @@ func Init() {
 		db = _db
 	}
 
+	// Init event bus
+	eventBus = hub.New()
+
 	log.Infof("running in %s mode.\n", config.Env)
 }
 
@@ -73,4 +81,8 @@ func Get() *Config {
 
 func Db() *bolthold.Store {
 	return db
+}
+
+func EventBus() *hub.Hub {
+	return eventBus
 }

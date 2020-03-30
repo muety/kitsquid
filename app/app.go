@@ -18,9 +18,9 @@ func init() {
 
 	config.Init()
 	web.Init()
-	events.Init(config.Db())
-	users.Init(config.Db())
-	admin.Init(config.Db())
+	events.Init(config.Db(), config.EventBus())
+	users.Init(config.Db(), config.EventBus())
+	admin.Init(config.Db(), config.EventBus())
 }
 
 func Run() {

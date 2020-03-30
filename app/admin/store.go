@@ -10,7 +10,7 @@ var (
 	cfg *config.Config
 )
 
-func InitStore(store *bolthold.Store) {
+func initStore(store *bolthold.Store) {
 	cfg = config.Get()
 	db = store
 }

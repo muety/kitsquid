@@ -11,6 +11,7 @@ $(() => {
         inputSearch = $('#input-search'),
         formSignup = $('#form-signup'),
         formFilter = $('#form-event-filter'),
+        formAccountDelete = $('#form-account-delete'),
         imgAvatar = $('#img-avatar'),
         ratingContainers = $('div[id^="star-rating"]')
 
@@ -51,6 +52,20 @@ $(() => {
             debounce = setTimeout(updateAvatar, 250)
         })
         inputSignupGender.change(updateAvatar)
+    }
+
+    let clickCount = 0
+    if (formAccountDelete) {
+        let deleteBtn = $('#btn-delete-account')
+        deleteBtn.click(() => {
+            if (!clickCount) {
+                deleteBtn.text('Bist du sicher?')
+                clickCount++
+            } else {
+                formAccountDelete.submit()
+                clickCount = 0
+            }
+        })
     }
 
     if (ratingContainers.length && eventId) {

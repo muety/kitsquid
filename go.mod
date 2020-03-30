@@ -11,6 +11,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/jinzhu/configor v1.1.1
+	github.com/leandro-lugaresi/hub v1.1.0
 	github.com/microcosm-cc/bluemonday v1.0.3-0.20191119130333-0a75d7616912
 	github.com/n1try/limiter/v3 v3.4.3-0.20200327100513-d7e04ca15b84
 	github.com/patrickmn/go-cache v2.1.0+incompatible
