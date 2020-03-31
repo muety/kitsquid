@@ -17,11 +17,13 @@
                     </button>
                 </div>
                 <div class="flex flex-grow w-1/2">
-                    <div class="w-full relative">
+                    <div class="w-full relative pr-6 sm:pr-0">
                         <div class="relative">
+                            {{ if not (in .tplCtx.Path "/login" "/signup") }}
                             <input id="input-search" class="border border-transparent border-gray-600 placeholder-gray-600 rounded-lg shadow-md bg-gray-900 py-1 pr-2 pl-10 block w-full"
                                    placeholder="Veranstaltung suchen ...">
                             <i class="icon-search pointer-events-none absolute inset-y-0 left-0 pl-4 pt-1 text-gray-600"></i>
+                            {{ end }}
                         </div>
                         <div id="search-results" class="absolute hidden w-full bg-gray-900 border border-gray-600 rounded-lg shadow-sm py-1 px-4 mt-1 z-10">
                             <ul id="search-results-list" class="text-sm">
@@ -29,9 +31,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-1/6 pr-6 xl:pr-0 flex items-center justify-end relative">
-                    <img src="{{ if .tplCtx.User }}https://avatars.dicebear.com/v2/{{ .tplCtx.User.Gender }}/{{ index (strSplit .tplCtx.User.Id "@") 0 }}.svg{{ else }}/assets/images/unknown.png{{ end }}" class="md:hidden w-8 rounded-full border-2 border-gray-500 mr-3 cursor-pointer" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ else }}toggleLoginButton(){{ end }}; event.stopPropagation()">
-                    <img src="{{ if .tplCtx.User }}https://avatars.dicebear.com/v2/{{ .tplCtx.User.Gender }}/{{ index (strSplit .tplCtx.User.Id "@") 0 }}.svg{{ else }}/assets/images/unknown.png{{ end }}" class="hidden md:block w-8 rounded-full border-2 border-gray-500 mr-3 {{ if .tplCtx.User }}cursor-pointer{{end}}" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
+                <div class="w-1/6 pr-6 xl:pr-0 flex items-center justify-end relative" style="min-height: 32px; min-width: 32px">
+                    <img src="{{ if .tplCtx.User }}https://avatars.dicebear.com/v2/{{ .tplCtx.User.Gender }}/{{ index (strSplit .tplCtx.User.Id "@") 0 }}.svg{{ else }}/assets/images/unknown.png{{ end }}" style="min-height: 32px; min-width: 32px" class="md:hidden w-8 rounded-full border-2 border-gray-500 mr-3 cursor-pointer" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ else }}toggleLoginButton(){{ end }}; event.stopPropagation()">
+                    <img src="{{ if .tplCtx.User }}https://avatars.dicebear.com/v2/{{ .tplCtx.User.Gender }}/{{ index (strSplit .tplCtx.User.Id "@") 0 }}.svg{{ else }}/assets/images/unknown.png{{ end }}" style="min-height: 32px; min-width: 32px" class="hidden md:block w-8 rounded-full border-2 border-gray-500 mr-3 {{ if .tplCtx.User }}cursor-pointer{{end}}" onclick="{{ if .tplCtx.User }}toggleLogoutButton(){{ end }}; event.stopPropagation()">
                     {{ if .tplCtx.User }}
                         <div class="text-sm hidden lg:block flex flex-col items-center" onclick="toggleLogoutButton(); event.stopPropagation()">
                             <a class="font-semibold cursor-pointer">
