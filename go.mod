@@ -13,7 +13,7 @@ require (
 	github.com/jinzhu/configor v1.1.1
 	github.com/leandro-lugaresi/hub v1.1.0
 	github.com/microcosm-cc/bluemonday v1.0.3-0.20191119130333-0a75d7616912
-	github.com/n1try/limiter/v3 v3.4.3-0.20200327100513-d7e04ca15b84
+	github.com/n1try/limiter/v3 v3.5.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/satori/go.uuid v1.2.0
 	github.com/timshannon/bolthold v0.0.0-20200224174833-bf6268f136e7
