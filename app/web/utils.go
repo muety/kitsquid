@@ -136,3 +136,11 @@ func in(needle interface{}, haystack ...interface{}) bool {
 	}
 	return false
 }
+
+func health() uint8 {
+	var dbUp uint8
+	if _, err := users.Get(cfg.Auth.Admin.User); err == nil {
+		dbUp = 1
+	}
+	return dbUp
+}

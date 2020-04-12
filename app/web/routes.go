@@ -44,6 +44,9 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	group.GET("/data-privacy", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "data_privacy", gin.H{"tplCtx": c.MustGet(config.TemplateContextKey)})
 	})
+	group.GET("/health", func(c *gin.Context) {
+		c.String(200, "app=1\ndb=%d", health())
+	})
 
 	return group
 }
