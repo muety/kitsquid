@@ -1,5 +1,12 @@
 # KITSquid
 
+[![](http://img.shields.io/liberapay/receives/muety.svg?logo=liberapay&style=flat-square)](https://liberapay.com/muety/)
+![](https://img.shields.io/github/license/muety/kitsquid?style=flat-square)
+[![Go Report Card](https://goreportcard.com/badge/github.com/muety/kitsquid)](https://goreportcard.com/report/github.com/muety/kitsquid)
+[![](https://img.shields.io/website?url=https%3A%2F%2Fkitsquid.de)](https://kitsquid.de)
+
+---
+
 <img src="app/public/assets/images/squid_green.png" width="128">
 
 🗒 An independent, private hobby project aiming to provide an alternative course catalog to students of [Karlsruhe Institute Of Technology](https://kit.edu). Students are given the ability to rate and comment lectures and provide valuable tips and advice to their fellow students. 
