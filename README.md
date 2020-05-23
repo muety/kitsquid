@@ -3,7 +3,7 @@
 [![](http://img.shields.io/liberapay/receives/muety.svg?logo=liberapay&style=flat-square)](https://liberapay.com/muety/)
 ![](https://img.shields.io/github/license/muety/kitsquid?style=flat-square)
 [![Go Report Card](https://goreportcard.com/badge/github.com/muety/kitsquid)](https://goreportcard.com/report/github.com/muety/kitsquid)
-[![](https://img.shields.io/website?url=https%3A%2F%2Fkitsquid.de)](https://kitsquid.de)
+[![](https://img.shields.io/website.svg?url=https%3A%2F%2Fkitsquid.de%2Fhealth&style=flat-square)](https://kitsquid.de)
 
 ---
 
