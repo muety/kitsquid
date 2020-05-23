@@ -1,8 +1,9 @@
 # KITSquid
 
 [![](http://img.shields.io/liberapay/receives/muety.svg?logo=liberapay&style=flat-square)](https://liberapay.com/muety/)
+[![Say thanks](https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg?style=flat-square)](https://saythanks.io/to/n1try)
 ![](https://img.shields.io/github/license/muety/kitsquid?style=flat-square)
-[![Go Report Card](https://goreportcard.com/badge/github.com/muety/kitsquid)](https://goreportcard.com/report/github.com/muety/kitsquid)
+[![Go Report Card](https://goreportcard.com/badge/github.com/muety/kitsquid?style=flat-square)](https://goreportcard.com/report/github.com/muety/kitsquid)
 [![](https://img.shields.io/website.svg?url=https%3A%2F%2Fkitsquid.de%2Fhealth&style=flat-square)](https://kitsquid.de)
 
 ---
