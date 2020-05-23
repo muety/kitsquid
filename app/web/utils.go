@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func GetFuncMap() template.FuncMap {
+func getFuncMap() template.FuncMap {
 	return template.FuncMap{
 		"add":           add,
 		"in":            in,
@@ -31,7 +31,7 @@ func GetFuncMap() template.FuncMap {
 	}
 }
 
-func GetTplCtx(c *gin.Context) util.TplCtx {
+func getTplCtx(c *gin.Context) util.TplCtx {
 	var (
 		alerts = make([]string, 0)
 		errors = make([]string, 0)
@@ -64,7 +64,7 @@ func GetTplCtx(c *gin.Context) util.TplCtx {
 			VvzBaseUrl   string
 		}{
 			FacultyIndex: config.FacultyIdx,
-			VvzBaseUrl:   config.KitVvzBaseUrl,
+			VvzBaseUrl:   config.KitVvzBaseURL,
 		},
 		Alerts:       alerts,
 		Errors:       errors,

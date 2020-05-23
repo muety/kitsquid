@@ -31,6 +31,9 @@ func initStore(store *bolthold.Store) {
 	}
 }
 
+/*
+Reindex rebuilds all indices in the users bucket
+*/
 func Reindex() {
 	r := func(name string) {
 		if r := recover(); r != nil {
@@ -43,11 +46,14 @@ func Reindex() {
 		log.Infof("reindexing %s", tn)
 		func() {
 			defer r(tn)
-			db.ReIndex(t, nil)
+			_ = db.ReIndex(t, nil)
 		}()
 	}
 }
 
+/*
+FlushCaches invalidates all user-related caches
+*/
 func FlushCaches() {
 	log.Infoln("flushing users caches")
 	usersCache.Flush()
@@ -82,6 +88,9 @@ func setup() {
 	}
 }
 
+/*
+Get retrieves a user by its Id
+*/
 func Get(id string) (*User, error) {
 	cacheKey := fmt.Sprintf("get:%s", id)
 	if l, ok := usersCache.Get(cacheKey); ok {
@@ -97,6 +106,9 @@ func Get(id string) (*User, error) {
 	return &user, nil
 }
 
+/*
+Find retrieves a list of users matching the given query
+*/
 func Find(query *UserQuery) ([]*User, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
 	if ll, ok := usersCache.Get(cacheKey); ok {
@@ -128,6 +140,9 @@ func Find(query *UserQuery) ([]*User, error) {
 	return foundUsers, err
 }
 
+/*
+GetAll retrieves all available users
+*/
 func GetAll() ([]*User, error) {
 	inactive, err := Find(&UserQuery{
 		ActiveEq: false,
@@ -135,14 +150,16 @@ func GetAll() ([]*User, error) {
 	if err != nil {
 		return []*User{}, err
 	}
+
 	active, err := Find(&UserQuery{
 		ActiveEq: true,
 	})
+	if err != nil {
+		return []*User{}, err
+	}
 
 	all := make([]*User, len(active)+len(inactive))
-	for i, u := range inactive {
-		all[i] = u
-	}
+	copy(all, inactive)
 
 	for i, u := range active {
 		all[i+len(inactive)] = u
@@ -151,6 +168,9 @@ func GetAll() ([]*User, error) {
 	return all, nil
 }
 
+/*
+Count returns the total number of users
+*/
 func Count() int {
 	cacheKey := "count"
 	if c, ok := usersCache.Get(cacheKey); ok {
@@ -166,6 +186,9 @@ func Count() int {
 	return len(all)
 }
 
+/*
+CountAdmins returns the total number of users with the admin flag set to true
+*/
 func CountAdmins() int {
 	cacheKey := "count:admins"
 	if c, ok := usersCache.Get(cacheKey); ok {
@@ -181,6 +204,9 @@ func CountAdmins() int {
 	return len(all)
 }
 
+/*
+Insert adds a new user or updates an existing one
+*/
 func Insert(user *User, upsert bool) error {
 	usersCache.Flush()
 
@@ -191,11 +217,17 @@ func Insert(user *User, upsert bool) error {
 	return f(user.Id, user)
 }
 
+/*
+Delete removes a user by its Id
+*/
 func Delete(key string) error {
 	defer usersCache.Flush()
 	return db.Delete(key, &User{})
 }
 
+/*
+GetAllSessions returns all registered user sessions for debugging purposes
+*/
 func GetAllSessions() ([]*UserSession, error) {
 	cacheKey := "get:all"
 	if ss, ok := sessionsCache.Get(cacheKey); ok {
@@ -211,6 +243,9 @@ func GetAllSessions() ([]*UserSession, error) {
 	return sessions, nil
 }
 
+/*
+GetSession retrieves an existing session by its used token
+*/
 func GetSession(token string) (*UserSession, error) {
 	if s, ok := sessionsCache.Get(token); ok && time.Since(s.(*UserSession).LastSeen) < cfg.SessionTimeout() {
 		return s.(*UserSession), nil
@@ -225,6 +260,9 @@ func GetSession(token string) (*UserSession, error) {
 	return &sess, nil
 }
 
+/*
+InsertSession starts a new session
+*/
 func InsertSession(sess *UserSession, upsert bool) error {
 	f := db.Insert
 	if upsert {
@@ -233,34 +271,46 @@ func InsertSession(sess *UserSession, upsert bool) error {
 	return f(sess.Token, sess)
 }
 
+/*
+DeleteSession removes an existing session and causes the user to be logged out
+*/
 func DeleteSession(sess *UserSession) error {
 	sessionsCache.Delete(sess.Token)
 	return db.Delete(sess.Token, sess)
 }
 
+/*
+GetToken returns the user Id related to the given token
+*/
 func GetToken(token string) (string, error) {
-	var userId string
+	var userID string
 	err := db.Bolt().View(func(tx *bolt.Tx) error {
 		v := tx.Bucket([]byte("token")).Get([]byte(token))
 		if v == nil {
-			userId = ""
+			userID = ""
 		}
-		userId = string(v)
+		userID = string(v)
 		return nil
 	})
-	return userId, err
+	return userID, err
 }
 
-func InsertToken(token, userId string) error {
+/*
+InsertToken associates the given user Id with the given token
+*/
+func InsertToken(token, userID string) error {
 	return db.Bolt().Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("token"))
 		if err != nil {
 			return err
 		}
-		return b.Put([]byte(token), []byte(userId))
+		return b.Put([]byte(token), []byte(userID))
 	})
 }
 
+/*
+DeleteToken removes the association of the given token with its user
+*/
 func DeleteToken(token string) error {
 	return db.Bolt().Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("token"))

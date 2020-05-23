@@ -23,6 +23,9 @@ func init() {
 	admin.Init(config.Db(), config.EventBus())
 }
 
+/*
+Run runs everything!
+*/
 func Run() {
 	if !config.Get().QuickStart {
 		migrations.RunAll()

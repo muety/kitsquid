@@ -5,6 +5,9 @@ import (
 	"github.com/timshannon/bolthold"
 )
 
+/*
+Init initializes the user store
+*/
 func Init(store *bolthold.Store, eventBus *hub.Hub) {
 	initStore(store)
 }

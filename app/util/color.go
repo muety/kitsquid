@@ -12,6 +12,9 @@ import (
 var letters = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"}
 var colorCache = cache.New(60*time.Minute, 60*2*time.Minute)
 
+/*
+RandomColor returns a randomly generated color code, using the given random seed
+*/
 func RandomColor(seedKey string) string {
 	if c, ok := colorCache.Get(seedKey); ok {
 		return c.(string)

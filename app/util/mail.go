@@ -9,6 +9,9 @@ import (
 	"text/template"
 )
 
+/*
+SendMail uses SMTP to send a new e-mail to the given recipient address with the given content
+*/
 func SendMail(recipient string, content *bytes.Buffer) error {
 	cfg := config.Get()
 
@@ -17,13 +20,16 @@ func SendMail(recipient string, content *bytes.Buffer) error {
 	}
 
 	return smtp.SendMail(
-		cfg.SmtpHost(),
-		cfg.SmtpAuth(),
+		cfg.SMTPHost(),
+		cfg.SMTPAuth(),
 		cfg.Mail.From,
 		[]string{recipient},
 		content.Bytes())
 }
 
+/*
+SendTestMail uses SMTP to send a new test e-mail for debugging purposes
+*/
 func SendTestMail(recipient string) error {
 	cfg := config.Get()
 

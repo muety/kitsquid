@@ -17,6 +17,9 @@ import (
 	"time"
 )
 
+/*
+RegisterRoutes registers all public routes with the given router instance
+*/
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/", getEvents(router))
 	group.GET("/bookmarks", CheckUser(), getBookmarks(router))
@@ -25,7 +28,10 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/event/:id/comments/delete", CheckUser(), deleteComment(router))
 }
 
-func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
+/*
+RegisterAPIRoutes registers all API routes with the given router instance
+*/
+func RegisterAPIRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/event/search", apiSearchEvents(router))
 	group.PUT("/event/:id/bookmark", CheckUser(), apiPutBookmark(router))
 	group.PUT("/event/:id/reviews", CheckUser(), apiPutReview(router))
@@ -259,7 +265,7 @@ func apiSearchEvents(r *gin.Engine) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		values := c.Request.URL.Query()
 
-		// TODO: Add ability to search by ID
+		// TODO: Add ability to search by Id
 		eventQuery := &EventQuery{
 			NameLike: values.Get("q"),
 			Limit:    config.MaxEventSearchResults,

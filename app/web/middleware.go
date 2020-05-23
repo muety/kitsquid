@@ -23,7 +23,7 @@ func ErrorHandle() gin.HandlerFunc {
 			}
 		}
 
-		tplCtx := GetTplCtx(c)
+		tplCtx := getTplCtx(c)
 		tplCtx.Errors = errors
 
 		c.HTML(c.Writer.Status(), "empty", gin.H{
@@ -56,7 +56,7 @@ func ApiErrorHandle() gin.HandlerFunc {
 
 func TemplateContext() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tplCtx := GetTplCtx(c)
+		tplCtx := getTplCtx(c)
 		c.Set(config.TemplateContextKey, &tplCtx)
 		c.Next()
 	}
@@ -75,7 +75,7 @@ func RemoteIp() gin.HandlerFunc {
 			remoteIp = strings.Split(remoteIp, ":")[0]
 		}
 
-		c.Set(config.RemoteIpKey, remoteIp)
+		c.Set(config.RemoteIPKey, remoteIp)
 		c.Next()
 	}
 }

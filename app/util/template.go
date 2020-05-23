@@ -6,6 +6,9 @@ import (
 	"github.com/n1try/kitsquid/app/config"
 )
 
+/*
+MakeError creates a new error in Gin
+*/
 func MakeError(c *gin.Context, tpl string, status int, error errors.KitSquidError, args *gin.H) {
 	tplCtx := c.MustGet(config.TemplateContextKey)
 	tplCtx.(*TplCtx).Errors = append(tplCtx.(*TplCtx).Errors, error.Error())
@@ -23,6 +26,9 @@ func MakeError(c *gin.Context, tpl string, status int, error errors.KitSquidErro
 	c.HTML(status, tpl, h)
 }
 
+/*
+TplCtx represents a collection of all properties to be attached to all templates
+*/
 type TplCtx struct {
 	User      interface{}
 	Url       string

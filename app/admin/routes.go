@@ -14,16 +14,22 @@ import (
 	"strings"
 )
 
+/*
+RegisterRoutes registers all public routes with the given router instance
+*/
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
-	group.GET("/admin", CheckAdmin(), getIndex(router))
+	group.GET("/admin", checkAdmin(), getIndex(router))
 }
 
-func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
-	group.POST("/admin/query", CheckAdmin(), apiAdminQuery(router))
-	group.POST("/admin/flush", CheckAdmin(), apiAdminFlush(router))
-	group.POST("/admin/reindex", CheckAdmin(), apiAdminReindex(router))
-	group.POST("/admin/scrape", CheckAdmin(), apiAdminScrape(router))
-	group.POST("/admin/test_mail", CheckAdmin(), apiAdminTestMail(router))
+/*
+RegisterAPIRoutes registers all API routes with the given router instance
+*/
+func RegisterAPIRoutes(router *gin.Engine, group *gin.RouterGroup) {
+	group.POST("/admin/query", checkAdmin(), apiAdminQuery(router))
+	group.POST("/admin/flush", checkAdmin(), apiAdminFlush(router))
+	group.POST("/admin/reindex", checkAdmin(), apiAdminReindex(router))
+	group.POST("/admin/scrape", checkAdmin(), apiAdminScrape(router))
+	group.POST("/admin/test_mail", checkAdmin(), apiAdminTestMail(router))
 }
 
 func getIndex(r *gin.Engine) func(c *gin.Context) {

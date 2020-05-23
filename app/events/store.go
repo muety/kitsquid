@@ -42,6 +42,9 @@ func initStore(store *bolthold.Store) {
 	}
 }
 
+/*
+Reindex rebuilds all indices in the events bucket
+*/
 func Reindex() {
 	r := func(name string) {
 		if r := recover(); r != nil {
@@ -59,6 +62,9 @@ func Reindex() {
 	}
 }
 
+/*
+FlushCaches invalidates all event-related caches
+*/
 func FlushCaches() {
 	log.Infoln("flushing events caches")
 	eventsCache.Flush()
@@ -70,6 +76,9 @@ func FlushCaches() {
 
 func setup() {}
 
+/*
+Get retrieves an event by its Id
+*/
 func Get(id string) (*Event, error) {
 	cacheKey := fmt.Sprintf("get:%s", id)
 	if l, ok := eventsCache.Get(cacheKey); ok {
@@ -85,10 +94,16 @@ func Get(id string) (*Event, error) {
 	return &event, nil
 }
 
+/*
+GetAll returns all events
+*/
 func GetAll() ([]*Event, error) {
 	return Find(nil)
 }
 
+/*
+Find retrieves a list of events matching the given query
+*/
 func Find(query *EventQuery) ([]*Event, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
 	if ee, ok := eventsCache.Get(cacheKey); ok {
@@ -153,6 +168,9 @@ func Find(query *EventQuery) ([]*Event, error) {
 	return foundEvents, err
 }
 
+/*
+Count returns the total number of events
+*/
 func Count() int {
 	cacheKey := "count"
 	if c, ok := eventsCache.Get(cacheKey); ok {
@@ -168,6 +186,9 @@ func Count() int {
 	return len(all)
 }
 
+/*
+Insert adds a new event or updates an existing one
+*/
 func Insert(event *Event, upsert bool, overwrite bool) error {
 	f := db.Insert
 
@@ -185,6 +206,9 @@ func Insert(event *Event, upsert bool, overwrite bool) error {
 	return f(event.Id, event)
 }
 
+/*
+InsertMulti adds a new events or updates an existing ones
+*/
 func InsertMulti(events []*Event, upsert bool, overwrite bool) error {
 	f := db.TxInsert
 	if upsert {
@@ -217,6 +241,9 @@ func InsertMulti(events []*Event, upsert bool, overwrite bool) error {
 	return tx.Commit()
 }
 
+/*
+Delete removes an event by its Id
+*/
 func Delete(key string) error {
 	defer FlushCaches()
 
@@ -245,10 +272,16 @@ func updateEvent(newEvent, existingEvent *Event) {
 	}
 }
 
+/*
+GetFaculties retrieves all faculties
+*/
 func GetFaculties() ([]string, error) {
 	return GetCategoriesAtIndex(config.FacultyIdx)
 }
 
+/*
+CountFaculties counts the number of faculties
+*/
 func CountFaculties() int {
 	cacheKey := "count:faculties"
 	if c, ok := miscCache.Get(cacheKey); ok {
@@ -264,6 +297,9 @@ func CountFaculties() int {
 	return len(all)
 }
 
+/*
+GetCategories retrieves all categories
+*/
 func GetCategories() ([]string, error) {
 	cacheKey := "get:categories"
 	if fl, ok := miscCache.Get(cacheKey); ok {
@@ -284,6 +320,9 @@ func GetCategories() ([]string, error) {
 	return categories, nil
 }
 
+/*
+GetCategoriesAtIndex ?
+*/
 func GetCategoriesAtIndex(index int) ([]string, error) {
 	cacheKey := fmt.Sprintf("get:categories:index:%d", index)
 	if fl, ok := miscCache.Get(cacheKey); ok {
@@ -315,6 +354,9 @@ func GetCategoriesAtIndex(index int) ([]string, error) {
 	return categories, nil
 }
 
+/*
+CountCategories counts the number of categories
+*/
 func CountCategories() int {
 	cacheKey := "count:categories"
 	if c, ok := miscCache.Get(cacheKey); ok {
@@ -330,6 +372,9 @@ func CountCategories() int {
 	return len(all)
 }
 
+/*
+GetTypes retrieves all types of events
+*/
 func GetTypes() ([]string, error) {
 	cacheKey := "get:types"
 	if fl, ok := miscCache.Get(cacheKey); ok {
@@ -361,6 +406,9 @@ func GetTypes() ([]string, error) {
 	return types, nil
 }
 
+/*
+GetLecturers retrieves all lecturers
+*/
 func GetLecturers() ([]*Lecturer, error) {
 	cacheKey := "get:lecturers"
 	if fl, ok := miscCache.Get(cacheKey); ok {
@@ -396,6 +444,9 @@ func GetLecturers() ([]*Lecturer, error) {
 	return lecturers, nil
 }
 
+/*
+GetSemesters retrieves all semesters
+*/
 func GetSemesters() (Semesters, error) {
 	cacheKey := "get:semesters"
 	if fl, ok := miscCache.Get(cacheKey); ok {
@@ -426,6 +477,9 @@ func GetSemesters() (Semesters, error) {
 	return semesters, nil
 }
 
+/*
+GetCurrentSemester returns the current semester
+*/
 func GetCurrentSemester() (curr string, err error) {
 	cacheKey := "get:semester:current"
 	if s, ok := miscCache.Get(cacheKey); ok {
@@ -441,6 +495,9 @@ func GetCurrentSemester() (curr string, err error) {
 	return curr, err
 }
 
+/*
+MustGetCurrentSemester returns the current semester
+*/
 func MustGetCurrentSemester() string {
 	if s, err := GetCurrentSemester(); err == nil {
 		return s
@@ -448,6 +505,9 @@ func MustGetCurrentSemester() string {
 	return ""
 }
 
+/*
+GetReview retrieves a review by its Id
+*/
 func GetReview(id string) (*Review, error) {
 	cacheKey := fmt.Sprintf("get:%s", id)
 	if c, ok := reviewsCache.Get(cacheKey); ok {
@@ -464,6 +524,9 @@ func GetReview(id string) (*Review, error) {
 	return &review, nil
 }
 
+/*
+FindReviews retrieves a list of reviews matching the given query
+*/
 func FindReviews(query *ReviewQuery) ([]*Review, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
 	if rr, ok := reviewsCache.Get(cacheKey); ok {
@@ -491,6 +554,9 @@ func FindReviews(query *ReviewQuery) ([]*Review, error) {
 	return foundReviews, err
 }
 
+/*
+FindCountReviews returns the amount of reviews matching the given query
+*/
 func FindCountReviews(query *ReviewQuery) int {
 	cacheKey := fmt.Sprintf("count:%v", query)
 	if c, ok := reviewsCache.Get(cacheKey); ok {
@@ -503,12 +569,18 @@ func FindCountReviews(query *ReviewQuery) int {
 	return -1
 }
 
+/*
+GetAllReviews retrieves all reviews
+*/
 func GetAllReviews() ([]*Review, error) {
 	return FindReviews(&ReviewQuery{})
 }
 
-func GetReviewAverages(eventId string) (map[string]float32, error) {
-	cacheKey := fmt.Sprintf("avg:%s", eventId)
+/*
+GetReviewAverages aggregates the average ratings of all reviews of a given event
+*/
+func GetReviewAverages(eventID string) (map[string]float32, error) {
+	cacheKey := fmt.Sprintf("avg:%s", eventID)
 	if avg, ok := reviewsCache.Get(cacheKey); ok {
 		return avg.(map[string]float32), nil
 	}
@@ -517,7 +589,7 @@ func GetReviewAverages(eventId string) (map[string]float32, error) {
 	count := make(map[string]float32)
 
 	reviews, err := FindReviews(&ReviewQuery{
-		EventIdEq: eventId,
+		EventIdEq: eventID,
 	})
 
 	if err != nil {
@@ -533,7 +605,7 @@ func GetReviewAverages(eventId string) (map[string]float32, error) {
 				count[k] = 0
 			}
 			result[k] += float32(v)
-			count[k] += 1
+			count[k]++
 		}
 	}
 
@@ -545,6 +617,9 @@ func GetReviewAverages(eventId string) (map[string]float32, error) {
 	return result, nil
 }
 
+/*
+InsertReview adds a new review or updates an existing one
+*/
 func InsertReview(review *Review, upsert bool) error {
 	review.Id = fmt.Sprintf("%s:%s", review.UserId, review.EventId)
 
@@ -560,6 +635,9 @@ func InsertReview(review *Review, upsert bool) error {
 	return f(review.Id, review)
 }
 
+/*
+DeleteReview removes a review by its Id
+*/
 func DeleteReview(key string) error {
 	defer reviewsCache.Flush()
 	return db.Delete(key, &Review{})
@@ -573,6 +651,9 @@ func updateReview(newReview, existingReview *Review) {
 	}
 }
 
+/*
+CountReviews the total number of reviews
+*/
 func CountReviews() int {
 	cacheKey := "count"
 	if c, ok := reviewsCache.Get(cacheKey); ok {
@@ -588,6 +669,9 @@ func CountReviews() int {
 	return len(all)
 }
 
+/*
+GetComment retrieves a comment by its Id
+*/
 func GetComment(id string) (*Comment, error) {
 	cacheKey := fmt.Sprintf("get:%s", id)
 	if c, ok := commentsCache.Get(cacheKey); ok {
@@ -604,6 +688,9 @@ func GetComment(id string) (*Comment, error) {
 	return &comment, nil
 }
 
+/*
+FindComments retrieves a list of comments matching the given query
+*/
 func FindComments(query *CommentQuery) ([]*Comment, error) {
 	cacheKey := fmt.Sprintf("find:%v", query)
 	if cc, ok := commentsCache.Get(cacheKey); ok {
@@ -638,6 +725,9 @@ func FindComments(query *CommentQuery) ([]*Comment, error) {
 	return foundComments, err
 }
 
+/*
+GetAllComments retrieves all available comments
+*/
 func GetAllComments() ([]*Comment, error) {
 	inactive, err := FindComments(&CommentQuery{
 		ActiveEq: false,
@@ -661,6 +751,9 @@ func GetAllComments() ([]*Comment, error) {
 	return all, nil
 }
 
+/*
+CountComments returns the total number of comments
+*/
 func CountComments() int {
 	cacheKey := "count"
 	if c, ok := commentsCache.Get(cacheKey); ok {
@@ -676,6 +769,9 @@ func CountComments() int {
 	return len(all)
 }
 
+/*
+InsertComment adds a new comment or updates an existing one
+*/
 func InsertComment(comment *Comment, upsert bool) error {
 	commentsCache.Flush()
 
@@ -687,19 +783,25 @@ func InsertComment(comment *Comment, upsert bool) error {
 	return f(comment.Id, comment)
 }
 
+/*
+DeleteComment removes a comment by its Id
+*/
 func DeleteComment(id string) error {
 	commentsCache.Flush()
 	return db.Delete(id, &Comment{})
 }
 
-func GetMaxCommentIndexByEvent(eventId string) (count uint8, err error) {
-	cacheKey := fmt.Sprintf("max:index:%s", eventId)
+/*
+GetMaxCommentIndexByEvent returns the index of the last inserted comment for the given event
+*/
+func GetMaxCommentIndexByEvent(eventID string) (count uint8, err error) {
+	cacheKey := fmt.Sprintf("max:index:%s", eventID)
 	if e, ok := commentsCache.Get(cacheKey); ok {
 		return e.(uint8), err
 	}
 
 	q := bolthold.
-		Where("EventId").Eq(eventId).Index("EventId")
+		Where("EventId").Eq(eventID).Index("EventId")
 
 	var result Comment
 
@@ -713,6 +815,9 @@ func GetMaxCommentIndexByEvent(eventId string) (count uint8, err error) {
 	return count, err
 }
 
+/*
+GetBookmark retrieves a bookmark by its Id
+*/
 func GetBookmark(key uint64) (*Bookmark, error) {
 	var bookmark Bookmark
 	if err := db.Get(key, &bookmark); err != nil {
@@ -721,6 +826,9 @@ func GetBookmark(key uint64) (*Bookmark, error) {
 	return &bookmark, nil
 }
 
+/*
+GetAllBookmarks retrieves all bookmarks
+*/
 func GetAllBookmarks() ([]*Bookmark, error) {
 	cacheKey := "get:bookmark:all"
 	if bb, ok := eventsCache.Get(cacheKey); ok {
@@ -736,8 +844,11 @@ func GetAllBookmarks() ([]*Bookmark, error) {
 	return bookmarks, nil
 }
 
-func FindBookmark(userId, entityId string) (*Bookmark, error) {
-	cacheKey := fmt.Sprintf("find:%s:%s", userId, entityId)
+/*
+FindBookmark retrieves the bookmarks for the given user and event
+*/
+func FindBookmark(userID, entityID string) (*Bookmark, error) {
+	cacheKey := fmt.Sprintf("find:%s:%s", userID, entityID)
 	if l, ok := bookmarksCache.Get(cacheKey); ok {
 		return l.(*Bookmark), nil
 	}
@@ -745,10 +856,10 @@ func FindBookmark(userId, entityId string) (*Bookmark, error) {
 	var bookmark Bookmark
 	if err := db.FindOne(&bookmark, bolthold.
 		Where("UserId").
-		Eq(userId).
+		Eq(userID).
 		Index("UserId").
 		And("EntityId").
-		Eq(entityId).
+		Eq(entityID).
 		Index("EntityId")); err != nil {
 		return nil, err
 	}
@@ -757,8 +868,11 @@ func FindBookmark(userId, entityId string) (*Bookmark, error) {
 	return &bookmark, nil
 }
 
-func FindBookmarks(userId string) ([]*Bookmark, error) {
-	cacheKey := fmt.Sprintf("find:%s", userId)
+/*
+FindBookmarks retrieves a list of bookmarks for the given user
+*/
+func FindBookmarks(userID string) ([]*Bookmark, error) {
+	cacheKey := fmt.Sprintf("find:%s", userID)
 	if l, ok := bookmarksCache.Get(cacheKey); ok {
 		return l.([]*Bookmark), nil
 	}
@@ -766,7 +880,7 @@ func FindBookmarks(userId string) ([]*Bookmark, error) {
 	var bookmarks []*Bookmark
 	if err := db.Find(&bookmarks, bolthold.
 		Where("UserId").
-		Eq(userId).
+		Eq(userID).
 		Index("UserId")); err != nil {
 		return nil, err
 	}
@@ -775,6 +889,9 @@ func FindBookmarks(userId string) ([]*Bookmark, error) {
 	return bookmarks, nil
 }
 
+/*
+CountBookmarks counts the number of bookmarks
+*/
 func CountBookmarks() int {
 	cacheKey := "count"
 	if c, ok := bookmarksCache.Get(cacheKey); ok {
@@ -790,11 +907,17 @@ func CountBookmarks() int {
 	return len(all)
 }
 
+/*
+InsertBookmark adds a new bookmark or updates an existing one
+*/
 func InsertBookmark(bookmark *Bookmark) error {
 	bookmarksCache.Flush()
 	return db.Insert(bolthold.NextSequence(), bookmark)
 }
 
+/*
+DeleteBookmark removes a user by its Id
+*/
 func DeleteBookmark(bookmark *Bookmark) error {
 	bookmarksCache.Flush()
 	return db.Delete(bookmark.Id, bookmark)

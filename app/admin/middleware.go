@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func CheckAdmin() gin.HandlerFunc {
+func checkAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if user, _ := c.Get(config.UserKey); user != nil && user.(*users.User).Admin {
 			c.Next()

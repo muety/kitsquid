@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func RegisterFallbackRoutes(router *gin.Engine) {
+func registerFallbackRoutes(router *gin.Engine) {
 	router.NoMethod(ErrorHandle(), func(c *gin.Context) {
 		c.AbortWithError(http.StatusMethodNotAllowed, errors.NotFound{}).SetType(gin.ErrorTypePublic)
 	})
@@ -20,12 +20,12 @@ func RegisterFallbackRoutes(router *gin.Engine) {
 	})
 }
 
-func RegisterStaticRoutes(router *gin.Engine) {
+func registerStaticRoutes(router *gin.Engine) {
 	router.Static("/assets", "app/public/build")
 	router.StaticFile("favicon.ico", "app/public/build/favicon.ico")
 }
 
-func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
+func registerMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/")
 	group.Use(ErrorHandle())
 	group.Use(users.ExtractUser())
@@ -51,14 +51,14 @@ func RegisterMainRoutes(router *gin.Engine) *gin.RouterGroup {
 	return group
 }
 
-func RegisterApiRoutes(router *gin.Engine) *gin.RouterGroup {
+func registerAPIRoutes(router *gin.Engine) *gin.RouterGroup {
 	group := router.Group("/api")
 	group.Use(ApiErrorHandle())
 	group.Use(users.ExtractUser())
 
-	events.RegisterApiRoutes(router, group)
-	users.RegisterApiRoutes(router, group)
-	admin.RegisterApiRoutes(router, group)
+	events.RegisterAPIRoutes(router, group)
+	users.RegisterAPIRoutes(router, group)
+	admin.RegisterAPIRoutes(router, group)
 
 	return group
 }

@@ -3,7 +3,7 @@ package scraping
 import "github.com/n1try/kitsquid/app/config"
 
 const (
-	baseUrl       = config.KitVvzBaseUrl
+	baseUrl       = config.KitVvzBaseURL
 	mainUrl       = baseUrl + "/field.asp"
 	facultiesUrl  = baseUrl + "/fields.asp?group=Vorlesungsverzeichnis"
 	eventUrl      = baseUrl + "/event.asp"

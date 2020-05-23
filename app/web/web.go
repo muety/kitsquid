@@ -23,6 +23,9 @@ var (
 	router *gin.Engine
 )
 
+/*
+Init performs everything requires to set up the application and start the web server
+*/
 func Init() {
 	cfg = config.Get()
 
@@ -34,7 +37,7 @@ func Init() {
 
 	// Configure CORS middleware
 	corsCfg := cors.DefaultConfig()
-	corsCfg.AllowOrigins = []string{cfg.Url}
+	corsCfg.AllowOrigins = []string{cfg.URL}
 	if cfg.IsDev() {
 		corsCfg.AllowOrigins = append(corsCfg.AllowOrigins, fmt.Sprintf("http://localhost:%d", cfg.Port))
 	}
@@ -59,17 +62,20 @@ func Init() {
 	ginviewConfig.Root = "app/views"
 	ginviewConfig.DisableCache = cfg.Env == "development"
 	ginviewConfig.Extension = ".tpl.html"
-	ginviewConfig.Funcs = GetFuncMap()
+	ginviewConfig.Funcs = getFuncMap()
 
 	router.HTMLRender = ginview.New(ginviewConfig)
 
 	// Routes
-	RegisterStaticRoutes(router)
-	RegisterFallbackRoutes(router)
-	RegisterMainRoutes(router)
-	RegisterApiRoutes(router)
+	registerStaticRoutes(router)
+	registerFallbackRoutes(router)
+	registerMainRoutes(router)
+	registerAPIRoutes(router)
 }
 
+/*
+Start actually runs the web server
+*/
 func Start() {
 	cfg := config.Get()
 
@@ -105,12 +111,12 @@ func Start() {
 }
 
 func getServeFunc(srv *http.Server) func() error {
-	if cfg.IsDev() || !cfg.Tls.Enable {
+	if cfg.IsDev() || !cfg.TLS.Enable {
 		return func() error {
 			return srv.ListenAndServe()
 		}
 	}
 	return func() error {
-		return srv.ListenAndServeTLS(cfg.Tls.CertPath, cfg.Tls.KeyPath)
+		return srv.ListenAndServeTLS(cfg.TLS.CertPath, cfg.TLS.KeyPath)
 	}
 }

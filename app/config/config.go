@@ -9,6 +9,9 @@ import (
 	"strings"
 )
 
+/*
+Messages is a set of messages displayed to the user
+*/
 // TODO: Use proper i18n
 var Messages = map[string]string{
 	"signup_success":         "Du hast dich erfolgreich registriert. Eine Bestätigungsmail ist auf dem Weg in dein Postfach",
@@ -23,8 +26,8 @@ const (
 	SessionKey            = "kitsquid_session"
 	UserKey               = "user"
 	TemplateContextKey    = "tplCtx"
-	RemoteIpKey           = "remoteIp"
-	KitVvzBaseUrl         = "https://campus.kit.edu/sp/campus/all"
+	RemoteIPKey           = "remoteIp"
+	KitVvzBaseURL         = "https://campus.kit.edu/sp/campus/all"
 	FacultyIdx            = 0
 	OverallRatingKey      = "overall"
 	DeletedUserName       = "(gelöschter Benutzer)"
@@ -38,6 +41,9 @@ var (
 	eventBus *hub.Hub
 )
 
+/*
+Init loads a config and performs all related initializations
+*/
 func Init() {
 	if config != nil {
 		return

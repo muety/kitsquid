@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+/*
+Event represents an events (lecture, tutorial, etc.) in this application
+*/
 type Event struct {
 	Id            string `boltholdIndex:"Id"`
 	Gguid         string
@@ -23,10 +26,16 @@ type Event struct {
 	Semesters     []string `boltholdSliceIndex:"Semesters"`
 }
 
-func (l *Event) Link(baseUrl string) string {
-	return fmt.Sprintf("%s/event.asp?gguid=%s", baseUrl, l.Gguid)
+/*
+Link returns the Url to this event
+*/
+func (l *Event) Link(baseURL string) string {
+	return fmt.Sprintf("%s/event.asp?gguid=%s", baseURL, l.Gguid)
 }
 
+/*
+InWinter returns whether or not this event takes place in the winter term
+*/
 func (l *Event) InWinter() bool {
 	cfg := config.Get()
 	for _, s := range l.Semesters {
@@ -37,6 +46,9 @@ func (l *Event) InWinter() bool {
 	return false
 }
 
+/*
+InSummer returns whether or not this event takes place in the summer term
+*/
 func (l *Event) InSummer() bool {
 	cfg := config.Get()
 	for _, s := range l.Semesters {
@@ -55,6 +67,9 @@ func (l Lecturer) String() string {
 	return l.Name
 }
 
+/*
+Semesters represents a sortable list of semester identifiers
+*/
 type Semesters []string
 
 func (s Semesters) Len() int {
@@ -81,7 +96,7 @@ func (s Semesters) split(str string) (token string, year int) {
 		return token, year
 	}
 
-	if y, err := strconv.Atoi(str[len(str)-2 : len(str)]); err == nil {
+	if y, err := strconv.Atoi(str[len(str)-2:]); err == nil {
 		year = y
 	} else {
 		return token, year
@@ -90,21 +105,33 @@ func (s Semesters) split(str string) (token string, year int) {
 	return str[:2], year
 }
 
+/*
+EventDate represents date and location of an event
+*/
 type EventDate struct {
 	Date string
 	Room string
 }
 
+/*
+Lecturer represents the lecturer of an event
+*/
 type Lecturer struct {
 	Gguid string
 	Name  string
 }
 
+/*
+Link represents an external link of an event
+*/
 type Link struct {
 	Name string
 	Url  string
 }
 
+/*
+EventQuery is used to query saved events
+*/
 type EventQuery struct {
 	NameLike     string
 	TypeEq       string
@@ -116,6 +143,9 @@ type EventQuery struct {
 	SortFields   []string
 }
 
+/*
+EventSearchResultItem represents an item in the result list of an event query
+*/
 type EventSearchResultItem struct {
 	Id        string   `json:"id"`
 	Name      string   `json:"name"`
@@ -123,6 +153,9 @@ type EventSearchResultItem struct {
 	Lecturers []string `json:"lecturers"`
 }
 
+/*
+NewEventSearchResultItem instantiates a new EventSearchResultItem
+*/
 func NewEventSearchResultItem(event *Event) *EventSearchResultItem {
 	lecturers := make([]string, len(event.Lecturers))
 	for i, l := range event.Lecturers {
@@ -137,26 +170,38 @@ func NewEventSearchResultItem(event *Event) *EventSearchResultItem {
 	}
 }
 
+/*
+Bookmark represents a bookmarked event
+*/
 type Bookmark struct {
 	Id       uint64 `boltholdKey:"Id"`
 	UserId   string `boltholdIndex:"UserId"`
 	EntityId string `boltholdIndex:"EntityId"`
 }
 
+/*
+Review represents an event review
+*/
 // TODO: View models!
 type Review struct {
-	Id        string           `json:"" boltholdKey:"Id" boltholdIndex:"Id"`
+	Id        string           `json:"" boltholdIndex:"Id"`
 	EventId   string           `json:"event_id" boltholdIndex:"EventId"`
 	UserId    string           `json:"" boltholdIndex:"UserId"`
 	Ratings   map[string]uint8 `json:"ratings"`
 	CreatedAt time.Time        `json:"" boltholdIndex:"CreatedAt"`
 }
 
+/*
+ReviewQuery is used to query for reviews
+*/
 type ReviewQuery struct {
 	EventIdEq string
 	UserIdEq  string
 }
 
+/*
+Comment represents a comment for an event
+*/
 type Comment struct {
 	Id        string    `form:"" boltholdIndex:"Id"`
 	Index     uint8     `form:"" boltholdIndex:"Index"`
@@ -167,6 +212,9 @@ type Comment struct {
 	CreatedAt time.Time `form:""`
 }
 
+/*
+CommentQuery is used to query for comments
+*/
 type CommentQuery struct {
 	EventIdEq string
 	UserIdEq  string

@@ -15,11 +15,11 @@ import (
 	"time"
 )
 
-const recaptchaApiUrl = "https://www.google.com/recaptcha/api/siteverify"
+const recaptchaAPIURL = "https://www.google.com/recaptcha/api/siteverify"
 
 var client *http.Client
 
-func getHttpClient() *http.Client {
+func getHTTPClient() *http.Client {
 	if client == nil {
 		client = &http.Client{
 			Timeout: 10 * time.Minute,
@@ -28,7 +28,10 @@ func getHttpClient() *http.Client {
 	return client
 }
 
-func NewUserValidator(cfg *config.Config, checkPw bool) UserValidator {
+/*
+NewUserValidator instantiates a new user validator
+*/
+func NewUserValidator(cfg *config.Config, checkPw bool) userValidator {
 	return func(u *User) bool {
 		if !util.ContainsString(u.Degree, cfg.University.Degrees) ||
 			!util.ContainsString(u.Major, cfg.University.Majors) ||
@@ -40,7 +43,10 @@ func NewUserValidator(cfg *config.Config, checkPw bool) UserValidator {
 	}
 }
 
-func NewUserCredentialsValidator(cfg *config.Config, checkPw bool) UserCredentialsValidator {
+/*
+NewUserCredentialsValidator instantiates a new user credentials validator
+*/
+func NewUserCredentialsValidator(cfg *config.Config, checkPw bool) userCredentialsValidator {
 	return func(u *User) bool {
 		whitelist := cfg.Auth.Whitelist
 
@@ -56,7 +62,10 @@ func NewUserCredentialsValidator(cfg *config.Config, checkPw bool) UserCredentia
 	}
 }
 
-func NewSessionValidator(cfg *config.Config, resolveUser UserResolver) UserSessionValidator {
+/*
+NewSessionValidator instantiates a new user credentials validator
+*/
+func NewSessionValidator(cfg *config.Config, resolveUser userResolver) userSessionValidator {
 	return func(s *UserSession) bool {
 		if user, err := resolveUser(s.UserId); err != nil || (!user.Active && !cfg.IsDev()) {
 			return false
@@ -69,8 +78,11 @@ func NewSessionValidator(cfg *config.Config, resolveUser UserResolver) UserSessi
 	}
 }
 
-// Inplace!
+/*
+HashPassword hashes the given user's plain text password in-place
+*/
 func HashPassword(u *User) error {
+	// Inplace!
 	cfg := config.Get()
 	bytes, err := bcrypt.GenerateFromPassword([]byte(u.Password+cfg.Auth.Salt), bcrypt.DefaultCost)
 	if err == nil {
@@ -79,12 +91,18 @@ func HashPassword(u *User) error {
 	return err
 }
 
+/*
+CheckPasswordHash checks a given password string against the user's hashed password
+*/
 func CheckPasswordHash(u *User, plainPassword string) bool {
 	cfg := config.Get()
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainPassword+cfg.Auth.Salt))
 	return err == nil
 }
 
+/*
+SendConfirmationMail sends a user registration confirmation mail with the given activation code for the given user
+*/
 func SendConfirmationMail(u *User, activationCode string) error {
 	tpl, err := template.ParseFiles("app/views/mail/confirmation.tpl.txt")
 	if err != nil {
@@ -105,23 +123,26 @@ func SendConfirmationMail(u *User, activationCode string) error {
 	return util.SendMail(u.Id, &buf)
 }
 
+/*
+ValidateRecaptcha is used to validate a given reCaptcha token
+*/
 func ValidateRecaptcha(token, ip string) bool {
 	form := url.Values{}
 	form.Add("secret", cfg.Recaptcha.ClientSecret)
 	form.Add("response", token)
 	form.Add("remoteip", ip)
 
-	req, _ := http.NewRequest(http.MethodPost, recaptchaApiUrl, strings.NewReader(form.Encode()))
+	req, _ := http.NewRequest(http.MethodPost, recaptchaAPIURL, strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 
-	res, err := getHttpClient().Do(req)
+	res, err := getHTTPClient().Do(req)
 	if err != nil {
 		return false
 	}
 	defer res.Body.Close()
 
-	var apiResponse recaptchaApiResponse
+	var apiResponse recaptchaAPIResponse
 	if err := json.NewDecoder(res.Body).Decode(&apiResponse); err != nil {
 		return false
 	}
@@ -129,6 +150,9 @@ func ValidateRecaptcha(token, ip string) bool {
 	return apiResponse.Success
 }
 
+/*
+DeletedUser returns an empty, placeholder user object
+*/
 func DeletedUser() *User {
 	return &User{
 		Id:        config.DeletedUserName,

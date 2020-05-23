@@ -6,6 +6,9 @@ import (
 	"github.com/timshannon/bolthold"
 )
 
+/*
+Init initializes a new events store
+*/
 func Init(store *bolthold.Store, eventBus *hub.Hub) {
 	initStore(store)
 	initSubscriptions(eventBus)

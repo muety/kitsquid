@@ -13,6 +13,9 @@ import (
 	"time"
 )
 
+/*
+RegisterRoutes registers all public routes with the given router instance
+*/
 func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.GET("/signup", getSignup(router))
 	group.GET("/login", getLogin(router))
@@ -26,7 +29,10 @@ func RegisterRoutes(router *gin.Engine, group *gin.RouterGroup) {
 	group.POST("/logout", CheckUser(), postLogout(router))
 }
 
-func RegisterApiRoutes(router *gin.Engine, group *gin.RouterGroup) {
+/*
+RegisterAPIRoutes registers all API routes with the given router instance
+*/
+func RegisterAPIRoutes(router *gin.Engine, group *gin.RouterGroup) {
 }
 
 func postLogout(r *gin.Engine) func(c *gin.Context) {
@@ -37,7 +43,7 @@ func postLogout(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		DeleteSession(sess.(*UserSession))
+		_ = DeleteSession(sess.(*UserSession))
 
 		c.HTML(http.StatusOK, "redirect", gin.H{
 			"tplCtx": c.MustGet(config.TemplateContextKey),
@@ -66,7 +72,7 @@ func postLogin(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		if err := c.ShouldBind(&l); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "login", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
 		}
@@ -74,7 +80,7 @@ func postLogin(r *gin.Engine) func(c *gin.Context) {
 		user, err := Get(l.UserId)
 		if err != nil || !CheckPasswordHash(user, l.Password) || !user.Active {
 			if err != nil {
-				c.Error(err).SetType(gin.ErrorTypePrivate)
+				_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			}
 			util.MakeError(c, "login", http.StatusUnauthorized, errors.Unauthorized{}, h)
 			return
@@ -113,7 +119,7 @@ func getSignup(r *gin.Engine) func(c *gin.Context) {
 		c.HTML(http.StatusOK, "signup", gin.H{
 			"whitelist":    cfg.Auth.Whitelist,
 			"university":   cfg.University,
-			"grecaptchaId": cfg.Recaptcha.ClientId,
+			"grecaptchaId": cfg.Recaptcha.ClientID,
 			"tplCtx":       c.MustGet(config.TemplateContextKey),
 		})
 	}
@@ -130,23 +136,23 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 		h := &gin.H{
 			"whitelist":    cfg.Auth.Whitelist,
 			"university":   cfg.University,
-			"grecaptchaId": cfg.Recaptcha.ClientId,
+			"grecaptchaId": cfg.Recaptcha.ClientID,
 		}
 
 		if err := c.ShouldBind(&recaptcha); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
 		}
 
-		if !ValidateRecaptcha(recaptcha.GRecaptchaToken, c.GetString(config.RemoteIpKey)) {
+		if !ValidateRecaptcha(recaptcha.GRecaptchaToken, c.GetString(config.RemoteIPKey)) {
 			log.Errorf("recaptcha validation failed while trying to sign up user %s\n", user.Id)
 			util.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
 		}
 
 		if err := c.ShouldBind(&user); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
 		}
@@ -167,7 +173,7 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		if err := Insert(&user, false); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			if err == bolthold.ErrKeyExists {
 				util.MakeError(c, "signup", http.StatusConflict, errors.Conflict{}, h)
 			} else {
@@ -218,7 +224,7 @@ func postAccount(r *gin.Engine) func(c *gin.Context) {
 		user.Admin = false
 
 		if err := c.ShouldBind(&change); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "account", http.StatusBadRequest, errors.BadRequest{}, nil)
 			return
 		}
@@ -257,7 +263,7 @@ func postAccount(r *gin.Engine) func(c *gin.Context) {
 		}
 
 		if err := Insert(user, true); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
 			return
 		}
@@ -278,13 +284,13 @@ func postDeleteAccount(r *gin.Engine) func(c *gin.Context) {
 		session := s.(*UserSession)
 
 		if err := Delete(user.Id); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 			util.MakeError(c, "account", http.StatusInternalServerError, errors.Internal{}, nil)
 			return
 		}
 
 		if err := DeleteSession(session); err != nil {
-			c.Error(err).SetType(gin.ErrorTypePrivate)
+			_ = c.Error(err).SetType(gin.ErrorTypePrivate)
 		}
 
 		config.EventBus().Publish(hub.Message{
@@ -314,16 +320,16 @@ func getActivate(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		userId, err := GetToken(token)
+		userID, err := GetToken(token)
 		if err != nil {
-			c.Error(err)
+			_ = c.Error(err)
 			makeError()
 			return
 		}
 
-		user, err := Get(userId)
+		user, err := Get(userID)
 		if err != nil {
-			c.Error(err)
+			_ = c.Error(err)
 			makeError()
 			return
 		}
@@ -331,7 +337,7 @@ func getActivate(r *gin.Engine) func(c *gin.Context) {
 		user.Active = true
 		user.Admin = false
 		if err := Insert(user, true); err != nil {
-			c.Error(err)
+			_ = c.Error(err)
 			makeError()
 			return
 		}
@@ -341,7 +347,7 @@ func getActivate(r *gin.Engine) func(c *gin.Context) {
 				log.Errorf("failed to delete token for %s\n", userId)
 				return
 			}
-		}(token, userId)
+		}(token, userID)
 
 		c.HTML(http.StatusNotFound, "redirect", gin.H{
 			"tplCtx": c.MustGet(config.TemplateContextKey),

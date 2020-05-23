@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+/*
+ExtractUser extracts the user information associated with the current request and attaches the user object and its related session to the context
+*/
 func ExtractUser() gin.HandlerFunc {
 	validator := NewSessionValidator(config.Get(), Get)
 
@@ -47,12 +50,15 @@ func ExtractUser() gin.HandlerFunc {
 	}
 }
 
+/*
+CheckUser checks whether a user is present in the current context
+*/
 func CheckUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if user, _ := c.Get(config.UserKey); user != nil {
 			c.Next()
 			return
 		}
-		c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{})
+		_ = c.AbortWithError(http.StatusUnauthorized, errors.Unauthorized{})
 	}
 }

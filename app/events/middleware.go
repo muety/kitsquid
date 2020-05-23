@@ -7,6 +7,9 @@ import (
 	"net/http"
 )
 
+/*
+CheckUser checks whether a user is attached to the current context
+*/
 func CheckUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer c.Next()

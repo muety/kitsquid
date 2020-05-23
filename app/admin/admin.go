@@ -14,6 +14,9 @@ var (
 	entities []*registeredEntity
 )
 
+/*
+Init initializes the admin store
+*/
 func Init(store *bolthold.Store, eventBus *hub.Hub) {
 	initStore(store)
 
