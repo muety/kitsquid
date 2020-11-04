@@ -362,7 +362,7 @@ func (l listEventsJob) process() (interface{}, error) {
 			reLecturerId := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 			tds, err := htmlquery.QueryAll(tr, "/td")
-			if err != nil || len(tds) != 6 {
+			if err != nil || len(tds) != 8 {
 				log.Errorf("failed to parse event columns for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
