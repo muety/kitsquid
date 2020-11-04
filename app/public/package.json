@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "description": "",
   "dependencies": {
-    "jquery": "^3.5.0",
-    "tailwindcss": "^1.9.6"
+    "jquery": "^3.5.0"
   },
   "devDependencies": {
+    "tailwindcss": "^1.9.6",
     "@tailwindcss/custom-forms": "^0.2.1"
   },
   "scripts": {
