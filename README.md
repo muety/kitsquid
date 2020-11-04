@@ -20,7 +20,7 @@
 * Get the code: `go get github.com/n1try/kitsquid`
 * Change directory: `cd $GOPATH/src/github.com/n1try/kitsquid`
 * Copy `config.example.yml` to `config.yml` and adapt it to your needs
-* Go to `app/public` and run `npm install` and `npm run build` (or `npm run dev` for development purposes) 
+* Go to `app/public` and run `yarn` and `yarn build` (or `yarn dev` for development purposes) 
 * Go back to the project root and run `GO111MODULE=on go build`
 * Run the application: `./kitsquid`
 

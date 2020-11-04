@@ -4,7 +4,7 @@
   "description": "",
   "dependencies": {
     "jquery": "^3.5.0",
-    "tailwindcss": "^1.1.4"
+    "tailwindcss": "^1.9.6"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1"

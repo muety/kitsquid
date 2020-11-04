@@ -1,6 +1,12 @@
-const { fontFamily } = require('tailwindcss/defaultTheme')
+const {fontFamily} = require('tailwindcss/defaultTheme')
 
 module.exports = {
+    purge: {
+        enabled: true,
+        content: [
+            '../views/**/*.tpl.html'
+        ]
+    },
     theme: {
         extend: {
             colors: {
@@ -17,7 +23,7 @@ module.exports = {
     },
     variants: {},
     plugins: [
-        require('@tailwindcss/custom-forms'),
+        require('@tailwindcss/custom-forms')
     ],
     corePlugins: {
         gridTemplateColumns: true
