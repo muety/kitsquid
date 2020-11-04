@@ -3,8 +3,8 @@ package users
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/common/errors"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/common/errors"
+	"github.com/muety/kitsquid/app/config"
 	"net/http"
 	"time"
 )

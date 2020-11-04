@@ -3,7 +3,7 @@ package util
 import (
 	"bytes"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/config"
 	"net/mail"
 	"net/smtp"
 	"text/template"

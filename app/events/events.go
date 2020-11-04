@@ -2,7 +2,7 @@ package events
 
 import (
 	"github.com/leandro-lugaresi/hub"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/config"
 	"github.com/timshannon/bolthold"
 )
 

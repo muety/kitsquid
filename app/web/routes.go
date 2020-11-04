@@ -2,11 +2,11 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kitsquid/app/admin"
-	"github.com/n1try/kitsquid/app/common/errors"
-	"github.com/n1try/kitsquid/app/config"
-	"github.com/n1try/kitsquid/app/events"
-	"github.com/n1try/kitsquid/app/users"
+	"github.com/muety/kitsquid/app/admin"
+	"github.com/muety/kitsquid/app/common/errors"
+	"github.com/muety/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/events"
+	"github.com/muety/kitsquid/app/users"
 	"net/http"
 )
 

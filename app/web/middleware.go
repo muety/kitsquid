@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/config"
 	"strings"
 )
 

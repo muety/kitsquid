@@ -3,8 +3,8 @@ package events
 import (
 	"fmt"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/config"
-	"github.com/n1try/kitsquid/app/util"
+	"github.com/muety/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/util"
 	"github.com/patrickmn/go-cache"
 	"github.com/timshannon/bolthold"
 	"go.etcd.io/bbolt"

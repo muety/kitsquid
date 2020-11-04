@@ -1,10 +1,9 @@
 # KITSquid
 
-[![](http://img.shields.io/liberapay/receives/muety.svg?logo=liberapay&style=flat-square)](https://liberapay.com/muety/)
-[![Say thanks](https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg?style=flat-square)](https://saythanks.io/to/n1try)
-![](https://img.shields.io/github/license/muety/kitsquid?style=flat-square)
+[![](http://badges.fw-web.space/liberapay/receives/muety.svg?logo=liberapay&style=flat-square)](https://liberapay.com/muety/)
+[![Say thanks](https://badges.fw-web.space/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg?style=flat-square)](https://saythanks.io/to/n1try)
+![](https://badges.fw-web.space/github/license/muety/kitsquid?style=flat-square)
 [![Go Report Card](https://goreportcard.com/badge/github.com/muety/kitsquid?style=flat-square)](https://goreportcard.com/report/github.com/muety/kitsquid)
-[![](https://img.shields.io/website.svg?url=https%3A%2F%2Fkitsquid.de%2Fhealth&style=flat-square)](https://kitsquid.de)
 
 ---
 
@@ -17,8 +16,8 @@
 * NodeJS >= 9.8
 
 ## ▶️ Usage
-* Get the code: `go get github.com/n1try/kitsquid`
-* Change directory: `cd $GOPATH/src/github.com/n1try/kitsquid`
+* Get the code: `go get github.com/muety/kitsquid`
+* Change directory: `cd $GOPATH/src/github.com/muety/kitsquid`
 * Copy `config.example.yml` to `config.yml` and adapt it to your needs
 * Go to `app/public` and run `yarn` and `yarn build` (or `yarn dev` for development purposes) 
 * Go back to the project root and run `GO111MODULE=on go build`

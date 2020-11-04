@@ -8,7 +8,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/config"
 	"github.com/n1try/limiter/v3"
 	mgin "github.com/n1try/limiter/v3/drivers/middleware/gin"
 	rls "github.com/n1try/limiter/v3/drivers/store/memory"

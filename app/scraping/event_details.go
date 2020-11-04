@@ -7,7 +7,7 @@ import (
 	"github.com/antchfx/htmlquery"
 	log "github.com/golang/glog"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/n1try/kitsquid/app/events"
+	"github.com/muety/kitsquid/app/events"
 	"golang.org/x/sync/semaphore"
 	"net/http"
 	"net/url"

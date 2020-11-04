@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/common"
+	"github.com/muety/kitsquid/app/common"
 	"net/smtp"
 	"strconv"
 	"time"

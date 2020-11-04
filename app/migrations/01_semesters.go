@@ -2,7 +2,7 @@ package migrations
 
 import (
 	"fmt"
-	"github.com/n1try/kitsquid/app/events"
+	"github.com/muety/kitsquid/app/events"
 	"github.com/timshannon/bolthold"
 	"strings"
 	"time"

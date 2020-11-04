@@ -2,7 +2,7 @@ package migrations
 
 import (
 	log "github.com/golang/glog"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/config"
 	"github.com/timshannon/bolthold"
 	"time"
 )

@@ -2,7 +2,7 @@ package migrations
 
 import (
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/n1try/kitsquid/app/events"
+	"github.com/muety/kitsquid/app/events"
 	"github.com/timshannon/bolthold"
 	"time"
 )

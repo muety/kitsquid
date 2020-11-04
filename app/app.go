@@ -2,12 +2,12 @@ package app
 
 import (
 	"flag"
-	"github.com/n1try/kitsquid/app/admin"
-	"github.com/n1try/kitsquid/app/config"
-	"github.com/n1try/kitsquid/app/events"
-	"github.com/n1try/kitsquid/app/migrations"
-	"github.com/n1try/kitsquid/app/users"
-	"github.com/n1try/kitsquid/app/web"
+	"github.com/muety/kitsquid/app/admin"
+	"github.com/muety/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/events"
+	"github.com/muety/kitsquid/app/migrations"
+	"github.com/muety/kitsquid/app/users"
+	"github.com/muety/kitsquid/app/web"
 )
 
 func init() {

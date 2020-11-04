@@ -1,8 +1,8 @@
 package migrations
 
 import (
-	"github.com/n1try/kitsquid/app/config"
-	"github.com/n1try/kitsquid/app/events"
+	"github.com/muety/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/events"
 	"github.com/timshannon/bolthold"
 )
 

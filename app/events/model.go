@@ -2,7 +2,7 @@ package events
 
 import (
 	"fmt"
-	"github.com/n1try/kitsquid/app/config"
+	"github.com/muety/kitsquid/app/config"
 	"strconv"
 	"strings"
 	"time"
