@@ -123,9 +123,5 @@ function sendTestMail() {
 
 function hasJsonBody(response) {
     return response.headers.get('content-type') &&
-        response.headers.get('content-type').startsWith('application/json') &&
-        (
-            (response.headers.get('content-length') && parseInt(response.headers.get('content-length')) > 0) ||
-            (response.headers.get('transfer-encoding') === 'chunked')
-        )
+        response.headers.get('content-type').startsWith('application/json')
 }
