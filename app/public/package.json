@@ -6,12 +6,12 @@
     "jquery": "^3.5.0"
   },
   "devDependencies": {
-    "tailwindcss": "^1.9.6",
-    "@tailwindcss/custom-forms": "^0.2.1"
+    "@tailwindcss/custom-forms": "^0.2.1",
+    "tailwindcss": "^1.9.6"
   },
   "scripts": {
-    "build": "npx tailwind build assets/css/app.tailwind.css -o build/css/app.css && node build.js",
-    "dev": "npm run build && node build.js --watch --no-build",
+    "build": "./node_modules/.bin/tailwind build assets/css/app.tailwind.css -o build/css/app.css && node build.js",
+    "dev": "yarn run build && node build.js --watch --no-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ferdinand Mütsch",

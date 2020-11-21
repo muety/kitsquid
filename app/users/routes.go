@@ -97,6 +97,7 @@ func postLogin(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		c.SetSameSite(http.SameSiteStrictMode)
 		c.SetCookie(config.SessionKey,
 			sess.Token,
 			int(cfg.SessionTimeout().Seconds()),
