@@ -40,4 +40,5 @@ type TplCtx struct {
 	Alerts       []string
 	Errors       []string
 	SemesterKeys []string
+	Version      string
 }

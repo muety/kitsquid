@@ -6,6 +6,8 @@ import (
 	"github.com/jinzhu/configor"
 	"github.com/leandro-lugaresi/hub"
 	"github.com/timshannon/bolthold"
+	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -58,6 +60,9 @@ func Init() {
 		log.Fatalf("config is not valid – %v", err)
 	}
 
+	// Read version
+	config.Version = readVersion()
+
 	// Init database
 	dbOpts := &bolthold.Options{
 		Encoder: bolthold.DefaultEncode,
@@ -91,4 +96,19 @@ func Db() *bolthold.Store {
 
 func EventBus() *hub.Hub {
 	return eventBus
+}
+
+func readVersion() string {
+	file, err := os.Open("version.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(bytes)
 }

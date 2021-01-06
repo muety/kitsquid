@@ -27,6 +27,7 @@ func getFuncMap() template.FuncMap {
 		"randomColor":   util.RandomColor,
 		"paginate":      paginate,
 		"date":          formatDate,
+		"date3339":      formatDate3339,
 		"noescape":      noescape,
 	}
 }
@@ -69,6 +70,7 @@ func getTplCtx(c *gin.Context) util.TplCtx {
 		Alerts:       alerts,
 		Errors:       errors,
 		SemesterKeys: semesters,
+		Version:      config.Get().Version,
 	}
 }
 
@@ -122,6 +124,10 @@ func paginate(path string, direction int) string {
 
 func formatDate(t time.Time) string {
 	return t.Format(time.RFC822)
+}
+
+func formatDate3339(t time.Time) string {
+	return t.Format(time.RFC3339)
 }
 
 func noescape(s string) template.HTML {

@@ -14,6 +14,7 @@ Config contains all configurable and derived properties in this application
 */
 type Config struct {
 	Env        string `default:"development" env:"KITSQUID_ENV"`
+	Version    string
 	QuickStart bool   `default:"false" env:"KITSQUID_QUICK_START"`
 	Port       int    `default:"8080" env:"KITSQUID_PORT"`
 	Addr       string `default:"" env:"KITSQUID_ADDR"`

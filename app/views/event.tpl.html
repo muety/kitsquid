@@ -6,7 +6,10 @@
             <span>&nbsp;ᐅ&nbsp;</span>
             <a href="#" class="underline">{{ .event.Name }}</a>
         </div>
-        <div class="flex flex-wrap items-start md:flex-no-wrap">
+        <div class="flex flex-wrap items-start md:flex-no-wrap" typeof="Course">
+            {{ if gt (len .event.Links) 0 }}
+                <div class="hidden" property="sameAs">{{ (index .event.Links 0).Url }}</div>
+            {{ end }}
             <div class="w-full md:w-2/3 lg:w-3/4 mb-8 mr-0 md:mr-2 flex flex-col">
                 <div class="w-full rounded relative shadow-md bg-gray-700 mb-2">
                     <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-8">
@@ -21,7 +24,7 @@
                             </div>
                         {{ end }}
                         <div class="flex items-center sm:items-start mb-4">
-                            <h1 class="text-xl md:text-2xl inline-block border-b-4 border-kit">{{ .event.Name }}</h1>
+                            <h1 class="text-xl md:text-2xl inline-block border-b-4 border-kit" property="name">{{ .event.Name }}</h1>
                             <div class="relative inline-block m-2 ml-4 flex">
                                 <div class="py-1 px-2 border border-gray-300 bg-gray-700 rounded text-xs md:text-base text-gray-300 font-semibold flex-grow-0 flex items-center"
                                      title="{{ .event.Type }}">
@@ -76,6 +79,7 @@
                             <div class="text-sm md:text-base flex items-center">
                                 <i class="icon-building mr-1"></i>
                                 <span class="border-b-2"
+                                      property="provider"
                                       style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .event.Categories .tplCtx.Constants.FacultyIndex }}</span>
                             </div>
                         </div>
@@ -92,15 +96,16 @@
                             <div class="my-1">
                                 <div class="text-sm md:text-base flex items-center">
                                     <i class="icon-link-ext mr-1"></i>
-                                    {{ range $i, $l := .event.Links }}{{ if $i }},&nbsp;{{ end }}<a href="{{ $l.Url }}"
-                                                                                               target="_blank"
-                                                                                               class="text-kit">{{ $l.Name }}</a>{{ end }}
+                                    {{ range $i, $l := .event.Links }}{{ if $i }},&nbsp;{{ end }}
+                                        <a href="{{ $l.Url }}" target="_blank" class="text-kit">{{ $l.Name }}</a>
+                                        <span class="hidden" property="url">{{ $l.Url }}</span>
+                                    {{ end }}
                                 </div>
                             </div>
                         {{ end }}
                         {{ if .event.Description }}
                             <div class="my-1 mt-8">
-                                <div class="show-li text-sm description">
+                                <div class="show-li text-sm description" property="abstract">
                                     {{ htmlSafe .event.Description }}
                                 </div>
                             </div>
@@ -111,6 +116,7 @@
                 <div class="w-full rounded relative shadow-md bg-gray-700 mt-2">
                     <div class="px-4 py-2 md:px-6 md:py-4 lg:px-10 lg:py-6 mb-4">
                         <h2 class="text-lg inline-block border-b-2 border-kit mb-4">Kommentare</h2>
+                        <span class="hidden" property="commentCount">{{ len .comments }}</span>
 
                         {{ if .tplCtx.User }}
                             <form action="/event/{{ .event.Id }}/comments" method="post" id="form-comments">
@@ -128,12 +134,15 @@
                             <div class="mt-16 flex flex-col">
                                 {{ range .comments }}
                                     {{ if index $.userMap .UserId }}
-                                    <div class="w-full relative border border-gray-600 rounded-lg p-4 bg-gray-800 text-sm my-2">
+                                    <div class="w-full relative border border-gray-600 rounded-lg p-4 bg-gray-800 text-sm my-2" property="comment" typeof="Comment">
                                         <div class="flex items-center">
-                                            <div class="mr-1" title="{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }} ({{ (index $.userMap .UserId).Degree }} {{ (index $.userMap .UserId).Major }})">
+                                            <div class="mr-1" title="{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }} ({{ (index $.userMap .UserId).Degree }} {{ (index $.userMap .UserId).Major }})" property="author" typeof="Person">
+                                                <span class="hidden" property="email">{{ (index $.userMap .UserId).Id }}</span>
                                                 {{ if eq (index $.userMap .UserId).Gender "–" }}
                                                     <img src="/assets/images/unknown.png" class="w-8 rounded-full border-2 border-gray-500 mr-3">
                                                 {{ else }}
+                                                    <span class="hidden" property="gender">{{ (index $.userMap .UserId).Gender }}</span>
+                                                    <span class="hidden" property="image">https://avatars.dicebear.com/v2/{{ (index $.userMap .UserId).Gender }}/{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }}.svg</span>
                                                     <img src="https://avatars.dicebear.com/v2/{{ (index $.userMap .UserId).Gender }}/{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }}.svg" class="w-8 rounded-full border-2 border-gray-500 mr-3">
                                                 {{ end }}
                                             </div>
@@ -141,6 +150,7 @@
                                                 <div class="w-full flex items-center mb-1">
                                                     <p class="text-kit font-semibold mr-1" title="{{ index (strSplit (index $.userMap .UserId).Id "@") 0 }} ({{ (index $.userMap .UserId).Degree }} {{ (index $.userMap .UserId).Major }})">{{ index (strSplit .UserId "@") 0 }}</p>
                                                     <p class="text-2xs ml-1 flex-grow text-gray-500">{{ .CreatedAt | date }}</p>
+                                                    <span class="hidden" property="dateCreated" typeof="DateTime">{{ .CreatedAt | date3339 | noescape }}</span>
                                                     {{ if eq .UserId $.tplCtx.User.Id }}
                                                         <form action="/event/{{ $.event.Id }}/comments/delete" method="post" class="m-0">
                                                             <input type="hidden" name="id" value="{{ .Id }}">
@@ -152,7 +162,7 @@
                                                     {{ end }}
                                                     <p class="text-kit font-semibold" title="{{ .Id }}">#{{ .Index }}</p>
                                                 </div>
-                                                <p>{{ .Text | noescape }}</p>
+                                                <p property="text">{{ .Text | noescape }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -176,10 +186,19 @@
                                 <div class="text-xs">
                                     <ul class="">
                                         {{ range .event.Dates }}
-                                            <li class="mb-2">
+                                            <li class="mb-2" property="hasCourseInstance" typeof="CourseInstance">
+                                                <span class="hidden" property="courseMode">{{ $.event.Type }}</span>
+                                                {{ range $e := $.event.Lecturers }}
+                                                <div class="hidden" property="instructor" typeof="Person">
+                                                    <span property="name">{{ $e }}</span>
+                                                </div>
+                                                {{ end }}
                                                 <span><i class="icon-calendar mr-2"></i>{{ .Date }}</span>
                                                 <br>
-                                                <span><i class="icon-location mr-2"></i>{{ .Room }}</span>
+                                                <div property="location" typeof="Room">
+                                                    <i class="icon-location mr-2"></i>
+                                                    <span property="name">{{ .Room }}</span>
+                                                </div>
                                             </li>
                                         {{ end }}
                                     </ul>
@@ -195,10 +214,11 @@
                                     <span class="text-xs">({{ .countRatings }})</span>
                                 </div>
                                 {{ if .tplCtx.User }}
-                                    <div class="mb-6">
+                                    <div class="mb-6" property="aggregateRating" typeof="AggregateRating">
                                         <div class="label text-sm mb-1">
-                                            <span class="font-semibold">Insgesamt</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-overall">{{ index .averageRatings "overall" }}</span>)</span>
+                                            <span class="hidden" property="ratingCount">{{ .countRatings }}</span>
+                                            <span class="font-semibold" property="reviewAspect">Insgesamt</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-overall" property="ratingValue">{{ index .averageRatings "overall" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie bewertest du diese Veranstaltung insgesamt?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
@@ -208,10 +228,11 @@
                                             <span class="text-2xs w-full text-right">sehr gut</span>
                                         </div>
                                     </div>
-                                    <div class="mb-6">
+                                    <div class="mb-6" property="aggregateRating" typeof="AggregateRating">
                                         <div class="label text-sm mb-1">
-                                            <span class="font-semibold">Anspruch</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-demand">{{ index .averageRatings "demand" }}</span>)</span>
+                                            <span class="hidden" property="ratingCount">{{ .countRatings }}</span>
+                                            <span class="font-semibold" property="reviewAspect">Anspruch</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-demand" property="ratingValue">{{ index .averageRatings "demand" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie bewertest du den inhaltlichen Anspruch dieser Veranstaltung?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
@@ -221,10 +242,11 @@
                                             <span class="text-2xs w-full text-right">zu schwer</span>
                                         </div>
                                     </div>
-                                    <div class="mb-6">
+                                    <div class="mb-6" property="aggregateRating" typeof="AggregateRating">
                                         <div class="label text-sm mb-1">
-                                            <span class="font-semibold">Zeitaufwand</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-effort">{{ index .averageRatings "effort" }}</span>)</span>
+                                            <span class="hidden" property="ratingCount">{{ .countRatings }}</span>
+                                            <span class="font-semibold" property="reviewAspect">Zeitaufwand</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-effort" property="ratingValue">{{ index .averageRatings "effort" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie bewertest du den zeitlichen Aufwand, der für diese Veranstaltung notwendig ist?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
@@ -234,10 +256,11 @@
                                             <span class="text-2xs w-full text-right">sehr hoch</span>
                                         </div>
                                     </div>
-                                    <div class="mb-6">
+                                    <div class="mb-6" property="aggregateRating" typeof="AggregateRating">
                                         <div class="label text-sm mb-1">
-                                            <span class="font-semibold">Praxisrelevanz</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-relevance">{{ index .averageRatings "relevance" }}</span>)</span>
+                                            <span class="hidden" property="ratingCount">{{ .countRatings }}</span>
+                                            <span class="font-semibold" property="reviewAspect">Praxisrelevanz</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-relevance" property="ratingValue">{{ index .averageRatings "relevance" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer text-gray-500" title="Für wie praxisrelevant und sinnvoll für dein weiteres Studium und deine Karriere hälst du diese Veranstaltung inhaltlich?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
@@ -247,10 +270,11 @@
                                             <span class="text-2xs w-full text-right">praxisnah</span>
                                         </div>
                                     </div>
-                                    <div class="mb-6">
+                                    <div class="mb-6" property="aggregateRating" typeof="AggregateRating">
                                         <div class="label text-sm mb-1">
-                                            <span class="font-semibold">Dozent</span>
-                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-lecturer">{{ index .averageRatings "lecturer" }}</span>)</span>
+                                            <span class="hidden" property="ratingCount">{{ .countRatings }}</span>
+                                            <span class="font-semibold" property="reviewAspect">Dozent</span>
+                                            <span class="whitespace-no-wrap">(&Oslash; <span id="rating-average-lecturer" property="ratingValue">{{ index .averageRatings "lecturer" }}</span>)</span>
                                             <i class="icon-info-circled cursor-pointer text-gray-500" title="Wie sympathisch und kompetent schätzt du den Dozent (Prof., Übungsleiter, Tutor, ...) dieser Veranstaltung ein?"></i>
                                         </div>
                                         <div class="flex items-center justify-between">
