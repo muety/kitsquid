@@ -269,6 +269,7 @@ func (l listEventCategoriesJob) process() (interface{}, error) {
 	return categories, nil
 }
 
+// https://campus.studium.kit.edu/events/catalog.php#!campus/all/field.asp?gguid=0xB96AB8E80396452C9FB08974707CFEB2&pagesize=250&view=list
 func (l listEventsJob) process() (interface{}, error) {
 	events := make([]*model.Event, 0)
 
@@ -362,7 +363,7 @@ func (l listEventsJob) process() (interface{}, error) {
 			reLecturerId := regexp.MustCompile(`.*gguid=(0x[\w\d]+).*`)
 
 			tds, err := htmlquery.QueryAll(tr, "/td")
-			if err != nil || len(tds) != 8 {
+			if err != nil || len(tds) != 9 {
 				log.Errorf("failed to parse event columns for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
 			}
