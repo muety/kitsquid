@@ -1,11 +1,13 @@
 package web
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/muety/kitsquid/app/config"
 	"strings"
-	"fmt"
 )
+
+const CLFDateFormat = "02/Jan/2006:15:04:05 -0700"
 
 func ErrorHandle() gin.HandlerFunc {
 	cfg := config.Get()
@@ -81,16 +83,15 @@ func RemoteIp() gin.HandlerFunc {
 	}
 }
 
-const FORMATED_DATE_REFERENCE = "02/Jan/2006:15:04:05 -0700"
 func RequestCLFLogger(param gin.LogFormatterParams) string {
 	// your custom format
 	return fmt.Sprintf("%s - - [%s] \"%s %s %s\" %d %d \n",
-			param.ClientIP,
-			param.TimeStamp.Format(FORMATED_DATE_REFERENCE),
-			param.Method,
-			param.Path,
-			param.Request.Proto,
-			param.StatusCode,
-			param.BodySize,
+		param.ClientIP,
+		param.TimeStamp.Format(CLFDateFormat),
+		param.Method,
+		param.Path,
+		param.Request.Proto,
+		param.StatusCode,
+		param.BodySize,
 	)
 }
