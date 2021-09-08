@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/muety/kitsquid/app/config"
 	"strings"
+	"fmt"
 )
 
 func ErrorHandle() gin.HandlerFunc {
@@ -78,4 +79,18 @@ func RemoteIp() gin.HandlerFunc {
 		c.Set(config.RemoteIPKey, remoteIp)
 		c.Next()
 	}
+}
+
+const FORMATED_DATE_REFERENCE = "02/Jan/2006:15:04:05 -0700"
+func RequestCLFLogger(param gin.LogFormatterParams) string {
+	// your custom format
+	return fmt.Sprintf("%s - - [%s] \"%s %s %s\" %d %d \n",
+			param.ClientIP,
+			param.TimeStamp.Format(FORMATED_DATE_REFERENCE),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.BodySize,
+	)
 }
