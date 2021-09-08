@@ -33,7 +33,7 @@ func Init() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	router = gin.Default()
+	router = gin.New()
 
 	// Configure CORS middleware
 	corsCfg := cors.DefaultConfig()
