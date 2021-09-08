@@ -56,6 +56,7 @@ func Init() {
 		corsMiddleware,
 		rateLimitMiddleware,
 		RemoteIp(),
+		gin.LoggerWithFormatter(RequestCLFLogger),
 	)
 
 	ginviewConfig := goview.DefaultConfig
