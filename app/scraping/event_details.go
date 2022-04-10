@@ -83,15 +83,15 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			}
 
 			var (
-				desc1   string
-				desc2   string
-				desc    string
-				link    string
-				extLink string
+				desc1     string
+				desc2     string
+				desc      string
+				link      string
+				institute string
 			)
 
 			// Description from "Veranstaltungsdetails"
-			noteEl, err := htmlquery.Query(doc, "//div[@id='rwev_note']")
+			noteEl, err := htmlquery.Query(doc, "//div[@id='rwev_note-field']//div[@class='element']")
 			if err != nil {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
@@ -103,22 +103,22 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 			// Description from "Weitere Informationen"
 			var sb strings.Builder
 
-			aimEl, err := htmlquery.Query(doc, "//div[@id='rwev_aim']")
+			aimEl, err := htmlquery.Query(doc, "//div[@id='cabv_aim-field']//div[@class='element']")
 			if err != nil {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
 			}
-			lcEl, err := htmlquery.Query(doc, "//div[@id='rwev_learningcontent']")
+			lcEl, err := htmlquery.Query(doc, "//div[@id='cabv_learningcontent-field']//div[@class='element']")
 			if err != nil {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
 			}
-			prereqEl, err := htmlquery.Query(doc, "//div[@id='rwev_prereq']")
+			prereqEl, err := htmlquery.Query(doc, "//div[@id='cabv_prerequisites-field']//div[@class='element']")
 			if err != nil {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
 			}
-			workloadEl, err := htmlquery.Query(doc, "//div[@id='rwev_workload']")
+			workloadEl, err := htmlquery.Query(doc, "//div[@id='cabv_workload-field']//div[@class='element']")
 			if err != nil {
 				log.Errorf("failed to query event document for description %s\n", gguid)
 				return
@@ -152,18 +152,37 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				desc = htmlPolicy.Sanitize(desc2)
 			}
 
-			// External Link
-			extLinkEl, err := htmlquery.Query(doc, "//div[@id='rwev_link']/a")
+			extLinks := make([]*events.Link, 0)
+
+			// E-Learning Links
+			extLinkEls, err := htmlquery.QueryAll(doc, "//a[contains(@class, 'elearning-link')]")
 			if err != nil {
-				log.Errorf("failed to query event document for link %s\n", gguid)
+				log.Errorf("failed to query event document for links %s\n", gguid)
 				return
 			}
-			if extLinkEl != nil {
-				extLink = htmlquery.SelectAttr(extLinkEl, "href")
+			for _, extLinkEl := range extLinkEls {
+				href := htmlquery.SelectAttr(extLinkEl, "href")
+				name := htmlquery.InnerText(extLinkEl)
+				if strings.Contains(href, "ilias") {
+					continue
+				}
+				extLinks = append(extLinks, &events.Link{Name: name, Url: href})
+			}
+
+			// Institut
+			instEls, err := htmlquery.QueryAll(doc, "//table[@id='UNITLIST']//a")
+			if err != nil {
+				log.Errorf("failed to query event document for institute %s\n", gguid)
+			}
+			for _, instEl := range instEls {
+				if name := htmlquery.InnerText(instEl); strings.Contains(strings.ToLower(name), "institut") {
+					institute = name
+					break
+				}
 			}
 
 			// Shortlink
-			linkEl, err := htmlquery.Query(doc, "//div[@id='shortlink']/input")
+			linkEl, err := htmlquery.Query(doc, "//div[@id='shortlink-field']//input")
 			if err != nil {
 				log.Errorf("failed to query event document for shortlink %s\n", gguid)
 				return
@@ -178,10 +197,10 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				log.Warningf("WARNING! event %s had description before, but was removed", existingEvent.Gguid)
 			}
 
+			newEvent.Institute = institute
+
 			newEvent.Links = []*events.Link{{Name: "VVZ", Url: link}}
-			if extLink != "" {
-				newEvent.Links = append(newEvent.Links, &events.Link{Name: "Link", Url: extLink})
-			}
+			newEvent.Links = append(newEvent.Links, extLinks...)
 
 			// Fetch ILIAS link
 			u, _ = url.Parse(fmt.Sprintf(eventIliasUrl, newEvent.Gguid))

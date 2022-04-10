@@ -80,9 +80,19 @@
                                 <i class="icon-building mr-1"></i>
                                 <span class="border-b-2"
                                       property="provider"
-                                      style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">{{ index .event.Categories .tplCtx.Constants.FacultyIndex }}</span>
+                                      style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">
+                                    {{ index .event.Categories .tplCtx.Constants.FacultyIndex }}
+                                </span>
                             </div>
                         </div>
+                        {{ if .event.Institute }}
+                        <div class="my-1">
+                            <div class="text-sm md:text-base flex items-center">
+                                <i class="icon-bank mr-1"></i>
+                                <span>{{ .event.Institute }}</span>
+                            </div>
+                        </div>
+                        {{ end }}
                         <div class="my-2">
                             <div class="text-sm md:text-base flex items-center">
                                 <i class="icon-calendar-check-o mr-1"></i>

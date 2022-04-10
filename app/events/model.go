@@ -17,6 +17,7 @@ type Event struct {
 	Name          string `boltholdIndex:"Name"`
 	Type          string `boltholdIndex:"Type"`
 	Description   string
+	Institute     string   `boltholdIndex:"Institute"`
 	Rating        float32  // for caching purposes only; actual rating is kept as reviews.Reviews
 	InverseRating float32  `boltholdIndex:"InverseRating"`
 	Categories    []string `boltholdSliceIndex:"Categories"`

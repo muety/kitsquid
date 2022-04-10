@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg">
-<metadata>Copyright (C) 2020 by original authors @ fontello.com</metadata>
+<metadata>Copyright (C) 2022 by original authors @ fontello.com</metadata>
 <defs>
 <font id="kitsquid" horiz-adv-x="1000" >
 <font-face font-family="kitsquid" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
@@ -59,6 +59,8 @@
 <glyph glyph-name="star-half-alt" unicode="&#xf123;" d="M662 316l143 140-198 29-37 5-17 34-89 179v-537l33-17 178-94-34 198-6 37z m252 146l-202-197 48-279q2-19-4-29t-19-11q-9 0-22 7l-251 132-250-132q-13-7-23-7-12 0-19 11t-3 29l48 279-203 197q-18 18-13 33t30 20l280 40 126 254q11 23 27 23 16 0 28-23l125-254 280-40q25-4 31-20t-14-33z" horiz-adv-x="928.6" />
 
 <glyph glyph-name="bug" unicode="&#xf188;" d="M911 314q0-14-11-25t-25-10h-125q0-96-37-162l116-117q10-11 10-25t-10-25q-10-11-25-11t-25 11l-111 110q-3-3-8-7t-24-16-36-21-46-16-54-7v500h-71v-500q-29 0-57 7t-49 19-36 22-25 18l-8 8-102-116q-11-12-27-12-13 0-24 9-11 10-11 25t8 26l113 127q-32 63-32 153h-125q-15 0-25 10t-11 25 11 25 25 11h125v164l-97 97q-11 10-11 25t11 25 25 10 25-10l97-97h471l96 97q11 10 25 10t26-10 10-25-10-25l-97-97v-164h125q15 0 25-11t11-25z m-268 322h-357q0 74 52 126t126 52 127-52 52-126z" horiz-adv-x="928.6" />
+
+<glyph glyph-name="bank" unicode="&#xf19c;" d="M536 850l535-214v-72h-71q0-14-11-25t-27-10h-852q-16 0-27 10t-12 25h-71v72z m-393-357h143v-429h71v429h143v-429h71v429h143v-429h72v429h143v-429h33q15 0 27-10t11-25v-36h-929v36q0 14 12 25t27 10h33v429z m890-536q16 0 27-11t11-25v-71h-1071v71q0 15 11 25t28 11h994z" horiz-adv-x="1142.9" />
 
 <glyph glyph-name="graduation-cap" unicode="&#xf19d;" d="M990 384l10-177q2-38-46-71t-131-52-180-20-180 20-131 52-46 71l10 177 320-101q12-4 27-4t27 4z m296 180q0-12-13-17l-625-196q-2-1-5-1t-6 1l-364 115q-24-19-39-63t-19-99q35-20 35-61 0-39-32-60l32-242q1-7-4-13-5-7-14-7h-107q-8 0-13 7-6 6-5 13l33 242q-33 21-33 60 0 41 36 62 7 115 55 184l-186 58q-12 5-12 17t12 18l625 196q3 1 6 1t5-1l625-196q13-5 13-18z" horiz-adv-x="1285.7" />
 
