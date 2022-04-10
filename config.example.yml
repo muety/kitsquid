@@ -44,7 +44,7 @@ auth:
     major: Informatik
     degree: Master
   whitelist:
-    - prefix-pattern: ^u[\w]{4}
+    - prefix-pattern: ^[uU][\w]{4}
       prefix-display: uxxxx
       suffix-pattern: \@student.kit.edu$
       suffix-display: student.kit.edu

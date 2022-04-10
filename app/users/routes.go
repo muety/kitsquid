@@ -10,6 +10,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/timshannon/bolthold"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -146,7 +147,7 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
-		if !ValidateRecaptcha(recaptcha.GRecaptchaToken, c.GetString(config.RemoteIPKey)) {
+		if !cfg.IsDev() && !ValidateRecaptcha(recaptcha.GRecaptchaToken, c.GetString(config.RemoteIPKey)) {
 			log.Errorf("recaptcha validation failed while trying to sign up user %s\n", user.Id)
 			util.MakeError(c, "signup", http.StatusBadRequest, errors.BadRequest{}, h)
 			return
@@ -168,6 +169,7 @@ func postSignup(r *gin.Engine) func(c *gin.Context) {
 			return
 		}
 
+		user.Id = strings.ToLower(user.Id)
 		user.CreatedAt = time.Now()
 		if u, err := Get(user.Id); err != nil || !u.Admin {
 			user.Admin = false
