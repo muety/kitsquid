@@ -9,13 +9,13 @@
 
 ---
 
-🗒 An independent, private hobby project aiming to provide an alternative course catalog to students of [Karlsruhe Institute Of Technology](https://kit.edu). Students are given the ability to rate and comment lectures and provide valuable tips and advice to their fellow students. 
+🗒 An independent, private hobby project aiming to provide an alternative course catalog to students of [Karlsruhe Institute Of Technology](https://kit.edu). Students can rate and comment lectures and provide valuable tips and advice to their fellow students. 
 
-<img src="https://anchr.io/i/9rkYu.png" width="660">
+<img src=".github/screenshot.png" width="660">
 
 ## ⚙️ Requirements
-* Go >= 1.13
-* NodeJS >= 9.8
+* Go >= 1.19
+* Node.js >= 18.x  
 
 ## ▶️ Usage
 * Get the code: `go get github.com/muety/kitsquid`
