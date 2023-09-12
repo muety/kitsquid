@@ -400,7 +400,7 @@ func (l listEventsJob) process() (interface{}, error) {
 			}
 
 			// Art
-			a, err = htmlquery.Query(tds[4], "/a")
+			a, err = htmlquery.Query(tds[5], "/a")
 			if err != nil {
 				log.Errorf("failed to get event type for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
@@ -409,7 +409,7 @@ func (l listEventsJob) process() (interface{}, error) {
 
 			// Dozenten
 			lecturers := make([]*model.Lecturer, 0)
-			as, err := htmlquery.QueryAll(tds[3], "/a")
+			as, err := htmlquery.QueryAll(tds[4], "/a")
 			if err != nil {
 				log.Errorf("failed to get lecturers for tguid %s and gguid %s in row %d\n", l.Tguid, l.Gguid, i)
 				continue
