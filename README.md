@@ -14,7 +14,7 @@
 <img src=".github/screenshot.png" width="660">
 
 ## ⚙️ Requirements
-* Go >= 1.19
+* Go >= 1.20
 * Node.js >= 18.x  
 
 ## ▶️ Usage
