@@ -87,6 +87,7 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				desc2     string
 				desc      string
 				link      string
+				faculty   string
 				institute string
 			)
 
@@ -169,12 +170,16 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				extLinks = append(extLinks, &events.Link{Name: name, Url: href})
 			}
 
-			// Institut
+			// Institut / Fakultät
 			instEls, err := htmlquery.QueryAll(doc, "//table[@id='UNITLIST']//a")
 			if err != nil {
 				log.Errorf("failed to query event document for institute %s\n", gguid)
 			}
-			for _, instEl := range instEls {
+			for idx, instEl := range instEls {
+				if idx == 1 {
+					faculty = htmlquery.InnerText(instEl)
+					continue
+				}
 				if name := htmlquery.InnerText(instEl); strings.Contains(strings.ToLower(name), "institut") {
 					institute = name
 					break
@@ -197,6 +202,7 @@ func (f FetchDetailsJob) process() (interface{}, error) {
 				log.Warningf("WARNING! event %s had description before, but was removed", existingEvent.Gguid)
 			}
 
+			newEvent.Faculty = faculty
 			newEvent.Institute = institute
 
 			newEvent.Links = []*events.Link{{Name: "VVZ", Url: link}}

@@ -17,6 +17,7 @@ type Event struct {
 	Name          string `boltholdIndex:"Name"`
 	Type          string `boltholdIndex:"Type"`
 	Description   string
+	Faculty       string
 	Institute     string   `boltholdIndex:"Institute"`
 	Rating        float32  // for caching purposes only; actual rating is kept as reviews.Reviews
 	InverseRating float32  `boltholdIndex:"InverseRating"`
@@ -58,6 +59,19 @@ func (l *Event) InSummer() bool {
 		}
 	}
 	return false
+}
+
+func (l *Event) GetFaculty() string {
+	if l.Faculty != "" {
+		return l.Faculty
+	}
+	if len(l.Categories) > config.FacultyIdx {
+		return l.Categories[config.FacultyIdx]
+	}
+	if len(l.Categories) > 0 {
+		return l.Categories[0]
+	}
+	return ""
 }
 
 func (l Event) String() string {

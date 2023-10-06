@@ -81,7 +81,7 @@
                                 <span class="border-b-2"
                                       property="provider"
                                       style="border-color: {{ randomColor (index .event.Categories $.tplCtx.Constants.FacultyIndex) }}">
-                                    {{ index .event.Categories .tplCtx.Constants.FacultyIndex }}
+                                    {{ .event.GetFaculty }}
                                 </span>
                             </div>
                         </div>
